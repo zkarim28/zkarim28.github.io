@@ -454,6 +454,14 @@ p {
   width: 100%;
 }
 
+.backbox {
+  height: 0%;
+  width: 50%;
+  background-color: #deaa9780;
+  padding-left: 5%;
+  padding-right: 5%;
+}
+
 #hero .hero-content {
   height: 100vh;
   text-align: left;
@@ -477,17 +485,18 @@ p {
   margin-top: 0;
   margin-bottom: 30px;
   text-transform: capitalize;
-  color: #fff;
+  color: rgb(0, 0, 0);
   font-weight: 500;
 }
 
 .hero-content .list-social li {
   float: left;
   margin-right: 20px;
+  
 }
 
 .hero-content .list-social li i {
-  color: #fff;
+  color: rgb(0, 0, 0);
   font-size: 15px;
 }
 
@@ -579,7 +588,7 @@ p {
 
 #about .about-descr .p-heading {
   font-family: "Playfair Display", serif;
-  font-size: 28px;
+  font-size: 24px;
   text-align: left;
 }
 
