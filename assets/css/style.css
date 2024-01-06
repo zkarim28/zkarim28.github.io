@@ -805,10 +805,10 @@ p {
 }
 
 /*--------------------------------------------------------------
-# Journal
+# skills
 --------------------------------------------------------------*/
-#journal,
-#journal-blog {
+#skills,
+#skills-blog {
   height: auto;
   width: 100%;
   background: #f7f7f7;
@@ -816,31 +816,31 @@ p {
   position: relative;
 }
 
-#journal-blog {
+#skills-blog {
   background: #fff;
   padding-bottom: 30px;
 }
 
-#journal .journal-block {
+#skills .skills-block {
   display: inline-block;
   height: auto;
   width: 100%;
 }
 
-#journal .journal-block .journal-info {
+#skills .skills-block .skills-info {
   position: relative;
 }
 
-.journal-block .journal-info img {
+.skills-block .skills-info img {
   max-width: 100%;
 }
 
-.journal-block .journal-info .journal-txt {
+.skills-block .skills-info .skills-txt {
   padding: 25px 0px;
   position: relative;
 }
 
-.journal-block .journal-info .journal-txt h4 a {
+.skills-block .skills-info .skills-txt h4 a {
   display: block;
   font-size: 19px;
   line-height: 24px;
@@ -850,19 +850,19 @@ p {
   transition: all 0.5s ease-in-out 0s;
 }
 
-.journal-block .journal-info .journal-txt h4 a:hover {
+.skills-block .skills-info .skills-txt h4 a:hover {
   color: #b8a07e;
   transition: all 0.5s ease-in-out 0s;
 }
 
-.journal-block .journal-info .journal-txt p {
+.skills-block .skills-info .skills-txt p {
   margin: 0;
   font-size: 14px;
   line-height: 24px;
 }
 
 /*--------------------------------------------------------------
-# Journal
+# skills
 --------------------------------------------------------------*/
 #contact {
   height: auto;
@@ -954,7 +954,7 @@ p {
 /*-----------------------------------------------------------------------------------*/
 /*  /* Single page */
 /*-----------------------------------------------------------------------------------*/
-#journal-blog {
+#skills-blog {
   padding-top: 140px;
 }
 
@@ -979,7 +979,7 @@ p {
   width: 100%;
 }
 
-.journal-txt h4 a {
+.skills-txt h4 a {
   display: block;
   font-size: 19px;
   line-height: 24px;
@@ -989,7 +989,7 @@ p {
   transition: all 0.5s ease-in-out 0s;
 }
 
-.journal-txt h4 a:hover {
+.skills-txt h4 a:hover {
   color: #b8a07e;
   transition: all 0.5s ease-in-out 0s;
 }
@@ -1075,6 +1075,56 @@ blockquote {
   margin: 30px 0;
   border: none;
   border-left: 4px solid #b8a07e;
+}
+
+/*--------------------------------------------------------------
+# Coursework
+--------------------------------------------------------------*/
+#coursework {
+  background: #fff;
+  position: relative;
+  padding-bottom: 80px;
+  padding-top: 80px;
+}
+
+.coursework-block span {
+  margin: 10px 0;
+  position: relative;
+  font-size: 13px;
+  color: #292929;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+  text-transform: uppercase;
+  display: block;
+}
+
+.coursework-block .separator {
+  margin: 0;
+  font-size: 13px;
+  line-height: 22px;
+}
+
+.coursework-block i {
+  font-size: 44px;
+  color: #b8a07e;
+  line-height: 44px;
+}
+
+.coursework-slider .swiper-pagination {
+  margin-top: 30px;
+  position: relative;
+}
+
+.coursework-slider .swiper-pagination .swiper-pagination-bullet {
+  width: 12px;
+  height: 12px;
+  background-color: #fff;
+  opacity: 1;
+  border: 1px solid #b8a07e;
+}
+
+.coursework-slider .swiper-pagination .swiper-pagination-bullet-active {
+  background-color: #b8a07e;
 }
 
 /*--------------------------------------------------------------
@@ -1199,8 +1249,8 @@ blockquote {
     display: inline-block;
   }
 
-  /* journal */
-  #journal .journal-block .journal-info {
+  /* skills */
+  #skills .skills-block .skills-info {
     margin-bottom: 30px;
   }
 
@@ -1282,8 +1332,8 @@ blockquote {
     display: inline-block;
   }
 
-  /* journal */
-  #journal .journal-block .journal-info {
+  /* skills */
+  #skills .skills-block .skills-info {
     margin-bottom: 30px;
   }
 
@@ -1365,8 +1415,8 @@ blockquote {
     display: inline-block;
   }
 
-  /* journal */
-  #journal .journal-block .journal-info {
+  /* skills */
+  #skills .skills-block .skills-info {
     margin-bottom: 30px;
   }
 
@@ -1447,8 +1497,8 @@ blockquote {
     margin: 20px;
   }
 
-  /* journal */
-  #journal .journal-block .journal-info {
+  /* skills */
+  #skills .skills-block .skills-info {
     margin-bottom: 30px;
   }
 
@@ -1514,7 +1564,6 @@ blockquote {
     margin-left: calc(0% - 0px);
   }
 
-  #about .about-descr .p-heading {
     font-size: 20px;
   }
 
@@ -1529,8 +1578,8 @@ blockquote {
     margin: 20px;
   }
 
-  /* journal */
-  #journal .journal-block .journal-info {
+  /* skills */
+  #skills .skills-block .skills-info {
     margin-bottom: 30px;
   }
 
