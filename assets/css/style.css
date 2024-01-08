@@ -862,7 +862,7 @@ p {
 }
 
 /*--------------------------------------------------------------
-# skills
+# contact
 --------------------------------------------------------------*/
 #contact {
   height: auto;
@@ -889,7 +889,7 @@ p {
   min-height: 160px;
 }
 
-.php-email-form .error-message {
+/* .php-email-form .error-message {
   display: none;
   color: #fff;
   background: #ed3c0d;
@@ -931,7 +931,7 @@ p {
   border: 3px solid #18d26e;
   border-top-color: #eee;
   animation: animate-loading 1s linear infinite;
-}
+} */
 
 @keyframes animate-loading {
   0% {
@@ -942,6 +942,52 @@ p {
     transform: rotate(360deg);
   }
 }
+
+/*--------------------------------------------------------------
+# resume
+--------------------------------------------------------------*/
+#resume,
+#resume-blog {
+  height: auto;
+  width: 100%;
+  background: #f7f7f7;
+  padding-bottom: 60px;
+  position: relative;
+}
+
+#resume-container {
+  height: 200px;
+  position: relative;
+  /* border: 3px solid green; */
+  border: 1px solid black;
+  /* height: 200px; */
+  /* position: relative; */
+}
+
+#resume-center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+#resume-blog {
+  background: #fff;
+  padding-bottom: 30px;
+}
+
+#resume .resume-block {
+  display: inline-block;
+  height: auto;
+  width: 100%;
+}
+
+#resume .resume-block .resume-info {
+  position: relative;
+}
+
 
 /*--------------------------------------------------------------
 # Blog
