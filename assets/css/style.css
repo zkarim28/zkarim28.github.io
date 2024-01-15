@@ -480,7 +480,7 @@ p {
 }
 
 .hero-content p {
-  font-size: 13px;
+  font-size: 20px;
   letter-spacing: 3px;
   margin-top: 0;
   margin-bottom: 30px;
@@ -497,7 +497,7 @@ p {
 
 .hero-content .list-social li i {
   color: rgb(0, 0, 0);
-  font-size: 15px;
+  font-size: 20px;
 }
 
 /*--------------------------------------------------------------
