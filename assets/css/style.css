@@ -567,7 +567,7 @@ p {
 #about {
   width: 100%;
   height: auto;
-  background: #f7f7f7;
+  background: #f0f0f0;
   padding-top: 120px;
 }
 
@@ -596,6 +596,7 @@ p {
   max-width: 80%;
   margin-bottom: 0;
   text-align: left;
+  color:#292929;
 }
 
 /*--------------------------------------------------------------
@@ -811,7 +812,7 @@ p {
 #skills-blog {
   height: auto;
   width: 100%;
-  background: #f7f7f7;
+  background: #f0f0f0;
   padding-bottom: 60px;
   position: relative;
 }
@@ -868,13 +869,13 @@ p {
 #pd-blog {
   height: auto;
   width: 100%;
-  background: #f7f7f7;
+  background: #f0f0f0;
   padding-bottom: 60px;
   position: relative;
 }
 
 #pd-blog {
-  background: #fff;
+  background: #f0f0f0;
   padding-bottom: 30px;
 }
 
@@ -1017,7 +1018,7 @@ p {
 #pd-blog {
   height: auto;
   width: 100%;
-  background: #f7f7f7;
+  background: #f0f0f0;
   padding-bottom: 60px;
   position: relative;
 }
@@ -1156,7 +1157,7 @@ p {
 #resume-blog {
   height: auto;
   width: 100%;
-  background: #f7f7f7;
+  background: #f0f0f0;
   padding-bottom: 60px;
   position: relative;
 }
@@ -1383,7 +1384,7 @@ blockquote {
 # Footer
 --------------------------------------------------------------*/
 #footer {
-  background: #f7f7f7;
+  background: #f0f0f0;
   padding-top: 50px;
   padding-bottom: 50px;
 }
