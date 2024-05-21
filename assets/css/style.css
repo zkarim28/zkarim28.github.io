@@ -1195,6 +1195,51 @@ p {
   position: relative;
 }
 
+/*--------------------------------------------------------------
+# experience
+--------------------------------------------------------------*/
+#experience,
+#experience-blog {
+  height: auto;
+  width: 100%;
+  background: rgb(109, 109, 109);
+  padding-bottom: 60px;
+  position: relative;
+}
+
+#experience-container {
+  height: 200px;
+  position: relative;
+  /* border: 3px solid green; */
+  border: 1px solid black;
+  /* height: 200px; */
+  /* position: relative; */
+}
+
+#experience-center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+#experience-blog {
+  background: #fff;
+  padding-bottom: 30px;
+}
+
+#experience .experience-block {
+  display: inline-block;
+  height: auto;
+  width: 100%;
+}
+
+#experience .experience-block .experience-info {
+  position: relative;
+}
+
 
 /*--------------------------------------------------------------
 # Blog
