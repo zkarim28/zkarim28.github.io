@@ -506,7 +506,7 @@ p {
 --------------------------------------------------------------*/
 .breadcrumbs {
   padding: 120px 0 0 0;
-  background-color: white;
+  background-color: #212A31;
   min-height: 40px;
 }
 
@@ -700,19 +700,19 @@ p {
   bottom: 0;
   z-index: 3;
   transition: all ease-in-out 0.3s;
-  background: rgba(255, 255, 255, 0.9);
+  background: #212A31;
   padding: 15px;
 }
 
 #portfolio .portfolio-item .portfolio-info h4 {
   font-size: 18px;
-  color: #666;
+  color: #D3D9D4;
   font-weight: 600;
   margin-bottom: 10px;
 }
 
 #portfolio .portfolio-item .portfolio-info p {
-  color: #999;
+  color: #D3D9D4;
   font-size: 14px;
   margin: 0;
   padding: 0;
@@ -771,7 +771,7 @@ p {
 
 .portfolio-details .portfolio-info {
   padding: 30px;
-  box-shadow: 0px 0 30px rgba(75, 74, 74, 0.08);
+  box-shadow: 0px 0 30px rgb(139, 145, 179);
 }
 
 .portfolio-details .portfolio-info h3 {
@@ -1073,6 +1073,7 @@ p {
 # contact
 --------------------------------------------------------------*/
 #contact {
+  background-color: #27313c;
   height: auto;
   width: 100%;
 }
@@ -1196,49 +1197,42 @@ p {
   position: relative;
 }
 
-/*--------------------------------------------------------------
-# experience
---------------------------------------------------------------*/
-#experience,
-#experience-blog {
-  height: auto;
+/*-----------------------------------------------------------------------------------*/
+/*  experience
+/*-----------------------------------------------------------------------------------*/
+#experience {
   width: 100%;
+  height: auto;
   background: #212A31;
-  padding-bottom: 60px;
-  position: relative;
+  padding-top: 120px;
 }
 
-#experience-container {
-  height: 200px;
-  position: relative;
-  /* border: 3px solid green; */
-  border: 1px solid black;
-  /* height: 200px; */
-  /* position: relative; */
-}
-
-#experience-center {
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-}
-
-#experience-blog {
-  background: #fff;
+#experience .div-img-bg {
   padding-bottom: 30px;
+  border: 20px solid #b8a07e;
 }
 
-#experience .experience-block {
-  display: inline-block;
-  height: auto;
+#experience .div-img-bg .experience-img img {
   width: 100%;
+  box-shadow: 0px 0px 85px 0px rgba(0, 0, 0, 0.14);
+  margin-top: -60px;
+  margin-left: 40px;
+  height: 400px;
+  -o-object-fit: cover;
+  object-fit: cover;
 }
 
-#experience .experience-block .experience-info {
-  position: relative;
+#experience .experience-descr .p-heading {
+  font-family: "Playfair Display", serif;
+  font-size: 24px;
+  text-align: left;
+}
+
+#experience .experience-descr .separator {
+  max-width: 80%;
+  margin-bottom: 0;
+  text-align: left;
+  color:#D3D9D4;
 }
 
 
