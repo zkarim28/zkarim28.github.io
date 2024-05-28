@@ -813,7 +813,7 @@ p {
 #skills-blog {
   height: auto;
   width: 100%;
-  background: #2E3944;
+  background: #212A31;
   padding-bottom: 60px;
   position: relative;
 }
@@ -926,6 +926,7 @@ p {
 #yt {
   position: relative;
   padding-bottom: 50px;
+  background-color: #212A31;
 }
 
 #yt #yt-flters {
@@ -1019,7 +1020,7 @@ p {
 #pd-blog {
   height: auto;
   width: 100%;
-  background: #2E3944;
+  background: #212A31;
   padding-bottom: 60px;
   position: relative;
 }
@@ -1073,7 +1074,7 @@ p {
 # contact
 --------------------------------------------------------------*/
 #contact {
-  background-color: #27313c;
+  background-color: #2E3944;
   height: auto;
   width: 100%;
 }
@@ -1159,7 +1160,7 @@ p {
 #resume-blog {
   height: auto;
   width: 100%;
-  background: #212A31;
+  background:#2E3944;
   padding-bottom: 60px;
   position: relative;
 }
@@ -1374,7 +1375,7 @@ blockquote {
 # Coursework
 --------------------------------------------------------------*/
 #coursework {
-  background: #212A31;
+  background: #2E3944;
   position: relative;
   padding-bottom: 80px;
   padding-top: 80px;
