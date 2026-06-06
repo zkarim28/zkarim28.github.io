@@ -5,39 +5,158 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>ALU-minati - Zarif Karim's Website</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
+  <title>DNA Alignment Score Accelerator — Zarif Karim</title>
+  <meta content="Smith-Waterman DNA local alignment ASIC accelerator tapeout — ECE 6745, Cornell University" name="description">
+  <meta content="ASIC, Smith-Waterman, DNA, systolic array, ECE 6745, Cornell, TSMC, PnR, Cadence" name="keywords">
 
-  <!-- Favicons -->
   <link href="assets/img/kiwi.png" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Poppins:300,300i,400,400i,500,500i,600,600i,700,700i|Playfair+Display:400,400i,500,500i,600,600i,700,700i,900,900i" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Vendor CSS Files -->
+  <!-- Vendor CSS -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
   <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
   <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
-  <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
 
-  <!-- =======================================================
-  * Template Name: Folio
-  * Updated: Nov 17 2023 with Bootstrap v5.3.2
-  * Template URL: https://bootstrapmade.com/folio-bootstrap-portfolio-template/
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+  <style>
+    .proj-section { margin-bottom: 40px; }
+    .proj-section h3 {
+      font-size: 1rem;
+      font-family: var(--mono, monospace);
+      color: var(--cyan, #00d4ff);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border, #1e3a5f);
+    }
+    .proj-section p {
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text-secondary, #94a3b8);
+      margin-bottom: 10px;
+    }
+    .proj-section ul {
+      padding-left: 18px;
+      margin: 0;
+    }
+    .proj-section ul li {
+      font-size: 14px;
+      color: var(--text-secondary, #94a3b8);
+      line-height: 1.8;
+      margin-bottom: 4px;
+    }
+    .perf-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      font-family: var(--mono, monospace);
+      margin-top: 12px;
+    }
+    .perf-table th {
+      background: rgba(0,212,255,0.08);
+      color: var(--cyan, #00d4ff);
+      padding: 8px 10px;
+      text-align: left;
+      border: 1px solid var(--border, #1e3a5f);
+      font-weight: 600;
+    }
+    .perf-table td {
+      padding: 7px 10px;
+      border: 1px solid var(--border, #1e3a5f);
+      color: var(--text-secondary, #94a3b8);
+    }
+    .perf-table tr:hover td { background: rgba(0,212,255,0.04); }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .stat-card {
+      background: rgba(0,212,255,0.04);
+      border: 1px solid var(--border, #1e3a5f);
+      border-radius: 4px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+    .stat-card .stat-val {
+      font-family: var(--mono, monospace);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--cyan, #00d4ff);
+      display: block;
+    }
+    .stat-card .stat-label {
+      font-size: 11px;
+      color: var(--text-muted, #475569);
+      margin-top: 4px;
+      display: block;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-family: var(--mono, monospace);
+      color: var(--cyan, #00d4ff);
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 3px;
+      padding: 2px 8px;
+      margin: 3px 3px 3px 0;
+    }
+    /* Ensure local images in the swiper fill properly without needing external URLs */
+    .portfolio-details-slider .swiper-slide img {
+      width: 100%;
+      height: auto;
+      max-height: 480px;
+      object-fit: contain;
+      background: #0d1426;
+      border-radius: 4px;
+      display: block;
+    }
+    .portfolio-info strong { color: var(--cyan, #00d4ff); }
+    .portfolio-info a { color: var(--cyan, #00d4ff); }
+    .portfolio-info a:hover { color: #7ee8ff; }
+    .axis-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .axis-card {
+      background: rgba(139,92,246,0.05);
+      border: 1px solid rgba(139,92,246,0.25);
+      border-radius: 4px;
+      padding: 12px 14px;
+    }
+    .axis-card h5 {
+      font-family: var(--mono, monospace);
+      font-size: 11px;
+      color: #8b5cf6;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .axis-card ul {
+      padding-left: 14px;
+      margin: 0;
+    }
+    .axis-card ul li {
+      font-size: 12px;
+      color: var(--text-secondary, #94a3b8);
+      line-height: 1.7;
+    }
+    @media (max-width: 576px) { .axis-grid { grid-template-columns: 1fr; } }
+  </style>
 </head>
 
 <body>
 
-  <!-- ======= Header ======= -->
+  <!-- Header -->
   <header id="header" class="fixed-top header-inner-pages">
     <div class="container d-flex align-items-center justify-content-between">
 
@@ -45,74 +164,74 @@
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="nav-link scrollto active" href="/index.html#hero">Home</a></li>
-          <li><a class="nav-link scrollto" href="/index.html#about">About</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#portfolio">Portfolio</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#skills">Skills</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#coursework">Relevant Coursework</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#resume">Resume</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#yt">YouTube</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#pd">Songs</a></li>
-          <li><a class="nav-link scrollto" href="/index.html#contact">Contact</a></li>
+          <li><a class="nav-link" href="/index.html#hero">Home</a></li>
+          <li><a class="nav-link" href="/index.html#about">About</a></li>
+          <li><a class="nav-link active" href="/index.html#portfolio">Portfolio</a></li>
+          <li><a class="nav-link" href="/index.html#skills">Skills</a></li>
+          <li><a class="nav-link" href="/index.html#coursework">Coursework</a></li>
+          <li><a class="nav-link" href="/index.html#yt">YouTube</a></li>
+          <li><a class="nav-link" href="/index.html#resume">Resume</a></li>
+          <li><a class="nav-link" href="/index.html#pd">Songs</a></li>
+          <li><a class="nav-link" href="/index.html#contact">Contact</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
-      </nav><!-- .navbar -->
+      </nav>
 
     </div>
-  </header><!-- End Header -->
+  </header>
 
   <main id="main">
 
-    <!-- ======= Breadcrumbs Section ======= -->
+    <!-- Breadcrumbs -->
     <section class="breadcrumbs">
       <div class="container">
-
-        <div class="container">
-          <div class="section-title text-center">
-            <h1>DNA Local Sequence Alignment Score Accelerator: <br> ASIC Tapeout <br> Complex Digital ASIC Design Project </h1>
-          </div>
+        <div class="section-title text-center">
+          <h1>DNA Local Alignment Score Accelerator</h1>
         </div>
-
         <div class="d-flex justify-content-between align-items-center">
-          <h2>Project Details</h2>
+          <h2>Project 2 — ECE 6745 Complex Digital ASIC Design</h2>
           <ol>
             <li><a href="index.html">Home</a></li>
             <li><a href="/index.html#portfolio">Portfolio</a></li>
             <li>Project Details</li>
           </ol>
         </div>
-
       </div>
-    </section><!-- Breadcrumbs Section -->
+    </section>
 
-    <!-- ======= Portfolio Details Section ======= -->
+    <!-- Portfolio Details -->
     <section id="portfolio-details" class="portfolio-details">
       <div class="container">
 
         <div class="row gy-4">
 
+          <!-- Left: image slider (all local images — no external deps) -->
           <div class="col-lg-8">
             <div class="portfolio-details-slider swiper">
               <div class="swiper-wrapper align-items-center">
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/asic2chip.png" alt="Chip Flow">
+                  <img src="assets/img/portfolio/full_asic_tape.png" alt="Full ASIC Tapeout Layout">
                 </div>
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/asic2blockpnr.png" alt="Block Flow">
+                  <img src="assets/img/portfolio/asic2chip.png" alt="Chip PnR Layout">
                 </div>
 
                 <div class="swiper-slide">
-                    <img src="assets/img/portfolio/asic2pe.png" alt="Processing Elements">
+                  <img src="assets/img/portfolio/asic2blockpnr.png" alt="Block Place and Route">
                 </div>
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/asic2Area.png" alt="Area">
+                  <img src="assets/img/portfolio/asic2pe.png" alt="Processing Elements Detail">
                 </div>
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/asic2EnergyAndDelay.png" alt="Delay and Energy Comparison">
+                  <img src="assets/img/portfolio/asic2Area.png" alt="Area Comparison Chart">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="assets/img/portfolio/asic2EnergyAndDelay.png" alt="Energy and Delay Comparison">
                 </div>
 
               </div>
@@ -120,67 +239,260 @@
             </div>
           </div>
 
+          <!-- Right: sidebar -->
           <div class="col-lg-4">
+
             <div class="portfolio-info">
               <h3>Project information</h3>
               <ul>
-                <li><strong>Project date</strong>: March 1, 2026- April 10, 2026</li>
-                <li><strong>Tools:</strong> pyMTL RTLsim, Synopsys VCS (rtl, ffgl, baglsim), Synopsys PT (sta, pwr), Cadence Innovus (PNR), Mentor Calibre (LVS, DRC) </li>
-                <li><strong></strong><a href="https://docs.google.com/presentation/d/1ojLhkFiZTMjgDn8PydFti69FDziZ89AARhr7BRF18lc/edit?slide=id.g3da005261b1_0_0#slide=id.g3da005261b1_0_0"_blank>Link to Presentation</a></li>
+                <li><strong>Course:</strong> ECE 6745 — Complex Digital ASIC Design</li>
+                <li><strong>Team:</strong> Zarif Karim, Vaishnavi Vednere, Vinay Ivaturi</li>
+                <li><strong>Technology:</strong> TSMC 180nm</li>
+                <li><strong>Tapeout:</strong> 1mm × 1mm ASIC chip</li>
+                <li><strong>Tools:</strong> PyMTL3, Synopsys VCS, Synopsys PT, Cadence Innovus (PnR), Mentor Calibre (DRC/LVS)</li>
+                <li><strong>Presentation:</strong> <a href="https://docs.google.com/presentation/d/1ojLhkFiZTMjgDn8PydFti69FDziZ89AARhr7BRF18lc/edit?slide=id.g3da005261b1_0_0#slide=id.g3da005261b1_0_0" target="_blank">Google Slides</a></li>
               </ul>
             </div>
-            <div class="portfolio-description">
-              <h2>Summary</h2>
-              <p>
-                DNA Local Sequence Alignment Accelerator: <br> ASIC Tapeout <br> Digital ASIC Design Project
-                <br> <br> As part of Cornell’s Digital ASIC Design course (ECE 6745), my group and I designed a 1mmx1mm ASIC in the TSMC 180nm node for tape out this comming summer
-                <br> <br> The ASIC implements a systolic array of processing elements to accelerate the Smith-Waterman algorithm for local sequence alignment, which is widely used in bioinformatics for comparing DNA sequences. The design includes a custom controller for the processing elements, and we developed a custom RTL design, synthesis, place and route flow using industry-standard tools. We also performed extensive verification and testing to ensure the correctness and performance of the design.
-              </p>
-            </div>
-          </div>
 
-        </div>
+            <!-- Key stats -->
+            <div class="stat-grid" style="margin-top:20px;">
+              <div class="stat-card">
+                <span class="stat-val">66x</span>
+                <span class="stat-label">Exec. time speedup</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-val">76x</span>
+                <span class="stat-label">Energy reduction</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-val">77</span>
+                <span class="stat-label">Cycles to compute</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-val">71%</span>
+                <span class="stat-label">Block area used</span>
+              </div>
+            </div>
+
+            <!-- Tags -->
+            <div style="margin-top:20px;">
+              <span class="tag">Smith-Waterman</span>
+              <span class="tag">Systolic Array</span>
+              <span class="tag">PyMTL3</span>
+              <span class="tag">TSMC 180nm</span>
+              <span class="tag">Cadence Innovus</span>
+              <span class="tag">DRC/LVS Clean</span>
+              <span class="tag">Tapeout</span>
+              <span class="tag">Bioinformatics</span>
+            </div>
+
+          </div><!-- end sidebar -->
+
+        </div><!-- end row -->
+
+        <!-- Full write-up -->
+        <div class="row mt-5">
+          <div class="col-12">
+
+            <div class="proj-section">
+              <h3>Introduction</h3>
+              <p>Genomics requires more memory and computation than nearly any other field of research. Rapid growth of genomic data creates a critical bottleneck: aligning DNA sequences against each other at scale is both memory- and compute-intensive. Building a dedicated hardware accelerator is a powerful workaround to the limited throughput and parallelism of general-purpose CPUs.</p>
+              <p>As part of Cornell's ECE 6745 Complex Digital ASIC Design course, our team of three designed and taped out a Smith-Waterman algorithm accelerator targeting the TSMC 180nm node. The chip fits within a 1mm × 1mm footprint alongside the course's shared processor baseline and was submitted for fabrication in summer 2026.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>Smith-Waterman Background</h3>
+              <p>Smith-Waterman is the gold standard algorithm for <strong>local sequence alignment</strong>: finding the most similar region between two DNA sequences, rather than forcing end-to-end alignment. It operates by building an (N+1) × (N+1) scoring matrix from two input sequences of length N. Each cell stores the best alignment score reachable at that position.</p>
+              <p>Three candidate scores are computed per cell:</p>
+              <ul>
+                <li><strong>Diagonal</strong> — match/mismatch between the two current bases (+1 match, −1 mismatch)</li>
+                <li><strong>Left</strong> — a gap in sequence 2 (−2 penalty)</li>
+                <li><strong>Above</strong> — a gap in sequence 1 (−2 penalty)</li>
+              </ul>
+              <p>The cell is assigned the maximum of the three candidates, floored at 0 (no negative scores). After filling the entire matrix, the maximum score across all cells is the local alignment score. Traceback to recover the optimal aligned sub-sequence is a separate step that was scoped out of this accelerator to meet area constraints.</p>
+              <p>Our accelerator takes two 16 base-pair DNA sequences (each base pair 2-bit encoded: A=00, C=01, G=10, T=11) and outputs the maximum alignment score.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>Design Space — Four Axes of Exploration</h3>
+              <p>The Smith-Waterman DP problem has a rich hardware design space. We explored four orthogonal axes:</p>
+              <div class="axis-grid">
+                <div class="axis-card">
+                  <h5>Calculation Style</h5>
+                  <ul>
+                    <li>Row-chunk (baseline)</li>
+                    <li>Anti-diagonal (final)</li>
+                  </ul>
+                </div>
+                <div class="axis-card">
+                  <h5>Pipelining</h5>
+                  <ul>
+                    <li>Combinational PE's</li>
+                    <li>Sequential PE's</li>
+                  </ul>
+                </div>
+                <div class="axis-card">
+                  <h5>Data Streaming</h5>
+                  <ul>
+                    <li>Bulk load</li>
+                    <li>Base forwarding</li>
+                  </ul>
+                </div>
+                <div class="axis-card">
+                  <h5>Dimensionality</h5>
+                  <ul>
+                    <li>16×16 array</li>
+                    <li>8×8 tiled (final)</li>
+                  </ul>
+                </div>
+              </div>
+              <p style="margin-top:14px;">The software baseline computes the matrix row-by-row — a "sliding window" that evaluates each row sequentially, limited by data dependencies that prevent parallelism and by high cycle counts per row. The hardware breaks these dependencies by exploiting the anti-diagonal structure of the DP graph.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>System Architecture — 8×8 Systolic Array</h3>
+              <p>The final accelerator is an <strong>8×8 systolic array of 64 processing elements (PEs)</strong>, paired with an 8×8 score buffer. The key insight: within the scoring matrix, cells on the same anti-diagonal are fully independent of each other — each only depends on its diagonal-left, top, and left neighbors, which belong to the previous anti-diagonal. This allows all cells on the same anti-diagonal to be computed simultaneously.</p>
+              <p>Rather than building a full 16×16 array (256 PEs), the 8×8 array tiles across the larger 16×16 scoring matrix. The design maintains:</p>
+              <ul>
+                <li><strong>Top row buffer</strong> — stores the bottom row of the previous tile row for use as the "above" input in the next tile row</li>
+                <li><strong>Left column buffer</strong> — stores the rightmost column of the previous tile column for "left" inputs</li>
+                <li><strong>Corner register</strong> — captures the single corner value at tile boundaries</li>
+              </ul>
+              <p>At each cycle, only the PEs on the active anti-diagonal are computing; others idle. This strict scheduling ensures all required inputs are ready from the previous cycle. Data flows locally between neighbors, eliminating global communication — the defining property of a systolic architecture.</p>
+              <p>Each PE: receives diagonal, top, and left score inputs; compares the two incoming DNA bases; computes all three candidate scores; outputs the max (floored at 0); and forwards its base and score to adjacent PEs.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>RTL → Synthesis → Place and Route → Tapeout Flow</h3>
+              <p>The complete ASIC implementation flow used industry-standard EDA tools:</p>
+              <ul>
+                <li><strong>RTL Simulation:</strong> PyMTL3 RTL sim + Synopsys VCS (71/71 test cases passed at both RTL and gate level)</li>
+                <li><strong>Synthesis:</strong> Synopsys Design Compiler — 7,904 standard cells, 128,142 μm² block area, 0.0145 ns setup slack</li>
+                <li><strong>Place and Route:</strong> Cadence Innovus — 9,334 cells post-PnR, 60.39% density, 0.0812 ns setup slack, 0.0201 ns hold slack, clock insertion source latency = 0 ns</li>
+                <li><strong>Static Timing Analysis:</strong> Synopsys PrimeTime — 0.1107 ns setup slack, 0.0164 ns hold slack (timing clean)</li>
+                <li><strong>Physical Verification:</strong> Mentor Calibre DRC + LVS — <strong>no violations found</strong></li>
+                <li><strong>Bag Sim:</strong> 71/71 passed (post-PnR functional verification)</li>
+              </ul>
+            </div>
+
+            <div class="proj-section">
+              <h3>Performance Results</h3>
+              <p>Clock period: 10 ns (100 MHz). Both the processor baseline and processor + accelerator meet timing.</p>
+              <table class="perf-table">
+                <thead>
+                  <tr>
+                    <th>Metric</th>
+                    <th>Processor Baseline</th>
+                    <th>Processor + Accelerator</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Area (μm²)</td><td>320,218</td><td>563,936</td></tr>
+                  <tr><td>Cycle Time</td><td>9.8276 ns</td><td>9.8552 ns</td></tr>
+                  <tr><td>Execution Time</td><td>53,250 ns</td><td><strong>810 ns (66x faster)</strong></td></tr>
+                  <tr><td>Energy</td><td>1,224.8 nJ</td><td><strong>13.8 nJ (76x less)</strong></td></tr>
+                </tbody>
+              </table>
+              <p style="margin-top:12px;">The accelerator completes alignment in a fixed <strong>77 cycles (770 ns)</strong> regardless of sequence content. Energy varies slightly across test cases due to differing match/mismatch rates but stays below 8.5 nJ per alignment. The massive energy reduction comes from eliminating repeated LOAD/ADD/BRANCH overhead — all computation flows directly through the PE array without memory round-trips.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>Test Case Results</h3>
+              <table class="perf-table">
+                <thead>
+                  <tr><th>Test Case</th><th>Cycles</th><th>Time (ns)</th><th>Power (mW)</th><th>Energy (nJ)</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>tc1-basic</td><td>77</td><td>770</td><td>11.00</td><td>8.47</td></tr>
+                  <tr><td>tc2-all-mismatch</td><td>77</td><td>770</td><td>9.36</td><td>7.20</td></tr>
+                  <tr><td>tc3-all-mismatch-alternating</td><td>77</td><td>770</td><td>9.52</td><td>7.33</td></tr>
+                  <tr><td>tc4-partial-match-front</td><td>77</td><td>770</td><td>9.95</td><td>7.66</td></tr>
+                  <tr><td>tc5-partial-match-mid</td><td>77</td><td>770</td><td>10.10</td><td>7.78</td></tr>
+                  <tr><td>tc6-single-match</td><td>77</td><td>770</td><td>9.40</td><td>7.24</td></tr>
+                  <tr><td>tc8-gap-shift-one</td><td>77</td><td>770</td><td>11.00</td><td>8.47</td></tr>
+                  <tr><td>tc10-first-base-mismatch</td><td>77</td><td>770</td><td>10.90</td><td>8.39</td></tr>
+                  <tr><td>tc11-gap-extra-base</td><td>77</td><td>770</td><td>11.00</td><td>8.47</td></tr>
+                  <tr><td>tc12-two-gaps</td><td>77</td><td>770</td><td>11.00</td><td>8.47</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="proj-section">
+              <h3>Resource Utilization</h3>
+              <table class="perf-table">
+                <thead>
+                  <tr><th>Metric</th><th>Value</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Block area constraint</td><td>360,000 μm²</td></tr>
+                  <tr><td>Synthesized area</td><td>128,142 μm² (36% of budget)</td></tr>
+                  <tr><td>Post-PnR cell area</td><td>148,792 μm²</td></tr>
+                  <tr><td>Post-PnR core area</td><td>256,562 μm² (71% of budget)</td></tr>
+                  <tr><td>PnR density</td><td>60.39%</td></tr>
+                  <tr><td>Standard cells (synthesis)</td><td>7,904</td></tr>
+                  <tr><td>Standard cells (post-PnR)</td><td>9,334</td></tr>
+                  <tr><td>DRC violations</td><td>None</td></tr>
+                  <tr><td>Antenna DRC violations</td><td>None</td></tr>
+                  <tr><td>LVS result</td><td>Clean (no violations)</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="proj-section">
+              <h3>Design Observations &amp; Tradeoffs</h3>
+              <p>The main architectural tradeoff encountered was between <strong>control logic area and array size</strong>. With the 8×8 tiled approach, the control logic (tile state machine, boundary buffers, anti-diagonal scheduling) grew to rival the area footprint of the PE array itself — visible in the PnR layout where yellow control logic and red PE regions share roughly equal space.</p>
+              <p>A 16×16 array would eliminate tiling complexity (and the boundary buffer overhead) at the cost of 4× more PEs. A smaller tile (e.g., 4×4) would reduce control complexity but require more tiles and more boundary-crossing overhead per alignment.</p>
+              <p>Energy reduction is structural: a CPU executing Smith-Waterman must issue LOAD, ADD, CMP, and BRANCH instructions for every cell — each involving memory access and pipeline overhead. The systolic array feeds inputs directly into PEs each cycle, eliminating all that overhead. Less unnecessary work per operation = proportionally less energy.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>Conclusions &amp; Future Work</h3>
+              <p>The tapeout-ready Smith-Waterman accelerator achieves a <strong>66x execution time reduction</strong> and <strong>76x energy reduction</strong> over the software baseline, completes in a fixed 77 cycles regardless of input, uses 71% of its area budget, and passes all DRC/LVS checks with no violations. The chip was submitted for fabrication in the TSMC 180nm node.</p>
+              <p>Key takeaway: hardware specialization for a specific algorithm — even implemented in an older process node — delivers order-of-magnitude efficiency gains that a general-purpose processor cannot match. The bottleneck shifted from computation to control logic overhead.</p>
+              <p>Future directions:</p>
+              <ul>
+                <li>Optimize tile controller to shrink the control logic area footprint</li>
+                <li>Extend to variable-length sequences (current design is fixed at 16 bp)</li>
+                <li>Add traceback logic to recover the optimal aligned sub-sequence, not just the score</li>
+                <li>Explore a 16×16 array to eliminate tiling overhead and reduce control complexity</li>
+                <li>Port to a more advanced node (e.g., TSMC 65nm or 28nm) to further improve PPA</li>
+              </ul>
+            </div>
+
+          </div>
+        </div><!-- end write-up row -->
 
       </div>
-    </section><!-- End Portfolio Details Section -->
+    </section>
 
-  </main><!-- End #main -->
+  </main>
 
-  <!-- ======= Footer ======= -->
+  <!-- Footer -->
   <div id="footer" class="text-center">
     <div class="container">
       <div class="socials-media text-center">
-
         <ul class="list-unstyled">
           <li><a href="https://github.com/zkarim28"><i class="bi bi-github"></i></a></li>
           <li><a href="https://www.linkedin.com/in/zkarim28/"><i class="bi bi-linkedin"></i></a></li>
           <li><a href="https://www.youtube.com/@zkarim28"><i class="bi bi-youtube"></i></a></li>
         </ul>
-
       </div>
-
-      <p>Check out my projects | connect with me | subscribe!</p>
-
-      <div class="credits" style="font-size:0.5rem;">
-        Template by <a href="https://bootstrapmade.com/" style="color:gray; cursor:default;">BootstrapMade</a>
+      <p>Check out my projects · connect with me · subscribe</p>
+      <div class="credits">
+        Template by <a href="https://bootstrapmade.com/" style="color:var(--text-muted); cursor:default;">BootstrapMade</a>
       </div>
-
     </div>
-  </div><!-- End Footer -->
+  </div>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-  <!-- Vendor JS Files -->
+  <!-- Vendor JS -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
   <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
   <script src="assets/vendor/typed.js/typed.umd.js"></script>
-  <script src="assets/vendor/php-email-form/validate.js"></script>
-
-  <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
 
 </body>
-
 </html>

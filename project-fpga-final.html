@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>AES-128 FPGA Encryption — Zarif Karim</title>
+  <meta content="AES-128 hardware encryption and decryption on the DE1-SoC FPGA with real-time VGA image display" name="description">
+  <meta content="AES, FPGA, Verilog, encryption, ECE 5760, Cornell, DE1-SoC" name="keywords">
+
+  <link href="assets/img/kiwi.png" rel="icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <link href="assets/css/style.css" rel="stylesheet">
+
+  <style>
+    /* Page-specific overrides */
+    .proj-section { margin-bottom: 40px; }
+    .proj-section h3 {
+      font-size: 1rem;
+      font-family: var(--mono, monospace);
+      color: var(--cyan, #00d4ff);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border, #1e3a5f);
+    }
+    .proj-section p {
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text-secondary, #94a3b8);
+      margin-bottom: 10px;
+    }
+    .proj-section ul {
+      padding-left: 18px;
+      margin: 0;
+    }
+    .proj-section ul li {
+      font-size: 14px;
+      color: var(--text-secondary, #94a3b8);
+      line-height: 1.8;
+      margin-bottom: 4px;
+    }
+    .perf-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      font-family: var(--mono, monospace);
+      margin-top: 12px;
+    }
+    .perf-table th {
+      background: rgba(0,212,255,0.08);
+      color: var(--cyan, #00d4ff);
+      padding: 8px 10px;
+      text-align: left;
+      border: 1px solid var(--border, #1e3a5f);
+      font-weight: 600;
+    }
+    .perf-table td {
+      padding: 7px 10px;
+      border: 1px solid var(--border, #1e3a5f);
+      color: var(--text-secondary, #94a3b8);
+    }
+    .perf-table tr:hover td { background: rgba(0,212,255,0.04); }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .stat-card {
+      background: rgba(0,212,255,0.04);
+      border: 1px solid var(--border, #1e3a5f);
+      border-radius: 4px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+    .stat-card .stat-val {
+      font-family: var(--mono, monospace);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--cyan, #00d4ff);
+      display: block;
+    }
+    .stat-card .stat-label {
+      font-size: 11px;
+      color: var(--text-muted, #475569);
+      margin-top: 4px;
+      display: block;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-family: var(--mono, monospace);
+      color: var(--cyan, #00d4ff);
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 3px;
+      padding: 2px 8px;
+      margin: 3px 3px 3px 0;
+    }
+    .portfolio-details-slider .swiper-slide iframe {
+      width: 100%;
+      aspect-ratio: 16/9;
+      height: auto;
+      display: block;
+      border: none;
+      border-radius: 4px;
+    }
+    .portfolio-details-slider .swiper-slide img {
+      width: 100%;
+      height: auto;
+      max-height: 420px;
+      object-fit: contain;
+      background: #0d1426;
+      border-radius: 4px;
+    }
+    .portfolio-info strong { color: var(--cyan, #00d4ff); }
+    .portfolio-info a { color: var(--cyan, #00d4ff); }
+    .portfolio-info a:hover { color: #7ee8ff; }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header id="header" class="fixed-top header-inner-pages">
+    <div class="container d-flex align-items-center justify-content-between">
+
+      <h1 class="logo"><a href="index.html">Zarif Karim</a></h1>
+
+      <nav id="navbar" class="navbar">
+        <ul>
+          <li><a class="nav-link" href="/index.html#hero">Home</a></li>
+          <li><a class="nav-link" href="/index.html#about">About</a></li>
+          <li><a class="nav-link active" href="/index.html#portfolio">Portfolio</a></li>
+          <li><a class="nav-link" href="/index.html#skills">Skills</a></li>
+          <li><a class="nav-link" href="/index.html#coursework">Coursework</a></li>
+          <li><a class="nav-link" href="/index.html#yt">YouTube</a></li>
+          <li><a class="nav-link" href="/index.html#resume">Resume</a></li>
+          <li><a class="nav-link" href="/index.html#pd">Songs</a></li>
+          <li><a class="nav-link" href="/index.html#contact">Contact</a></li>
+        </ul>
+        <i class="bi bi-list mobile-nav-toggle"></i>
+      </nav>
+
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- Breadcrumbs -->
+    <section class="breadcrumbs">
+      <div class="container">
+        <div class="section-title text-center">
+          <h1>AES-128 FPGA Encryption</h1>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Final Project — ECE 5760</h2>
+          <ol>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="/index.html#portfolio">Portfolio</a></li>
+            <li>Project Details</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- Portfolio Details -->
+    <section id="portfolio-details" class="portfolio-details">
+      <div class="container">
+
+        <div class="row gy-4">
+
+          <!-- Left: media slider -->
+          <div class="col-lg-8">
+            <div class="portfolio-details-slider swiper">
+              <div class="swiper-wrapper align-items-center">
+
+                <div class="swiper-slide">
+                  <iframe
+                    src="https://www.youtube.com/embed/_qnT7gPqqno?si=I8CTGWDc1m3uHnsZ"
+                    title="AES-128 FPGA Encryption Demo"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen></iframe>
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="https://people.ece.cornell.edu/land/courses/ece5760/FinalProjects/s2026/am2589_ns752_zk67/am2589_ns752_zk67/am2589_ns752_zk67/System%20Level%20Diagram-System%20Level.drawio.png" alt="System Level Diagram">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="https://people.ece.cornell.edu/land/courses/ece5760/FinalProjects/s2026/am2589_ns752_zk67/am2589_ns752_zk67/am2589_ns752_zk67/aes_algo_working.png" alt="AES Algorithm Overview">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="https://people.ece.cornell.edu/land/courses/ece5760/FinalProjects/s2026/am2589_ns752_zk67/am2589_ns752_zk67/am2589_ns752_zk67/aes128_flow.png" alt="AES-128 Pipelined Flow">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="https://people.ece.cornell.edu/land/courses/ece5760/FinalProjects/s2026/am2589_ns752_zk67/am2589_ns752_zk67/am2589_ns752_zk67/professor_adams_encrypted.png" alt="Encrypted Image Result">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="https://people.ece.cornell.edu/land/courses/ece5760/FinalProjects/s2026/am2589_ns752_zk67/am2589_ns752_zk67/am2589_ns752_zk67/cornell_logo_encrypted_once.png" alt="ECB Mode Weakness: Cornell Logo">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="https://people.ece.cornell.edu/land/courses/ece5760/FinalProjects/s2026/am2589_ns752_zk67/am2589_ns752_zk67/am2589_ns752_zk67/chip_planner_pipeline_enc_comb_dec.png" alt="Chip Planner — Pipelined Enc + Combinational Dec">
+                </div>
+
+              </div>
+              <div class="swiper-pagination"></div>
+            </div>
+          </div>
+
+          <!-- Right: sidebar -->
+          <div class="col-lg-4">
+
+            <div class="portfolio-info">
+              <h3>Project information</h3>
+              <ul>
+                <li><strong>Course:</strong> ECE 5760 — Hardware Acceleration via FPGA</li>
+                <li><strong>Team:</strong> Zarif Karim, Arnav Muthiayen, Nikhil Sampath</li>
+                <li><strong>Platform:</strong> Intel Altera DE1-SoC</li>
+                <li><strong>Tools:</strong> Verilog HDL, Quartus Prime, ModelSim, Platform Designer (Qsys), ARM A9 HPS Linux + C</li>
+                <li><strong>GitHub:</strong> <a href="https://github.com/zkarim28/aes128_de1soc_fpga" target="_blank">aes128_de1soc_fpga</a></li>
+                <li><strong>Full Report:</strong> <a href="https://people.ece.cornell.edu/land/courses/ece5760/FinalProjects/s2026/am2589_ns752_zk67/am2589_ns752_zk67/am2589_ns752_zk67/am2589_ns752_zk67.html" target="_blank">Cornell ECE 5760</a></li>
+                <li><strong>Demo:</strong> <a href="https://youtu.be/_qnT7gPqqno" target="_blank">YouTube</a></li>
+              </ul>
+            </div>
+
+            <!-- Key stats -->
+            <div class="stat-grid" style="margin-top:20px;">
+              <div class="stat-card">
+                <span class="stat-val">4.5x</span>
+                <span class="stat-label">Encrypt speedup</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-val">3.6x</span>
+                <span class="stat-label">Decrypt speedup</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-val">86%</span>
+                <span class="stat-label">ALM utilization</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-val">50 MHz</span>
+                <span class="stat-label">FPGA clock</span>
+              </div>
+            </div>
+
+            <!-- Tags -->
+            <div style="margin-top:20px;">
+              <span class="tag">AES-128</span>
+              <span class="tag">Verilog HDL</span>
+              <span class="tag">FPGA</span>
+              <span class="tag">Pipelined</span>
+              <span class="tag">DE1-SoC</span>
+              <span class="tag">VGA</span>
+              <span class="tag">HPS</span>
+              <span class="tag">Cryptography</span>
+            </div>
+
+          </div><!-- end sidebar -->
+
+        </div><!-- end row -->
+
+        <!-- Full write-up below -->
+        <div class="row mt-5">
+          <div class="col-12">
+
+            <div class="proj-section">
+              <h3>Introduction</h3>
+              <p>This project implements AES-128 encryption and decryption on the DE1-SoC FPGA, demonstrated by encrypting image data and displaying the result through a real-time VGA output. The project was motivated by the importance of accelerating security workloads so that cryptographic operations do not become a performance bottleneck in modern systems.</p>
+              <p>In the final design, the HPS (ARM A9) loads image data, packs pixels into 128-bit blocks, sends them to the Verilog AES engine on the FPGA fabric, and streams the processed output to the VGA display buffer. The completed system supports encryption and decryption of multiple images with user-selected 128-bit keys.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>AES-128 Background</h3>
+              <p>AES (Advanced Encryption Standard) is a symmetric key block cipher — the same key is used for both encryption and decryption. AES-128 operates on 128-bit data blocks with a 128-bit key over 10 rounds of transformation. Each round applies four operations:</p>
+              <ul>
+                <li><strong>SubBytes</strong> — Non-linear SBox lookup substitution of each byte</li>
+                <li><strong>ShiftRows</strong> — Cyclic left rotation of each row to rearrange bytes across columns</li>
+                <li><strong>MixColumns</strong> — Column mixing to spread information across the block (skipped in the final round)</li>
+                <li><strong>AddRoundKey</strong> — XOR of the current state with the round key</li>
+              </ul>
+              <p>Key expansion generates 11 round keys (1 initial + 1 per round) using byte rotations, SBox substitutions, and XOR with Rcon constants. Decryption applies the inverse operations in reverse order. The algorithm is bit-exact and fully lossless.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>System Architecture</h3>
+              <p>The system is a hardware-software co-design pipeline across HPS and FPGA:</p>
+              <ul>
+                <li><strong>HPS (software):</strong> Image loading (640×480 RGB565 .bin files), terminal menu, key entry, VGA display coordination, and block I/O to the FPGA via memory-mapped PIO</li>
+                <li><strong>FPGA (hardware):</strong> Pipelined 10-round AES-128 encryption datapath, combinational AES-128 decryption datapath, 11-round key expansion module, and an output FIFO decoupling the pipeline from HPS reads</li>
+              </ul>
+              <p>Pixel data is packed into 128-bit blocks of 8 pixels (16-bit RGB565 each) and transferred via four 32-bit PIO writes. A ready/valid/ack handshaking protocol manages the pipeline flow. The PIO-based communication through the AXI heavyweight bus is the dominant bottleneck — not the AES core itself.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>Hardware Design — Pipelined Encryption</h3>
+              <p>The encryption datapath is fully pipelined: an initial AddRoundKey stage (round key 0), rounds 1–9 applying the full four-operation sequence, and a final round omitting MixColumns. Pipeline registers between each stage carry both the 128-bit state and a valid bit, enabling one new block to be accepted every clock cycle at steady state.</p>
+              <p>A small output FIFO decouples the encryption pipeline from HPS reads. It tracks write/read pointers and occupancy, asserting <code>ready</code> when space exists and <code>valid</code> when output is available. The HPS dequeues results by reading the output PIOs and pulsing an <code>ack</code> signal.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>Hardware Design — Decryption</h3>
+              <p>Decryption applies the inverse operations in reverse order through a combinational (non-pipelined) datapath: AddRoundKey with the final encryption round key, then per-round inverse ShiftRows → inverse SubBytes → AddRoundKey → inverse MixColumns (final round omits inverse MixColumns). The same expanded round keys generated for encryption are reused in reverse order.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>Performance Results</h3>
+              <p>Clock: 50 MHz FPGA PLL. Full 640×480 frame = 38,400 AES blocks. Default test key: <code>000102030405060708090a0b0c0d0e0f</code>.</p>
+              <table class="perf-table">
+                <thead>
+                  <tr>
+                    <th>Operation</th>
+                    <th>Implementation</th>
+                    <th>Time (ms)</th>
+                    <th>Speedup</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Encrypt 640×480</td><td>ARM software</td><td>~1179</td><td>1.0x</td></tr>
+                  <tr><td>Encrypt 640×480</td><td>Pipelined FPGA</td><td>~264</td><td><strong>~4.5x</strong></td></tr>
+                  <tr><td>Decrypt 640×480</td><td>ARM software</td><td>~8970</td><td>1.0x</td></tr>
+                  <tr><td>Decrypt 640×480</td><td>Combinational FPGA</td><td>~2461</td><td><strong>~3.6x</strong></td></tr>
+                </tbody>
+              </table>
+              <p style="margin-top:12px;">Speedup is consistent across image content, confirming it is structural rather than data-dependent. The bottleneck is PIO bus bandwidth (~4 writes + 4 reads + handshake pulses per block), not the AES core. The pipelined core is theoretically capable of one block per cycle — well under 1 ms for a full frame.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>Resource Utilization</h3>
+              <table class="perf-table">
+                <thead>
+                  <tr><th>Resource</th><th>Usage</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>ALMs</td><td>27,575 / 32,070 (86%)</td></tr>
+                  <tr><td>ALUTs</td><td>36,717 / 64,140 total</td></tr>
+                  <tr><td>Dedicated Logic Registers</td><td>11,537</td></tr>
+                  <tr><td>M10K Blocks</td><td>16 / 396 (4%)</td></tr>
+                  <tr><td>DSP Blocks</td><td>6 / 87 (7%)</td></tr>
+                  <tr><td>Compile Time</td><td>~30 minutes</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="proj-section">
+              <h3>Visual Results &amp; ECB Mode Weakness</h3>
+              <p>Encrypted images appear as noise. The project demonstrates a well-known ECB (Electronic Codebook) mode weakness: when an input has large uniform-color regions (e.g., the Cornell logo, the Tux penguin), identical plaintext blocks encrypt to identical ciphertext blocks — leaving the underlying shape faintly visible in the encrypted output.</p>
+              <p>Correctness was verified two ways: (1) walking the hardware through the NIST FIPS 197 Appendix B worked example bit-for-bit, and (2) cross-checking pipelined FPGA output against a pure-software C AES implementation on the same image and key — the encrypted <code>.bin</code> files were identical at every pixel.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>Conclusions &amp; Future Work</h3>
+              <p>The system achieved a 4.5x encryption and 3.6x decryption speedup over the software ARM baseline while staying within 86% ALM utilization and passing NIST FIPS 197 verification. The ECB-mode weakness demonstration provided a visually compelling cryptographic lesson.</p>
+              <p>Key takeaway: even after accelerating computation, the system is only as fast as its slowest link. The PIO bus, not the AES core, was the bottleneck throughout. Future improvements:</p>
+              <ul>
+                <li>Replace per-block PIO transfers with DMA-style burst transfers from SDRAM directly into the AES core</li>
+                <li>Implement proper ready/valid/ack handshake for the decryption path</li>
+                <li>Pipeline the decryption datapath to match encryption throughput</li>
+                <li>Add CBC (Cipher Block Chaining) mode to eliminate ECB outline artifacts</li>
+              </ul>
+            </div>
+
+          </div>
+        </div><!-- end write-up row -->
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <div id="footer" class="text-center">
+    <div class="container">
+      <div class="socials-media text-center">
+        <ul class="list-unstyled">
+          <li><a href="https://github.com/zkarim28"><i class="bi bi-github"></i></a></li>
+          <li><a href="https://www.linkedin.com/in/zkarim28/"><i class="bi bi-linkedin"></i></a></li>
+          <li><a href="https://www.youtube.com/@zkarim28"><i class="bi bi-youtube"></i></a></li>
+        </ul>
+      </div>
+      <p>Check out my projects · connect with me · subscribe</p>
+      <div class="credits">
+        Template by <a href="https://bootstrapmade.com/" style="color:var(--text-muted); cursor:default;">BootstrapMade</a>
+      </div>
+    </div>
+  </div>
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="assets/vendor/typed.js/typed.umd.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+
+  <script src="assets/js/main.js"></script>
+
+</body>
+</html>
