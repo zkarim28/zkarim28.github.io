@@ -656,11 +656,26 @@ span.typed { color: var(--cyan); }
   padding-bottom: 60px;
 }
 
+.yt-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+.yt-panel-header {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--cyan);
+  letter-spacing: 0.08em;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
 .yt-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-  margin-bottom: 32px;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 0;
 }
 
 .yt-card {
@@ -679,6 +694,32 @@ span.typed { color: var(--cyan); }
   aspect-ratio: 16/9;
   display: block;
   border: none;
+}
+.yt-thumb-link {
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+.yt-thumb-link img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  display: block;
+}
+.yt-play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.3);
+  transition: background 0.2s;
+  font-size: 3rem;
+  color: rgba(255,255,255,0.9);
+}
+.yt-thumb-link:hover .yt-play-overlay {
+  background: rgba(0,0,0,0.5);
+  color: #fff;
 }
 .yt-card .yt-label {
   padding: 8px 14px;
@@ -849,5 +890,6 @@ blockquote {
   .paddsection { padding: 60px 0; }
   .section-title h1 { font-size: 1.5rem; }
   .hero-content h1 { font-size: 2.4rem; }
+  .yt-panels { grid-template-columns: 1fr; }
   .yt-grid { grid-template-columns: 1fr; }
 }
