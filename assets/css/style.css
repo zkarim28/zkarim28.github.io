@@ -11,8 +11,8 @@
   --purple:        #8b5cf6;
   --green:         #10b981;
   --text-primary:  #e2e8f0;
-  --text-secondary:#94a3b8;
-  --text-muted:    #475569;
+  --text-secondary:#c8d5e1;
+  --text-muted:    #94a3b8;
   --mono:          'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
   --sans:          'Poppins', sans-serif;
   --ease:          all 0.3s ease;
@@ -634,7 +634,7 @@ span.typed { color: var(--cyan); }
   margin: 0;
   font-size: 13px;
   line-height: 1.6;
-  color: var(--text-muted);
+  color: #ffffff;
 }
 
 .services-slider .swiper-pagination { margin-top: 24px; position: relative; }

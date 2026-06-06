@@ -5,132 +5,168 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>MIDI Visualizer - Zarif Karim's Website</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
+  <title>MIDI Visualizer — Zarif Karim</title>
+  <meta content="Live MIDI piano visualizer in Java — notes stream upward with velocity-based color intensity, multi-threaded for smooth playback" name="description">
+  <meta content="MIDI, Java, Swing, visualizer, piano, multi-threading, javax.sound.midi" name="keywords">
 
-  <!-- Favicons -->
   <link href="assets/img/kiwi.png" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Poppins:300,300i,400,400i,500,500i,600,600i,700,700i|Playfair+Display:400,400i,500,500i,600,600i,700,700i,900,900i" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Vendor CSS Files -->
+  <!-- Vendor CSS -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
   <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
   <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
-  <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
 
-  <!-- =======================================================
-  * Template Name: Folio
-  * Updated: Nov 17 2023 with Bootstrap v5.3.2
-  * Template URL: https://bootstrapmade.com/folio-bootstrap-portfolio-template/
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+  <style>
+    .proj-section { margin-bottom: 40px; }
+    .proj-section h3 {
+      font-size: 1rem;
+      font-family: var(--mono, monospace);
+      color: var(--cyan, #00d4ff);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border, #1e3a5f);
+    }
+    .proj-section p {
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text-secondary, #94a3b8);
+      margin-bottom: 10px;
+    }
+    .proj-section ul {
+      padding-left: 18px;
+      margin: 0;
+    }
+    .proj-section ul li {
+      font-size: 14px;
+      color: var(--text-secondary, #94a3b8);
+      line-height: 1.8;
+      margin-bottom: 4px;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-family: var(--mono, monospace);
+      color: var(--cyan, #00d4ff);
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 3px;
+      padding: 2px 8px;
+      margin: 3px 3px 3px 0;
+    }
+    .portfolio-details-slider .swiper-slide iframe {
+      width: 100%;
+      aspect-ratio: 16/9;
+      height: auto;
+      display: block;
+      border: none;
+      border-radius: 4px;
+    }
+    .portfolio-details-slider .swiper-slide img {
+      width: 100%;
+      height: 420px;
+      object-fit: contain;
+      background: #0d1426;
+      border-radius: 4px;
+      display: block;
+    }
+    .portfolio-info strong { color: var(--cyan, #00d4ff); }
+    .portfolio-info a { color: var(--cyan, #00d4ff); }
+    .portfolio-info a:hover { color: #7ee8ff; }
+  </style>
 </head>
 
 <body>
 
-  <!-- ======= Header ======= -->
+  <!-- Header -->
   <header id="header" class="fixed-top header-inner-pages">
     <div class="container d-flex align-items-center justify-content-between">
 
-      <!-- <a href="index.html" class="logo"><img src="assets/img/logo.png" alt="" class="img-fluid"></a> -->
-      <!-- Uncomment below if you prefer to use an text logo -->
       <h1 class="logo"><a href="index.html">Zarif Karim</a></h1>
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="nav-link scrollto active" href="/index.html#hero">Home</a></li>
-          <li><a class="nav-link scrollto" href="/index.html#about">About</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#portfolio">Portfolio</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#skills">Skills</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#coursework">Relevant Coursework</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#resume">Resume</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#yt">YouTube</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#pd">Songs</a></li>
-          <li><a class="nav-link scrollto" href="/index.html#contact">Contact</a></li>
+          <li><a class="nav-link" href="/index.html#hero">Home</a></li>
+          <li><a class="nav-link" href="/index.html#about">About</a></li>
+          <li><a class="nav-link active" href="/index.html#portfolio">Portfolio</a></li>
+          <li><a class="nav-link" href="/index.html#skills">Skills</a></li>
+          <li><a class="nav-link" href="/index.html#coursework">Coursework</a></li>
+          <li><a class="nav-link" href="/index.html#yt">YouTube</a></li>
+          <li><a class="nav-link" href="/index.html#resume">Resume</a></li>
+          <li><a class="nav-link" href="/index.html#pd">Songs</a></li>
+          <li><a class="nav-link" href="/index.html#contact">Contact</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
-      </nav><!-- .navbar -->
+      </nav>
 
     </div>
-  </header><!-- End Header -->
+  </header>
 
   <main id="main">
 
-    <!-- ======= Breadcrumbs Section ======= -->
+    <!-- Breadcrumbs -->
     <section class="breadcrumbs">
       <div class="container">
-
-        <div class="container">
-          <div class="section-title text-center">
-            <h1>MIDI Visualizer</h1>
-          </div>
+        <div class="section-title text-center">
+          <h1>MIDI Visualizer</h1>
         </div>
-
         <div class="d-flex justify-content-between align-items-center">
-          <h2>Project Details</h2>
+          <h2>Live Piano Visual Effects — Java</h2>
           <ol>
             <li><a href="index.html">Home</a></li>
             <li><a href="/index.html#portfolio">Portfolio</a></li>
             <li>Project Details</li>
           </ol>
         </div>
-
-        <div class="d-flex justify-content-between align-items-center">
-          <h2> </h2>
-          <ol>
-            <li> ‎  </li>
-
-          </ol>
-        </div>
-
       </div>
-    </section><!-- Breadcrumbs Section -->
+    </section>
 
-    <!-- ======= Portfolio Details Section ======= -->
+    <!-- Portfolio Details -->
     <section id="portfolio-details" class="portfolio-details">
       <div class="container">
 
         <div class="row gy-4">
 
+          <!-- Left: media slider -->
           <div class="col-lg-8">
             <div class="portfolio-details-slider swiper">
               <div class="swiper-wrapper align-items-center">
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/mv_sc.png" alt="">
+                  <img src="assets/img/portfolio/mv_sc.png" alt="MIDI Visualizer Screenshot">
                 </div>
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/chris_brown.png" alt="">
+                  <img src="assets/img/portfolio/chris_brown.png" alt="Chris Brown visualization">
                 </div>
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/mv_pp.jpeg" alt="">
+                  <img src="assets/img/portfolio/mv_pp.jpeg" alt="Piano Performance">
                 </div>
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/mv_jp.jpeg" alt="">
+                  <img src="assets/img/portfolio/mv_jp.jpeg" alt="Jazz Performance">
                 </div>
 
                 <div class="swiper-slide">
-                  <!-- <video height="auto" width="auto" src="assets/img/portfolio/Wait For It - From Broadway Show_ Hamilton.mp4" controls = "true"> -->
-                  <iframe width="500" height="275" src="https://www.youtube.com/embed/tYoPVWI0KZE?si=Ebe8HrfG578Dffbp" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                  <!-- </video> -->
+                  <iframe src="https://www.youtube.com/embed/tYoPVWI0KZE?si=Ebe8HrfG578Dffbp"
+                    title="Wait For It — Hamilton"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen></iframe>
                 </div>
 
                 <div class="swiper-slide">
-                  <!-- <video height="auto" width="auto" src="assets/img/portfolio/Wait For It - From Broadway Show_ Hamilton.mp4" controls = "true"> -->
-                  <iframe width="500" height="275" src="https://www.youtube.com/embed/f_Em-iWok9k?si=xfCbT-ZhB7-P2BxU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                  <!-- </video> -->
+                  <iframe src="https://www.youtube.com/embed/f_Em-iWok9k?si=xfCbT-ZhB7-P2BxU"
+                    title="Forever"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen></iframe>
                 </div>
 
               </div>
@@ -138,61 +174,91 @@
             </div>
           </div>
 
+          <!-- Right: sidebar -->
           <div class="col-lg-4">
+
             <div class="portfolio-info">
               <h3>Project information</h3>
               <ul>
-                <li><strong>Project date</strong>: June 10, 2023 - June 28, 2023</li>
-                <li><strong>Programming languages used</strong>: Java</li>
-                <li><strong>Libraries/Frameworks used</strong>: Swing, javax.sound.midi</li>
-                <li><strong>GitHub repo</strong>: <a href="https://github.com/zkarim28/MIDIVisualizer" target="_blank">github.com/zkarim28/MIDIVisualizer</a></li>
-                <li><strong>Live demo 1</strong>: <a href="https://youtu.be/tYoPVWI0KZE?si=nQ68z1tnSzSods_2" target="_blank">Wait for It (YouTube Link)</a></li>
-                <li><strong>Live demo 2</strong>: <a href="https://youtu.be/f_Em-iWok9k?si=7tW2y4UA_GR1AViM" target="_blank">Forever (YouTube Link)</a></li>
+                <li><strong>Date:</strong> June 10 – June 28, 2023</li>
+                <li><strong>Language:</strong> Java</li>
+                <li><strong>Libraries:</strong> Java Swing, javax.sound.midi</li>
+                <li><strong>GitHub:</strong> <a href="https://github.com/zkarim28/MIDIVisualizer" target="_blank">zkarim28/MIDIVisualizer</a></li>
+                <li><strong>Demo 1:</strong> <a href="https://youtu.be/tYoPVWI0KZE" target="_blank">Wait for It (Hamilton)</a></li>
+                <li><strong>Demo 2:</strong> <a href="https://youtu.be/f_Em-iWok9k" target="_blank">Forever (Chris Brown)</a></li>
               </ul>
             </div>
-            <div class="portfolio-description">
-              <h2>Summary</h2>
-              <p>
-                Developed a live visual effects program for MIDI keyboards using the Java Swing Framework and the Java MIDI module where notes stream upward from the bottom of the screen displaying different color intensities based on the velocity of key press. Addressed concurrency exceptions between keyboard and GUI data processing by utilizing thread-safe data structures. Originally created a prototype of the concept using Python, showing how it will work as a video overlay for my piano performances, then began developing in Java. Leveraged multi-threading to improve application efficiency: MIDI signal processing occurs on one thread while GUI drawing and deleting of notes occurs on another thread. 
-              </p>
+
+            <!-- Tags -->
+            <div style="margin-top:20px;">
+              <span class="tag">Java</span>
+              <span class="tag">Swing</span>
+              <span class="tag">MIDI</span>
+              <span class="tag">Multi-threading</span>
+              <span class="tag">GUI</span>
+              <span class="tag">Piano</span>
             </div>
+
           </div>
 
         </div>
 
+        <!-- Write-up -->
+        <div class="row mt-5">
+          <div class="col-12">
+
+            <div class="proj-section">
+              <h3>Summary</h3>
+              <p>MIDI Visualizer is a live visual effects program for MIDI keyboards. Notes stream upward from the bottom of the screen with color intensity based on key-press velocity — harder strikes produce brighter, more saturated note bars. The project was originally prototyped in Python as a video overlay concept for piano performances, then rebuilt from scratch in Java for performance and threading control.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>Architecture</h3>
+              <p>The application runs two parallel threads to decouple time-sensitive MIDI input from rendering:</p>
+              <ul>
+                <li><strong>MIDI thread:</strong> Listens to the system MIDI device via <code>javax.sound.midi</code>, processes NoteOn/NoteOff events, and enqueues note state updates using thread-safe data structures</li>
+                <li><strong>GUI thread:</strong> Java Swing event dispatch thread reads note state and repaints the canvas at a fixed frame rate, drawing and animating active note bars</li>
+              </ul>
+              <p>Separating these threads eliminated concurrency exceptions that occurred when MIDI callbacks attempted to directly mutate Swing component state.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>Features</h3>
+              <ul>
+                <li>Velocity-mapped color: soft touches render cool blue tones, hard strikes render bright white/yellow</li>
+                <li>Smooth upward animation with configurable note scroll speed</li>
+                <li>Works with any MIDI keyboard connected as a system MIDI device</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
       </div>
-    </section><!-- End Portfolio Details Section -->
+    </section>
 
-  </main><!-- End #main -->
+  </main>
 
-  <!-- ======= Footer ======= -->
+  <!-- Footer -->
   <div id="footer" class="text-center">
     <div class="container">
       <div class="socials-media text-center">
-
         <ul class="list-unstyled">
           <li><a href="https://github.com/zkarim28"><i class="bi bi-github"></i></a></li>
           <li><a href="https://www.linkedin.com/in/zkarim28/"><i class="bi bi-linkedin"></i></a></li>
           <li><a href="https://www.youtube.com/@zkarim28"><i class="bi bi-youtube"></i></a></li>
         </ul>
-
       </div>
-
-      <p>Check out my projects | connect with me | subscribe!</p>
-
-      <div class="credits" style="font-size:0.5rem;">
-        <!-- All the links in the footer should remain intact. -->
-        <!-- You can delete the links only if you purchased the pro version. -->
-        <!-- Licensing information: https://bootstrapmade.com/license/ -->
-        Template by <a href="https://bootstrapmade.com/" style="color:gray; cursor:default;">BootstrapMade</a>
+      <p>Check out my projects · connect with me · subscribe</p>
+      <div class="credits">
+        Template by <a href="https://bootstrapmade.com/" style="color:var(--text-muted); cursor:default;">BootstrapMade</a>
       </div>
-
     </div>
-  </div><!-- End Footer -->
+  </div>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-  <!-- Vendor JS Files -->
+  <!-- Vendor JS -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
   <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
@@ -200,9 +266,7 @@
   <script src="assets/vendor/typed.js/typed.umd.js"></script>
   <script src="assets/vendor/php-email-form/validate.js"></script>
 
-  <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
 
 </body>
-
 </html>

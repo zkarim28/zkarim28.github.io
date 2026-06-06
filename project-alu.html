@@ -5,39 +5,87 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>ALU-minati - Zarif Karim's Website</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
+  <title>ALU-minati — 4-Bit ALU — Zarif Karim</title>
+  <meta content="High-speed 4-bit ALU in Cadence Virtuoso — custom dynamic-static logic, ripple carry adder, barrel shifters — ECE 4740, Cornell University" name="description">
+  <meta content="ALU, VLSI, Cadence Virtuoso, dynamic logic, ECE 4740, Cornell, SPICE, DRC, LVS" name="keywords">
 
-  <!-- Favicons -->
   <link href="assets/img/kiwi.png" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Poppins:300,300i,400,400i,500,500i,600,600i,700,700i|Playfair+Display:400,400i,500,500i,600,600i,700,700i,900,900i" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Vendor CSS Files -->
+  <!-- Vendor CSS -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
   <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
   <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
-  <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
 
-  <!-- =======================================================
-  * Template Name: Folio
-  * Updated: Nov 17 2023 with Bootstrap v5.3.2
-  * Template URL: https://bootstrapmade.com/folio-bootstrap-portfolio-template/
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+  <style>
+    .proj-section { margin-bottom: 40px; }
+    .proj-section h3 {
+      font-size: 1rem;
+      font-family: var(--mono, monospace);
+      color: var(--cyan, #00d4ff);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border, #1e3a5f);
+    }
+    .proj-section p {
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text-secondary, #94a3b8);
+      margin-bottom: 10px;
+    }
+    .proj-section ul {
+      padding-left: 18px;
+      margin: 0;
+    }
+    .proj-section ul li {
+      font-size: 14px;
+      color: var(--text-secondary, #94a3b8);
+      line-height: 1.8;
+      margin-bottom: 4px;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-family: var(--mono, monospace);
+      color: var(--cyan, #00d4ff);
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 3px;
+      padding: 2px 8px;
+      margin: 3px 3px 3px 0;
+    }
+    .portfolio-details-slider .swiper-slide iframe {
+      width: 100%;
+      aspect-ratio: 16/9;
+      height: auto;
+      display: block;
+      border: none;
+      border-radius: 4px;
+    }
+    .portfolio-details-slider .swiper-slide img {
+      width: 100%;
+      height: 420px;
+      object-fit: contain;
+      background: #0d1426;
+      border-radius: 4px;
+      display: block;
+    }
+    .portfolio-info strong { color: var(--cyan, #00d4ff); }
+    .portfolio-info a { color: var(--cyan, #00d4ff); }
+    .portfolio-info a:hover { color: #7ee8ff; }
+  </style>
 </head>
 
 <body>
 
-  <!-- ======= Header ======= -->
+  <!-- Header -->
   <header id="header" class="fixed-top header-inner-pages">
     <div class="container d-flex align-items-center justify-content-between">
 
@@ -45,164 +93,188 @@
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="nav-link scrollto active" href="/index.html#hero">Home</a></li>
-          <li><a class="nav-link scrollto" href="/index.html#about">About</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#portfolio">Portfolio</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#skills">Skills</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#coursework">Relevant Coursework</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#resume">Resume</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#yt">YouTube</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#pd">Songs</a></li>
-          <li><a class="nav-link scrollto" href="/index.html#contact">Contact</a></li>
+          <li><a class="nav-link" href="/index.html#hero">Home</a></li>
+          <li><a class="nav-link" href="/index.html#about">About</a></li>
+          <li><a class="nav-link active" href="/index.html#portfolio">Portfolio</a></li>
+          <li><a class="nav-link" href="/index.html#skills">Skills</a></li>
+          <li><a class="nav-link" href="/index.html#coursework">Coursework</a></li>
+          <li><a class="nav-link" href="/index.html#yt">YouTube</a></li>
+          <li><a class="nav-link" href="/index.html#resume">Resume</a></li>
+          <li><a class="nav-link" href="/index.html#pd">Songs</a></li>
+          <li><a class="nav-link" href="/index.html#contact">Contact</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
-      </nav><!-- .navbar -->
+      </nav>
 
     </div>
-  </header><!-- End Header -->
+  </header>
 
   <main id="main">
 
-    <!-- ======= Breadcrumbs Section ======= -->
+    <!-- Breadcrumbs -->
     <section class="breadcrumbs">
       <div class="container">
-
-        <div class="container">
-          <div class="section-title text-center">
-            <h1>ALUminati: <br> High-Speed 4-Bit Arithmetic Logic Unit (ALU) Design <br> Digital VLSI Final Project </h1>
-          </div>
+        <div class="section-title text-center">
+          <h1>ALU-minati — High-Speed 4-Bit ALU</h1>
         </div>
-
         <div class="d-flex justify-content-between align-items-center">
-          <h2>Project Details</h2>
+          <h2>Digital VLSI Final Project — ECE 4740</h2>
           <ol>
             <li><a href="index.html">Home</a></li>
             <li><a href="/index.html#portfolio">Portfolio</a></li>
             <li>Project Details</li>
           </ol>
         </div>
-
       </div>
-    </section><!-- Breadcrumbs Section -->
+    </section>
 
-    <!-- ======= Portfolio Details Section ======= -->
+    <!-- Portfolio Details -->
     <section id="portfolio-details" class="portfolio-details">
       <div class="container">
 
         <div class="row gy-4">
 
+          <!-- Left: media slider -->
           <div class="col-lg-8">
             <div class="portfolio-details-slider swiper">
               <div class="swiper-wrapper align-items-center">
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/poster.png" alt="reserach poster">
+                  <img src="assets/img/portfolio/poster.png" alt="Research Poster">
                 </div>
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/adder.png" alt="adder Schematic & Layout">
+                  <img src="assets/img/portfolio/adder.png" alt="Adder Schematic & Layout">
                 </div>
 
                 <div class="swiper-slide">
-                    <img src="assets/img/portfolio/RC.png" alt="Ripple Carry">
+                  <img src="assets/img/portfolio/RC.png" alt="Ripple Carry Adder">
                 </div>
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/MUL.png" alt="multiplier">
+                  <img src="assets/img/portfolio/MUL.png" alt="Multiplier">
                 </div>
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/MUL.png" alt="multiplier">
+                  <img src="assets/img/portfolio/AND.png" alt="AND Gate">
                 </div>
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/AND.png" alt="AND">
+                  <img src="assets/img/portfolio/OR.png" alt="OR Gate">
                 </div>
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/OR.png" alt="OR">
+                  <img src="assets/img/portfolio/XOR.png" alt="XOR Gate">
                 </div>
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/XOR.png" alt="XOR">
+                  <img src="assets/img/portfolio/SRL.png" alt="Shift Right Logical">
                 </div>
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/SRL.png" alt="SRL">
+                  <img src="assets/img/portfolio/SLL.png" alt="Shift Left Logical">
                 </div>
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/SLL.png" alt="SLL">
+                  <img src="assets/img/portfolio/alu_stats.png" alt="Simulation Results">
                 </div>
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/alu_stats.png" alt="sim res">
+                  <img src="assets/img/portfolio/alu_postex.png" alt="Post-Extraction Simulation">
                 </div>
-
-                <div class="swiper-slide">
-                  <img src="assets/img/portfolio/alu_postex.png" alt="sim res post ex">
-                </div>
-
 
               </div>
               <div class="swiper-pagination"></div>
             </div>
           </div>
 
+          <!-- Right: sidebar -->
           <div class="col-lg-4">
+
             <div class="portfolio-info">
               <h3>Project information</h3>
               <ul>
-                <li><strong>Project date</strong>: April 21, 2025- May 17, 2025</li>
-                <li><strong>Tools:</strong> Cadence Virtuoso (Schematic & Layout)</li>
-                <li><strong></strong><a href="https://github.com/zkarim28/alu="_blank>Link to Github Repo</a></li>
-                <li><strong></strong><a href="https://drive.google.com/file/d/1vvQSkPsZVFGUSSKQY7BgGj7DYwcBveEJ/view?usp=sharing target="_blank>Link to Final Report</a></li>
-                <li><strong></strong><a href="https://drive.google.com/file/d/10faIJixS_0hbrDUY9qul-73Yb9NBGLHn/view?usp=sharing"_blank>Link to Final Poster</a></li>
+                <li><strong>Course:</strong> ECE 4740 — Intro to Digital VLSI</li>
+                <li><strong>Date:</strong> April 21 – May 17, 2025</li>
+                <li><strong>Tools:</strong> Cadence Virtuoso (Schematic &amp; Layout), SPICE, DRC, LVS</li>
+                <li><strong>GitHub:</strong> <a href="https://github.com/zkarim28/alu" target="_blank">zkarim28/alu</a></li>
+                <li><strong>Report:</strong> <a href="https://drive.google.com/file/d/1vvQSkPsZVFGUSSKQY7BgGj7DYwcBveEJ/view?usp=sharing" target="_blank">Final Report</a></li>
+                <li><strong>Poster:</strong> <a href="https://drive.google.com/file/d/10faIJixS_0hbrDUY9qul-73Yb9NBGLHn/view?usp=sharing" target="_blank">Final Poster</a></li>
               </ul>
             </div>
-            <div class="portfolio-description">
-              <h2>Summary</h2>
-              <p>
-                ALUminati: <br> High-Speed 4-Bit Arithmetic Logic Unit (ALU) Design <br> Digital VLSI Final Project 
-                <br> <br> As part of Cornell’s Digital VLSI course (ECE 4740), my team and I designed a high-speed 4-bit Arithmetic Logic Unit (ALU) capable of performing 10 operations, including arithmetic (ADD, SUB, MUL), bitwise (AND, OR, XOR), logical shifts (SLL, SRL), and comparisons (G, GEQ). Our focus was on optimizing performance using dynamic logic for speed and exploring alternative logic for power efficiency. 
-                <br> <br> First, we drew and verified circuits via simulations. Then, we did transistor layout, following Design Rule Check (DRC) and Layout Versus Schematic (LVS) checks. 
-                <br> <br> Key features included a custom-designed ripple carry adder with mixed dynamic-static logic, area-efficient barrel shifters, and verified subcell integration through SPICE simulation. The project emphasized delay optimization, glitch mitigation, and layout-aware design—showcasing practical applications of VLSI techniques in a classic digital system.
-              </p>
+
+            <!-- Tags -->
+            <div style="margin-top:20px;">
+              <span class="tag">VLSI</span>
+              <span class="tag">Cadence Virtuoso</span>
+              <span class="tag">Dynamic Logic</span>
+              <span class="tag">ALU</span>
+              <span class="tag">SPICE</span>
+              <span class="tag">DRC/LVS</span>
+              <span class="tag">Layout</span>
             </div>
+
           </div>
 
         </div>
 
+        <!-- Write-up -->
+        <div class="row mt-5">
+          <div class="col-12">
+
+            <div class="proj-section">
+              <h3>Summary</h3>
+              <p>As part of Cornell's Digital VLSI course (ECE 4740), my team designed a high-speed 4-bit Arithmetic Logic Unit capable of performing 10 operations: ADD, SUB, MUL, AND, OR, XOR, SLL, SRL, and two comparison variants (G, GEQ). The focus was on optimizing performance using dynamic logic for speed while exploring static logic alternatives for power efficiency.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>Design Process</h3>
+              <p>The full design flow ran schematic-first through layout:</p>
+              <ul>
+                <li>Drew and verified each sub-cell (adder, shifter, logic gates) via SPICE simulation in Cadence Virtuoso</li>
+                <li>Performed transistor-level layout for each cell, then verified via DRC and LVS</li>
+                <li>Integrated sub-cells into the top-level ALU and re-ran SPICE post-extraction</li>
+              </ul>
+            </div>
+
+            <div class="proj-section">
+              <h3>Key Design Features</h3>
+              <ul>
+                <li>Custom ripple-carry adder using mixed dynamic-static logic for minimum critical path delay</li>
+                <li>Area-efficient barrel shifters for SLL and SRL operations</li>
+                <li>Glitch mitigation techniques applied to the dynamic precharge network</li>
+                <li>All cells layout-verified DRC/LVS clean before integration</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
       </div>
-    </section><!-- End Portfolio Details Section -->
+    </section>
 
-  </main><!-- End #main -->
+  </main>
 
-  <!-- ======= Footer ======= -->
+  <!-- Footer -->
   <div id="footer" class="text-center">
     <div class="container">
       <div class="socials-media text-center">
-
         <ul class="list-unstyled">
           <li><a href="https://github.com/zkarim28"><i class="bi bi-github"></i></a></li>
           <li><a href="https://www.linkedin.com/in/zkarim28/"><i class="bi bi-linkedin"></i></a></li>
           <li><a href="https://www.youtube.com/@zkarim28"><i class="bi bi-youtube"></i></a></li>
         </ul>
-
       </div>
-
-      <p>Check out my projects | connect with me | subscribe!</p>
-
-      <div class="credits" style="font-size:0.5rem;">
-        Template by <a href="https://bootstrapmade.com/" style="color:gray; cursor:default;">BootstrapMade</a>
+      <p>Check out my projects · connect with me · subscribe</p>
+      <div class="credits">
+        Template by <a href="https://bootstrapmade.com/" style="color:var(--text-muted); cursor:default;">BootstrapMade</a>
       </div>
-
     </div>
-  </div><!-- End Footer -->
+  </div>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-  <!-- Vendor JS Files -->
+  <!-- Vendor JS -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
   <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
@@ -210,9 +282,7 @@
   <script src="assets/vendor/typed.js/typed.umd.js"></script>
   <script src="assets/vendor/php-email-form/validate.js"></script>
 
-  <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
 
 </body>
-
 </html>

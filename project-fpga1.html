@@ -5,39 +5,87 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>ALU-minati - Zarif Karim's Website</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
+  <title>Lorenz System Solver — FPGA ODE Solver — Zarif Karim</title>
+  <meta content="Hardware ordinary differential equation solver for the Lorenz system on DE1-SoC FPGA with real-time VGA display — ECE 5760, Cornell University" name="description">
+  <meta content="FPGA, Lorenz system, ODE solver, DE1-SoC, VGA, Verilog, ECE 5760, Cornell" name="keywords">
 
-  <!-- Favicons -->
   <link href="assets/img/kiwi.png" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Poppins:300,300i,400,400i,500,500i,600,600i,700,700i|Playfair+Display:400,400i,500,500i,600,600i,700,700i,900,900i" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Vendor CSS Files -->
+  <!-- Vendor CSS -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
   <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
   <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
-  <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
 
-  <!-- =======================================================
-  * Template Name: Folio
-  * Updated: Nov 17 2023 with Bootstrap v5.3.2
-  * Template URL: https://bootstrapmade.com/folio-bootstrap-portfolio-template/
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+  <style>
+    .proj-section { margin-bottom: 40px; }
+    .proj-section h3 {
+      font-size: 1rem;
+      font-family: var(--mono, monospace);
+      color: var(--cyan, #00d4ff);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border, #1e3a5f);
+    }
+    .proj-section p {
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text-secondary, #94a3b8);
+      margin-bottom: 10px;
+    }
+    .proj-section ul {
+      padding-left: 18px;
+      margin: 0;
+    }
+    .proj-section ul li {
+      font-size: 14px;
+      color: var(--text-secondary, #94a3b8);
+      line-height: 1.8;
+      margin-bottom: 4px;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-family: var(--mono, monospace);
+      color: var(--cyan, #00d4ff);
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 3px;
+      padding: 2px 8px;
+      margin: 3px 3px 3px 0;
+    }
+    .portfolio-details-slider .swiper-slide iframe {
+      width: 100%;
+      aspect-ratio: 16/9;
+      height: auto;
+      display: block;
+      border: none;
+      border-radius: 4px;
+    }
+    .portfolio-details-slider .swiper-slide img {
+      width: 100%;
+      height: 420px;
+      object-fit: contain;
+      background: #0d1426;
+      border-radius: 4px;
+      display: block;
+    }
+    .portfolio-info strong { color: var(--cyan, #00d4ff); }
+    .portfolio-info a { color: var(--cyan, #00d4ff); }
+    .portfolio-info a:hover { color: #7ee8ff; }
+  </style>
 </head>
 
 <body>
 
-  <!-- ======= Header ======= -->
+  <!-- Header -->
   <header id="header" class="fixed-top header-inner-pages">
     <div class="container d-flex align-items-center justify-content-between">
 
@@ -45,58 +93,57 @@
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="nav-link scrollto active" href="/index.html#hero">Home</a></li>
-          <li><a class="nav-link scrollto" href="/index.html#about">About</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#portfolio">Portfolio</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#skills">Skills</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#coursework">Relevant Coursework</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#resume">Resume</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#yt">YouTube</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#pd">Songs</a></li>
-          <li><a class="nav-link scrollto" href="/index.html#contact">Contact</a></li>
+          <li><a class="nav-link" href="/index.html#hero">Home</a></li>
+          <li><a class="nav-link" href="/index.html#about">About</a></li>
+          <li><a class="nav-link active" href="/index.html#portfolio">Portfolio</a></li>
+          <li><a class="nav-link" href="/index.html#skills">Skills</a></li>
+          <li><a class="nav-link" href="/index.html#coursework">Coursework</a></li>
+          <li><a class="nav-link" href="/index.html#yt">YouTube</a></li>
+          <li><a class="nav-link" href="/index.html#resume">Resume</a></li>
+          <li><a class="nav-link" href="/index.html#pd">Songs</a></li>
+          <li><a class="nav-link" href="/index.html#contact">Contact</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
-      </nav><!-- .navbar -->
+      </nav>
 
     </div>
-  </header><!-- End Header -->
+  </header>
 
   <main id="main">
 
-    <!-- ======= Breadcrumbs Section ======= -->
+    <!-- Breadcrumbs -->
     <section class="breadcrumbs">
       <div class="container">
-
-        <div class="container">
-          <div class="section-title text-center">
-            <h1>Hardware Ordinary Differential System Solver <br>  Lorenz System on Hardware <br> Hardware Acceleration via FPGA - Project </h1>
-          </div>
+        <div class="section-title text-center">
+          <h1>Lorenz System — Hardware ODE Solver</h1>
         </div>
-
         <div class="d-flex justify-content-between align-items-center">
-          <h2>Project Details</h2>
+          <h2>FPGA Project 1 — ECE 5760</h2>
           <ol>
             <li><a href="index.html">Home</a></li>
             <li><a href="/index.html#portfolio">Portfolio</a></li>
             <li>Project Details</li>
           </ol>
         </div>
-
       </div>
-    </section><!-- Breadcrumbs Section -->
+    </section>
 
-    <!-- ======= Portfolio Details Section ======= -->
+    <!-- Portfolio Details -->
     <section id="portfolio-details" class="portfolio-details">
       <div class="container">
 
         <div class="row gy-4">
 
+          <!-- Left: media slider -->
           <div class="col-lg-8">
             <div class="portfolio-details-slider swiper">
               <div class="swiper-wrapper align-items-center">
 
                 <div class="swiper-slide">
-                  <iframe width="800" height="500" src="https://www.youtube.com/embed/xYvvM2Gfnqw?si=PuVOHKRAzS3gtn3o" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                  <iframe src="https://www.youtube.com/embed/xYvvM2Gfnqw?si=PuVOHKRAzS3gtn3o"
+                    title="Lorenz System Demo"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen></iframe>
                 </div>
 
                 <div class="swiper-slide">
@@ -104,7 +151,7 @@
                 </div>
 
                 <div class="swiper-slide">
-                  <img src="assets/img/portfolio/fpga1vga.png" alt="VGA">
+                  <img src="assets/img/portfolio/fpga1vga.png" alt="VGA Output">
                 </div>
 
                 <div class="swiper-slide">
@@ -116,7 +163,7 @@
                 </div>
 
                 <div class="swiper-slide">
-                    <img src="assets/img/portfolio/fpga1hw.png" alt="Hardware Diagram">
+                  <img src="assets/img/portfolio/fpga1hw.png" alt="Hardware Diagram">
                 </div>
 
                 <div class="swiper-slide">
@@ -132,59 +179,95 @@
             </div>
           </div>
 
+          <!-- Right: sidebar -->
           <div class="col-lg-4">
+
             <div class="portfolio-info">
               <h3>Project information</h3>
               <ul>
-                <li><strong>Project date</strong>: Janurary, 19 2026 - February 2, 2026</li>
-                <li><strong>Tools:</strong> Intel Quartus, Intel Altera DE1-SoC FPGA, ModelSim, Qsys</li>
-                <li><strong></strong><a href="https://www.youtube.com/watch?v=xYvvM2Gfnqw&list=PLp01Id4HdPRLIeiKKv8cg-CnyxWUHXDcL&index=1"_blank>Link to YouTube Video</a></li>
-                <li><strong></strong><a href="https://drive.google.com/file/d/1vSu9tu2YcUw0hVgbJvtW_-3hSp0LMeCz/view"_blank>Link to Lab Report</a></li>
+                <li><strong>Course:</strong> ECE 5760 — FPGA &amp; Hardware Accelerator Design</li>
+                <li><strong>Date:</strong> January 19 – February 2, 2026</li>
+                <li><strong>Platform:</strong> Intel Altera DE1-SoC</li>
+                <li><strong>Tools:</strong> Quartus Prime, ModelSim, Qsys (Platform Designer)</li>
+                <li><strong>Demo:</strong> <a href="https://www.youtube.com/watch?v=xYvvM2Gfnqw" target="_blank">YouTube</a></li>
+                <li><strong>Report:</strong> <a href="https://drive.google.com/file/d/1vSu9tu2YcUw0hVgbJvtW_-3hSp0LMeCz/view" target="_blank">Lab Report</a></li>
               </ul>
             </div>
-            <div class="portfolio-description">
-              <h2>Summary</h2>
-              <p>
-                Lorenz System Solver: <br> Hardware Differential Equation Solver <br> FPGA Design Project 
-                <br> <br> As part of Cornell’s Hardware Acceleration via FPGA course (ECE 5760), my group and I designed a hardware ordinary differential system solver for the Lorenz system on an Intel Altera DE1-SoC FPGA. We implemented a hardware design that solved the Lorenz system of equations in real time and displayed the results on a VGA monitor. The project involved designing the hardware architecture, implementing the necessary mathematical computations.
-                <br> <br> 
-                <br> <br> 
-              </p>
+
+            <!-- Tags -->
+            <div style="margin-top:20px;">
+              <span class="tag">FPGA</span>
+              <span class="tag">Verilog HDL</span>
+              <span class="tag">ODE Solver</span>
+              <span class="tag">Lorenz System</span>
+              <span class="tag">VGA</span>
+              <span class="tag">DE1-SoC</span>
+              <span class="tag">Fixed Point</span>
             </div>
+
           </div>
 
         </div>
 
+        <!-- Write-up -->
+        <div class="row mt-5">
+          <div class="col-12">
+
+            <div class="proj-section">
+              <h3>Summary</h3>
+              <p>As part of Cornell's FPGA &amp; Hardware Accelerator Design course (ECE 5760), my group implemented a hardware ordinary differential equation solver for the Lorenz system on an Intel Altera DE1-SoC FPGA. The system solves the three coupled differential equations in real time and streams the result to a VGA monitor, rendering the characteristic Lorenz attractor trajectory.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>The Lorenz System</h3>
+              <p>The Lorenz system is a set of three ODEs that exhibit chaotic behavior — small changes in initial conditions produce wildly divergent trajectories. Solving it requires continuous integration of:</p>
+              <ul>
+                <li>dx/dt = σ(y − x)</li>
+                <li>dy/dt = x(ρ − z) − y</li>
+                <li>dz/dt = xy − βz</li>
+              </ul>
+              <p>The hardware solver uses fixed-point arithmetic to iteratively update the state at each clock cycle, using forward Euler integration. The resulting x-y trajectory is rendered to the VGA framebuffer.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>Hardware Architecture</h3>
+              <p>The system is structured as a memory-mapped hardware/software co-design on the DE1-SoC:</p>
+              <ul>
+                <li>The Verilog ODE core performs all multiplications and additions each cycle in fixed-point</li>
+                <li>Platform Designer (Qsys) maps the core's state registers to the HPS address space</li>
+                <li>The HPS (ARM A9) handles user input for σ, ρ, β parameters and initial conditions</li>
+                <li>VGA output is driven directly from the hardware-computed x-y coordinates</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
       </div>
-    </section><!-- End Portfolio Details Section -->
+    </section>
 
-  </main><!-- End #main -->
+  </main>
 
-  <!-- ======= Footer ======= -->
+  <!-- Footer -->
   <div id="footer" class="text-center">
     <div class="container">
       <div class="socials-media text-center">
-
         <ul class="list-unstyled">
           <li><a href="https://github.com/zkarim28"><i class="bi bi-github"></i></a></li>
           <li><a href="https://www.linkedin.com/in/zkarim28/"><i class="bi bi-linkedin"></i></a></li>
           <li><a href="https://www.youtube.com/@zkarim28"><i class="bi bi-youtube"></i></a></li>
         </ul>
-
       </div>
-
-      <p>Check out my projects | connect with me | subscribe!</p>
-
-      <div class="credits" style="font-size:0.5rem;">
-        Template by <a href="https://bootstrapmade.com/" style="color:gray; cursor:default;">BootstrapMade</a>
+      <p>Check out my projects · connect with me · subscribe</p>
+      <div class="credits">
+        Template by <a href="https://bootstrapmade.com/" style="color:var(--text-muted); cursor:default;">BootstrapMade</a>
       </div>
-
     </div>
-  </div><!-- End Footer -->
+  </div>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-  <!-- Vendor JS Files -->
+  <!-- Vendor JS -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
   <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
@@ -192,9 +275,7 @@
   <script src="assets/vendor/typed.js/typed.umd.js"></script>
   <script src="assets/vendor/php-email-form/validate.js"></script>
 
-  <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
 
 </body>
-
 </html>

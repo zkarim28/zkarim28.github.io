@@ -5,39 +5,87 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>RiffMIDI - Zarif Karim's Website</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
+  <title>RiffMIDI — Guitar MIDI Controller — Zarif Karim</title>
+  <meta content="Rockband guitar controller converted into a fully functional MIDI controller using Arduino Mega and custom C++ firmware" name="description">
+  <meta content="MIDI, Arduino, C++, guitar, controller, RiffMIDI, music hardware, DAW" name="keywords">
 
-  <!-- Favicons -->
   <link href="assets/img/kiwi.png" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Poppins:300,300i,400,400i,500,500i,600,600i,700,700i|Playfair+Display:400,400i,500,500i,600,600i,700,700i,900,900i" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Vendor CSS Files -->
+  <!-- Vendor CSS -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
   <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
   <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
-  <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
 
-  <!-- =======================================================
-  * Template Name: Folio
-  * Updated: Nov 17 2023 with Bootstrap v5.3.2
-  * Template URL: https://bootstrapmade.com/folio-bootstrap-portfolio-template/
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+  <style>
+    .proj-section { margin-bottom: 40px; }
+    .proj-section h3 {
+      font-size: 1rem;
+      font-family: var(--mono, monospace);
+      color: var(--cyan, #00d4ff);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border, #1e3a5f);
+    }
+    .proj-section p {
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text-secondary, #94a3b8);
+      margin-bottom: 10px;
+    }
+    .proj-section ul {
+      padding-left: 18px;
+      margin: 0;
+    }
+    .proj-section ul li {
+      font-size: 14px;
+      color: var(--text-secondary, #94a3b8);
+      line-height: 1.8;
+      margin-bottom: 4px;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-family: var(--mono, monospace);
+      color: var(--cyan, #00d4ff);
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 3px;
+      padding: 2px 8px;
+      margin: 3px 3px 3px 0;
+    }
+    .portfolio-details-slider .swiper-slide iframe {
+      width: 100%;
+      aspect-ratio: 16/9;
+      height: auto;
+      display: block;
+      border: none;
+      border-radius: 4px;
+    }
+    .portfolio-details-slider .swiper-slide img {
+      width: 100%;
+      height: 420px;
+      object-fit: contain;
+      background: #0d1426;
+      border-radius: 4px;
+      display: block;
+    }
+    .portfolio-info strong { color: var(--cyan, #00d4ff); }
+    .portfolio-info a { color: var(--cyan, #00d4ff); }
+    .portfolio-info a:hover { color: #7ee8ff; }
+  </style>
 </head>
 
 <body>
 
-  <!-- ======= Header ======= -->
+  <!-- Header -->
   <header id="header" class="fixed-top header-inner-pages">
     <div class="container d-flex align-items-center justify-content-between">
 
@@ -45,52 +93,48 @@
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="nav-link scrollto active" href="/index.html#hero">Home</a></li>
-          <li><a class="nav-link scrollto" href="/index.html#about">About</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#portfolio">Portfolio</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#skills">Skills</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#coursework">Relevant Coursework</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#resume">Resume</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#yt">YouTube</a></li>
-          <li><a class="nav-link  scrollto" href="/index.html#pd">Songs</a></li>
-          <li><a class="nav-link scrollto" href="/index.html#contact">Contact</a></li>
+          <li><a class="nav-link" href="/index.html#hero">Home</a></li>
+          <li><a class="nav-link" href="/index.html#about">About</a></li>
+          <li><a class="nav-link active" href="/index.html#portfolio">Portfolio</a></li>
+          <li><a class="nav-link" href="/index.html#skills">Skills</a></li>
+          <li><a class="nav-link" href="/index.html#coursework">Coursework</a></li>
+          <li><a class="nav-link" href="/index.html#yt">YouTube</a></li>
+          <li><a class="nav-link" href="/index.html#resume">Resume</a></li>
+          <li><a class="nav-link" href="/index.html#pd">Songs</a></li>
+          <li><a class="nav-link" href="/index.html#contact">Contact</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
-      </nav><!-- .navbar -->
+      </nav>
 
     </div>
-  </header><!-- End Header -->
+  </header>
 
   <main id="main">
 
-    <!-- ======= Breadcrumbs Section ======= -->
+    <!-- Breadcrumbs -->
     <section class="breadcrumbs">
       <div class="container">
-
-        <div class="container">
-          <div class="section-title text-center">
-            <h1>RiffMIDI - Rockband Guitar MIDI Controller</h1>
-          </div>
+        <div class="section-title text-center">
+          <h1>RiffMIDI — a guitar anyone can play</h1>
         </div>
-
         <div class="d-flex justify-content-between align-items-center">
-          <h2>Project Details</h2>
+          <h2>Rockband Guitar → MIDI Controller</h2>
           <ol>
             <li><a href="index.html">Home</a></li>
             <li><a href="/index.html#portfolio">Portfolio</a></li>
             <li>Project Details</li>
           </ol>
         </div>
-
       </div>
-    </section><!-- Breadcrumbs Section -->
+    </section>
 
-    <!-- ======= Portfolio Details Section ======= -->
+    <!-- Portfolio Details -->
     <section id="portfolio-details" class="portfolio-details">
       <div class="container">
 
         <div class="row gy-4">
 
+          <!-- Left: media slider -->
           <div class="col-lg-8">
             <div class="portfolio-details-slider swiper">
               <div class="swiper-wrapper align-items-center">
@@ -100,13 +144,15 @@
                 </div>
 
                 <div class="swiper-slide">
-                    <img src="assets/img/portfolio/riffinternal.png" alt="RiffMIDI Guitar Controller">
-                  </div>
+                  <img src="assets/img/portfolio/riffinternal.png" alt="Internal Wiring">
+                </div>
 
                 <div class="swiper-slide">
-                <!-- <video height="auto" width="auto" src="assets/img/portfolio/Wait For It - From Broadway Show_ Hamilton.mp4" controls = "true"> -->
-                    <iframe width="560" height="315" src="https://www.youtube.com/embed/RiYse2FOwos?si=BEZgiOavsPzqHWc5" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                    <!-- </video> -->
+                  <iframe src="https://www.youtube.com/embed/RiYse2FOwos?si=BEZgiOavsPzqHWc5"
+                    title="RiffMIDI Showcase"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen></iframe>
                 </div>
 
               </div>
@@ -114,59 +160,83 @@
             </div>
           </div>
 
+          <!-- Right: sidebar -->
           <div class="col-lg-4">
+
             <div class="portfolio-info">
               <h3>Project information</h3>
               <ul>
-                <li><strong>Project date</strong>: July 24, 2024 - Aug 24, 2024</li>
-                <li><strong>Language</strong>: C++</li>
-                <li><strong>Libraries/Frameworks</strong>: Control Surface</li>
-                <li><strong>Hardware</strong>: Arduino Mega, Rockband Guitar Controller</li>
-                <li><strong>Software</strong>: Arduino IDE, MIDI Library</li>
-                <li><strong>Repo</strong>: <a href="https://github.com/zkarim28/RiffMIDI" target="_blank">github.com/zkarim28/RiffMIDI</a></li>
-                <li><strong></strong><a href="https://youtu.be/RiYse2FOwos" target="_blank">Showcase Video</a></li>
+                <li><strong>Date:</strong> July 24 – August 24, 2024</li>
+                <li><strong>Language:</strong> C++</li>
+                <li><strong>Libraries:</strong> Control Surface</li>
+                <li><strong>Hardware:</strong> Arduino Mega 2560, Rockband Guitar Controller</li>
+                <li><strong>Software:</strong> Arduino IDE</li>
+                <li><strong>GitHub:</strong> <a href="https://github.com/zkarim28/RiffMIDI" target="_blank">zkarim28/RiffMIDI</a></li>
+                <li><strong>Demo:</strong> <a href="https://youtu.be/RiYse2FOwos" target="_blank">YouTube</a></li>
               </ul>
             </div>
-            <div class="portfolio-description">
-              <h2>Summary</h2>
-              <p>
-                RiffMIDI is a custom project that transforms a Rockband guitar controller into a fully functional MIDI controller. The project uses an Arduino Mega to interface with the guitar's buttons and fretboard, sending MIDI signals to a digital audio workstation (DAW). This allows users to play and control virtual instruments using the familiar guitar layout. The project involved extensive hardware hacking, including reverse-engineering the controller's wiring and developing custom firmware to handle MIDI output. RiffMIDI adds a unique, guitar-centric approach to music production, making it an innovative tool for musicians and hobbyists alike.
-              </p>
+
+            <!-- Tags -->
+            <div style="margin-top:20px;">
+              <span class="tag">C++</span>
+              <span class="tag">Arduino</span>
+              <span class="tag">MIDI</span>
+              <span class="tag">Hardware Hacking</span>
+              <span class="tag">Music</span>
+              <span class="tag">Embedded</span>
             </div>
+
           </div>
 
         </div>
 
+        <!-- Write-up -->
+        <div class="row mt-5">
+          <div class="col-12">
+
+            <div class="proj-section">
+              <h3>Summary</h3>
+              <p>RiffMIDI transforms a Rockband guitar controller into a fully functional MIDI controller. The project uses an Arduino Mega 2560 to interface with the guitar's fret buttons, strumbar, whammy bar, and tilt sensor — translating physical inputs into standard MIDI messages that any DAW or virtual instrument can receive.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>Hardware Hacking</h3>
+              <p>The Rockband guitar uses a proprietary USB protocol that no standard MIDI host understands. To repurpose it, the original PCB's output lines were reverse-engineered by probing each button's signal line, then connected directly to the Arduino Mega's GPIO pins. The whammy bar uses an analog potentiometer already on the board, read via ADC. The tilt/accelerometer sensor was also retained and mapped to pitch bend or modulation.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>Firmware</h3>
+              <p>The firmware is built on the <strong>Control Surface</strong> C++ library, which abstracts MIDI message construction and USB-MIDI HID enumeration. Each button maps to a configurable MIDI note or CC message. The strumbar acts as a note trigger (NoteOn on downstrum, NoteOff on release), while fret buttons determine the pitch — mimicking an expressive one-handed instrument anyone can pick up.</p>
+            </div>
+
+          </div>
+        </div>
+
       </div>
-    </section><!-- End Portfolio Details Section -->
+    </section>
 
-  </main><!-- End #main -->
+  </main>
 
-  <!-- ======= Footer ======= -->
+  <!-- Footer -->
   <div id="footer" class="text-center">
     <div class="container">
       <div class="socials-media text-center">
-
         <ul class="list-unstyled">
           <li><a href="https://github.com/zkarim28"><i class="bi bi-github"></i></a></li>
           <li><a href="https://www.linkedin.com/in/zkarim28/"><i class="bi bi-linkedin"></i></a></li>
           <li><a href="https://www.youtube.com/@zkarim28"><i class="bi bi-youtube"></i></a></li>
         </ul>
-
       </div>
-
-      <p>Check out my projects | connect with me | subscribe!</p>
-
-      <div class="credits" style="font-size:0.5rem;">
-        Template by <a href="https://bootstrapmade.com/" style="color:gray; cursor:default;">BootstrapMade</a>
+      <p>Check out my projects · connect with me · subscribe</p>
+      <div class="credits">
+        Template by <a href="https://bootstrapmade.com/" style="color:var(--text-muted); cursor:default;">BootstrapMade</a>
       </div>
-
     </div>
-  </div><!-- End Footer -->
+  </div>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-  <!-- Vendor JS Files -->
+  <!-- Vendor JS -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
   <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
@@ -174,9 +244,7 @@
   <script src="assets/vendor/typed.js/typed.umd.js"></script>
   <script src="assets/vendor/php-email-form/validate.js"></script>
 
-  <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
 
 </body>
-
 </html>
