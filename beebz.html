@@ -1,0 +1,222 @@
+<!doctype html><html><head><!-- frame-runtime --><base href="/_f/1787109563-8b04/"><script>window.__FRAME_PREAMBLE={"capabilities":{"artifact":"artifact.BWD0CGLd.js","assets":"assets.BkxVItX2.js","comments":"comments.CaMLzWgX.js","db":"db.5PgiKS-2.js","downloads":"downloads.C3GSvEDP.js","embed":"embed.CbQfZY8W.js","mcp":"mcp.D3B2EyQu.js","permissions":"permissions.BNySkLV5.js","room":"room.BgXZkiYR.js","sample":"sample.B3bg5_Ty.js","self":"artifact.BWD0CGLd.js","user":"user.BpKav-Rf.js"},"transforms":"_transforms.h3_8GSUa.js","comments":"_comments.8rmPM2AJ.js","translate":"_translate.5HCW4BJh.js"}</script><script>(function(){"use strict";var ce=["light","dark","system"],ue=/^[A-Za-z0-9_-]{1,64}$/,V=/^[a-zA-Z_:][a-zA-Z0-9_:.-]{0,127}$/,fe=new Set(["class","hidden","value","checked"]);function de(e){const t=e.toLowerCase();return t.startsWith("data-")||t.startsWith("aria-")||fe.has(t)}var pe="http://www.w3.org/1999/xhtml",me="http://www.w3.org/2000/svg",ge=new Set(["script","style","iframe","noscript","noframes","noembed","xmp","plaintext","template","title","textarea","object","embed"]),_e=new Set(["script","style"]);function ve(e){const t=e.localName.toLowerCase();return e.namespaceURI===pe?!ge.has(t):e.namespaceURI===me?!_e.has(t):!1}function he(e){if(e===null||typeof e!="object")return!1;const t=e.__frame_patch;if(t===null||typeof t!="object")return!1;const{seq:n,elements:a}=t;if(typeof n!="number"||!Number.isSafeInteger(n)||!Array.isArray(a)||a.length===0||a.length>64)return!1;for(const i of a){if(i===null||typeof i!="object")return!1;const r=i;if(typeof r.target!="string"||!ue.test(r.target)||r.text!==void 0&&typeof r.text!="string")return!1;if(r.attrsSet!==void 0){if(r.attrsSet===null||typeof r.attrsSet!="object")return!1;for(const[l,c]of Object.entries(r.attrsSet))if(!V.test(l)||typeof c!="string")return!1}if(r.attrsRemoved!==void 0){if(!Array.isArray(r.attrsRemoved))return!1;for(const l of r.attrsRemoved)if(typeof l!="string"||!V.test(l))return!1}}return!0}function ye(e){if(e===null||typeof e!="object")return!1;const t=e.__frame_init;return t!==null&&typeof t=="object"}function be(e){return e!==null&&typeof e=="object"&&e.__frame_size_poke===!0}function Ee(e){if(e===null||typeof e!="object")return!1;const t=e.__frame_theme;if(t===null||typeof t!="object")return!1;const n=t.theme;return typeof n=="string"&&ce.includes(n)}function we(e){try{typeof reportError=="function"?reportError(e):setTimeout(()=>{throw e},0)}catch{}}var X=["#62744c","#b04e72","#5b7596","#a3651f","#7a6ba8","#3f7a75"];function J(e){let t=0;for(let n=0;n<e.length;n++)t=t*31+e.charCodeAt(n)>>>0;return X[t%X.length]??"#788c5d"}var Z="#c7c9d1",Ae=["data:image","/svg+xml,"].join("");function Q(e){return Ae+"%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2'%3E%3Ccircle cx='1' cy='1' r='1' fill='"+encodeURIComponent(e)+"'/%3E%3C/svg%3E"}var Se=Object.freeze({id:null,name:"",avatarUrl:Q(Z),color:Z,email:null,isOwner:!1,canEdit:!1});function je(...e){const t=e[0],n=typeof t=="string"?[t]:Array.isArray(t)?t.filter(i=>typeof i=="string"):[],a=Object.create(null);for(const i of n)a[i]={id:i,name:"",avatarUrl:Q(J(i)),color:J(i),email:null,isMe:!1};return a}var ee=Object.freeze(Object.assign(Object.create(null),{user:Object.freeze(Object.assign(Object.create(null),{id:null,isOwner:!1,canEdit:!1,me:Se,profiles:je,name:"",avatarUrl:null,search:Object.freeze([]),email:null}))})),Re={sample:"sample"};function te(){const e=new Uint8Array(20);try{crypto.getRandomValues(e)}catch{for(let n=0;n<e.length;n++)e[n]=Math.floor(Math.random()*256)}let t="";for(const n of e)t+=(n%36).toString(36);return t}function Oe(e,t){const n=r=>{const l={path:r},c=r.split("/");return{id:c[c.length-1],path:r,get:()=>t("get",[l]),set:d=>t("set",[l,d]),update:d=>t("update",[l,d]),delete:()=>t("delete",[l]),acquire:d=>t("acquire",[l,d]),onSnapshot:(d,E)=>t("subscribe",[l,d,E]),collection:d=>i(r+"/"+String(d))}},a=r=>({where:(l,c,d)=>a({...r,where:[...r.where??[],{f:String(l),op:String(c),v:d}]}),orderBy:(l,c)=>a({...r,orderBy:{f:String(l),dir:c===void 0?"asc":String(c)}}),limit:l=>a({...r,limit:Number(l)}),get:()=>t("query",[r]),onSnapshot:(l,c)=>t("subscribe",[r,l,c])}),i=r=>({...a({collection:r}),path:r,doc:l=>n(r+"/"+(l===void 0?te():String(l))),add:l=>{const c=n(r+"/"+te());return Promise.resolve(c.set(l)).then(()=>c)}});e.doc=r=>n(String(r)),e.collection=r=>i(String(r))}var Pe=Object.freeze([]);function Te(e,t){let n=null,a=null;const i=()=>e.__settled;e.peers=()=>Pe,e.connected=()=>!1,e.emit=()=>i()?.()??Promise.resolve(),e.presence=r=>{const l=i();if(l)return l();let c=null;if(r!==null&&typeof r=="object")try{Array.isArray(r)||(c={...r})}catch{}return c===null?Promise.reject({code:"invalid_argument",message:"presence takes an object"}):(n===null&&(n=Object.create(null),a=Promise.resolve(t("presence",[n]))),Object.assign(n,c),a)}}var B="__frame_scroll",Me=150,Le=310,ke=160,Ce=3e4;function Ne(){let e=0,t=!1,n=!1,a=!1,i=0,r=null;const l=u=>{try{sessionStorage.setItem(B,JSON.stringify({y:u}))}catch{}},c=()=>{if(clearTimeout(e),r===null)return;const u=r;r=null,l(u)},d=()=>{if(t){t=!1;return}n=!0,r=scrollY,clearTimeout(e),e=setTimeout(c,Me)};try{addEventListener("scroll",d,{passive:!0}),addEventListener("pagehide",c)}catch{}const E=()=>{let u;try{u=sessionStorage.getItem(B)}catch{return null}if(u===null)return null;let g;try{g=JSON.parse(u)}catch{g=null}const f=g?.y;if(!(typeof f=="number"&&Number.isFinite(f)&&f>=0)){try{sessionStorage.removeItem(B)}catch{}return null}return f};let T=!1;const h=u=>{try{const g=scrollY;scrollTo({top:u,left:0,behavior:"instant"}),i=u,a=!0,clearTimeout(e),r=null,l(u);const f=scrollY;f!==g&&(t=!0),f!==u&&!T&&(T=!0,addEventListener("load",()=>{try{if(scrollY===f){const p=E();h(p!==null?p:i)}}catch{}},{once:!0}))}catch{}},R=()=>{try{return!!location.hash}catch{return!0}};let A=!1;const O=()=>{try{if(A||innerWidth>Le||innerHeight>ke)return;A=!0;const u=Date.now(),g=()=>{try{removeEventListener("resize",g)}catch{}if(Date.now()-u>Ce||n||R())return;const f=E();h(f!==null?f:i)};addEventListener("resize",g)}catch{}};let M=!1,o=!1;return{restore(){if(M||(M=!0,R()))return;const u=E();u!==null&&(h(u),O())},promoted(){if(o||(o=!0,R()))return;const u=E();u!==null?(h(u),O()):a&&h(i)}}}var Ye="modulepreload",We=function(e){return"/"+e},Ke={},Ue=function(t,n,a){let i=Promise.resolve();function r(l){const c=new Event("vite:preloadError",{cancelable:!0});if(c.payload=l,window.dispatchEvent(c),!c.defaultPrevented)throw l}return i.then(l=>{for(const c of l||[])c.status==="rejected"&&r(c.reason);return t().catch(r)})};(function(){const e=Object.defineProperty,t=globalThis,n=["RTCPeerConnection","webkitRTCPeerConnection","RTCDataChannel","RTCIceCandidate","RTCSessionDescription","RTCRtpSender","RTCRtpReceiver"];let a=0;for(let i=0;i<n.length;i++){const r=n[i];try{e(t,r,{value:void 0,writable:!1,configurable:!1})}catch{try{delete t[r]}catch{}try{e(t,r,{value:void 0,writable:!1,configurable:!0})}catch{}}typeof t[r]=="function"&&a++}if(a&&window!==top)try{parent.postMessage({__frame_rtc_lockdown_failed:a},"*")}catch{}})();var qe=1e4,Ie=Object.freeze([...window.__FRAME_PREAMBLE?.origins??["https://claude.ai","https://preview.claude.ai"]]);function re(e){for(const t of Ie)if(t.endsWith(":*"))try{const n=new URL(e);if(`${n.protocol}//${n.hostname}:*`===t)return!0}catch{}else if(e===t)return!0;return!1}var k=Object.freeze({...window.__FRAME_PREAMBLE?.capabilities}),x=window.__FRAME_PREAMBLE?.transforms,$=window.__FRAME_PREAMBLE?.comments,z=window.__FRAME_PREAMBLE?.translate,q=/^[\w.-]+\.js$/,De=/^[a-z][a-z0-9_-]{0,63}$/;function I(e){return Ue(()=>import("/_runtime/"+e),void 0)}function Be(e,t){return{contract:e.contract,changes:new Set(e.changes??[]),flags:new Set(e.flags??[]),capabilities:e.capabilities??{},capBudgets:e.capBudgets??{},transforms:new Map,shellOrigin:t,mount:Y,pipe:()=>({wrap:(n,a)=>(...i)=>{try{return a(...i)}catch(r){return Promise.reject(r)}}})}}var ne=null,C=null;function F(e,t,n){try{Object.defineProperty(e,t,{value:n,writable:!1,configurable:!1,enumerable:!0})}catch{try{Object.defineProperty(e,t,{value:n,writable:!1,configurable:!0,enumerable:!0})}catch{}}}var H=!1;function xe(e,t){const n=[];for(const a of e.elements){const i=document.querySelector(`[data-id="${a.target}"]`);if(!i){parent.postMessage({__frame_patch_miss:{seq:e.seq}},t);return}if([...Object.keys(a.attrsSet??{}),...a.attrsRemoved??[]].some(r=>!de(r))){parent.postMessage({__frame_patch_miss:{seq:e.seq}},t);return}if(a.text!==void 0&&!ve(i)){parent.postMessage({__frame_patch_miss:{seq:e.seq}},t);return}for(const[r,l]of Object.entries(a.attrsSet??{}))if(!oe(i,r)){try{i.setAttribute(r,l)}catch{}se(i,r,l)}for(const r of a.attrsRemoved??[])oe(i,r)||(i.removeAttribute(r),se(i,r,null));typeof a.text=="string"&&(i.textContent=a.text),n.push(a.target)}try{document.dispatchEvent(new CustomEvent("claude:edit",{detail:{seq:e.seq,targets:n}}))}catch{}}function se(e,t,n){if(!(e instanceof HTMLInputElement))return;const a=t.toLowerCase();a==="checked"?e.checked=n!==null:a==="value"&&e.type!=="file"&&(e.value=n??"")}function oe(e,t){const n=t.toLowerCase(),a=e;return n==="data-id"||(n==="value"||n==="checked")&&(a.__artifactSecret===!0||/^(password|hidden|file)$/.test(a.type??"")||/(^|\s)(cc-|one-time-code|current-password|new-password)/i.test(`${e.getAttribute("autocomplete")??""} ${a.autocomplete??""}`))}function ae(e){const t=document.documentElement;e==="light"||e==="dark"?(t.dataset.theme=e,t.style.colorScheme=e,H=!0):H&&(delete t.dataset.theme,t.style.colorScheme="",H=!1)}var ie=256,N=Object.assign(Object.create(null),{mcp:Object.assign(Object.create(null),{watchTool:{handlerArg:3}}),db:Object.assign(Object.create(null),{subscribe:{handlerArg:1,errArg:2}}),room:Object.assign(Object.create(null),{on:{handlerArg:1,errArg:2},onPeers:{handlerArg:0,errArg:1},onConnection:{handlerArg:0,errArg:1}})}),$e=Object.assign(Object.create(null),{db:(e,t)=>Oe(e,t),room:(e,t,n)=>Te(e,n)}),j=new Map;function Y(e,t){const n=j.get(e);if(!n)return;const a=Object.assign(Object.create(null),t);Object.assign(n.impl,a),n.r(n.ns),n.impl.__settled=()=>Promise.reject({code:"capability_removed",message:`${e}: method not in this runtime`});const i=n.queue;n.queue=[];for(const r of i){const l=a[r.method];if(l)if(N[e]?.[r.method])try{r.resolve(l(...r.args))}catch{U(r,N[e][r.method],{code:"transform_error",message:`${e}.${r.method} rejected its arguments`})}else l(...r.args).then(r.resolve,r.reject);else{const c={code:"capability_removed",message:`${e}.${r.method} is not in this runtime`},d=N[e]?.[r.method];if(d){U(r,d,c);continue}r.reject(c)}}}function ze(e,t){const n=j.get(e);if(!n)return;n.impl.__settled=()=>Promise.reject(t),n.r(null);const a=n.queue;n.queue=[];for(const i of a){const r=N[e]?.[i.method];if(r){U(i,r,t);continue}i.reject(t)}}function le(e,t){if(typeof e=="function")try{return e(...t)}catch{return Object.create(null)}return Array.isArray(e)?[...e]:e!==null&&typeof e=="object"?{...e}:e}function D(e,t){const n=ee[e];if(!n){ze(e,t);return}j.get(e)?.r(null),Y(e,Object.fromEntries(Object.entries(n).map(([a,i])=>[a,(...r)=>Promise.resolve(le(i,r))])))}function U(e,t,n){if(e.syncState?.dead)return;const a=t.errArg===void 0?void 0:e.args[t.errArg],i=t.errArg===void 0?e.args[t.handlerArg]:a;typeof i=="function"&&queueMicrotask(()=>{if(!e.syncState?.dead)try{i(t.errArg===void 0?{type:"error",error:n}:n)}catch(r){we(r)}})}var W=Object.getOwnPropertyDescriptor(window,"claude");if(window!==top&&!(W&&W.writable===!1)){const e=x&&q.test(x)?I(x).catch(()=>{}):Promise.resolve(void 0),t=o=>{if(o.type==="auxclick"&&o.button!==1)return;const u=o.target,g=u&&u.closest?u.closest("a[href],area[href]"):null;if(!g)return;const f=g.getAttribute("href");if(!f)return;let p,P;try{p=new URL(f,document.baseURI),P=new URL(document.baseURI).origin}catch{return}if((p.protocol==="http:"||p.protocol==="https:")&&p.origin!==P){o.preventDefault();const w=(g.getAttribute("target")??"").toLowerCase(),y=o.type==="auxclick"||o.metaKey||o.ctrlKey||o.shiftKey||o.altKey||!["","_self","_top","_parent"].includes(w);parent.postMessage({__frame_nav:!0,url:p.href,newTab:y},"*")}};addEventListener("click",t,!0),addEventListener("auxclick",t,!0);const n={},a=o=>{o.isTrusted&&(n.pointer=!0)},i=o=>{o.isTrusted&&(n.click=!0)};addEventListener("pointermove",a,{capture:!0,passive:!0}),addEventListener("click",i,{capture:!0,passive:!0}),e.then(o=>{o?.wireNav&&(o.wireNav(),removeEventListener("click",t,!0),removeEventListener("auxclick",t,!0),removeEventListener("pointermove",a,!0),removeEventListener("click",i,!0),o.wireEngagement?.(n))});let r=null;try{r=Ne()}catch{}const l=W?.value??{};F(window,"claude",l);const c=o=>{let u;const g=new Promise(v=>{u=v}),f={impl:Object.create(null),queue:[],u:g,r:u,ns:null};j.set(o,f);const p=f.impl,P=v=>({code:"queue_overflow",message:`${o}.${v}: pre-init call queue is full`}),w=(v,s)=>{if(f.queue.length>=ie){const m=ee[o];return m&&v in m?Promise.resolve(le(m[v],s)):Promise.reject(P(v))}return new Promise((m,_)=>{f.queue.push({method:v,args:s,resolve:m,reject:_})})},y=Re[o],L=new Proxy(y===void 0?p:(()=>{}),{apply:(v,s,m)=>{const _=y,b=p[_]??p.__settled;return b?b(...m):w(_,m)},get:(v,s)=>{if(typeof s!="string"||s==="then"||s==="toJSON"||s==="valueOf")return;if(s==="toString")return Object.prototype.toString;if(y!==void 0&&(s==="call"||s==="apply"||s==="bind"))return Function.prototype[s];const m=N[o]?.[s];return m?(..._)=>{if(typeof _[m.handlerArg]!="function")throw new TypeError(`${o}.${s} requires a handler function`);const b=p[s];if(b)return b(..._);if(p.__settled){const S={dead:!1},Fe={args:[..._],syncState:S};return p.__settled().catch(He=>U(Fe,m,He)),()=>{S.dead=!0}}if(f.queue.length>=ie){const S={dead:!1};return U({args:[..._],syncState:S},m,P(s)),()=>{S.dead=!0}}let K=null;const G={dead:!1};return f.queue.push({method:s,args:_,resolve:S=>{K=typeof S=="function"?S:null,G.dead&&K?.()},reject:()=>{},syncState:G}),()=>{G.dead=!0,K?.()}}:(..._)=>{const b=p[s]??p.__settled;return b?b(..._):w(s,_)}},set:()=>!1});$e[o]?.(p,(v,s)=>L[v](...s),w),f.ns=L,F(l,o,L)};for(const o of Object.keys(k)){if(l[o]!==void 0){F(l,o,l[o]);continue}c(o)}if(l.use===void 0){const o=u=>{if(typeof u!="string"||!Object.hasOwn(k,u))return Promise.resolve(null);const g=j.get(u);return g?g.u:Promise.resolve(l[u]??null)};try{Object.defineProperty(l,"use",{value:o,writable:!0,configurable:!0,enumerable:!1})}catch{}}let d=null,E=null,T=0;const h=o=>{o.source!==parent||!re(o.origin)||ye(o.data)&&(d=o.data.__frame_init,C=o.origin,removeEventListener("message",h),clearTimeout(T),E?.())};addEventListener("message",h),parent.postMessage({__frame_connect:!0},"*");const R=new Promise(o=>{E=o,T=setTimeout(()=>{removeEventListener("message",h),o()},qe)}),A=document.readyState==="loading"?new Promise(o=>document.addEventListener("DOMContentLoaded",()=>o(),{once:!0})):Promise.resolve();A.then(()=>{try{r?.restore()}catch{}});const O={cb:null},M=o=>{if(!(o.source!==parent||!re(o.origin))&&be(o.data)){try{r?.promoted()}catch{}O.cb?.()}};addEventListener("message",M),R.then(async()=>{if(!d||!C){for(const s of j.keys())D(s,{code:"not_granted",message:"frame initialization did not arrive - capability unavailable"});return}ae(d.theme);const o=C;let u=!1,g=!1;addEventListener("message",s=>{if(s.source!==parent||s.origin!==o)return;Ee(s.data)&&ae(s.data.__frame_theme.theme),he(s.data)&&xe(s.data.__frame_patch,o);const m=s.data?.__fc_mode;m&&typeof m=="object"&&!u&&$&&q.test($)&&(u=!0,I($).then(b=>b.install?.(o,m.on===!0)).catch(()=>{}));const _=s.data?.__ft_cmd;_&&typeof _=="object"&&!g&&z&&q.test(z)&&(g=!0,I(z).then(b=>b.install?.(o,_)).catch(()=>{}))});const f=Object.keys(d.capabilities??{});for(const s of f)Object.hasOwn(k,s)||De.test(s)&&l[s]===void 0&&(c(s),D(s,{code:"capability_disabled",message:"capability not in this runtime generation"}));const p=f.filter(s=>Object.hasOwn(k,s)).map(s=>[s,k[s]]).filter(s=>typeof s[1]=="string"&&q.test(s[1])),P=await Promise.allSettled(p.map(([,s])=>I(s))),w=await e,y=C;w?.buildBoot||parent.postMessage({__frame_cap_telemetry:{kind:"cap-load-error",cap:"_transforms"}},y),ne=w?.buildBoot?w.buildBoot(d,w.TRANSFORMS??{},{shellOrigin:y,mount:Y},s=>parent.postMessage({__frame_cap_telemetry:s},y)):Be(d,y);const L=s=>parent.postMessage({__frame_cap_telemetry:{kind:"cap-load-error",cap:s}},y),v=ne;P.forEach((s,m)=>{const _=p[m][0];if(s.status!=="fulfilled"){L(_);return}try{s.value?.install?.(v)}catch{L(_)}});for(const[s,m]of j)if(m.impl.__settled===void 0){if(f.includes(s)){D(s,{code:"capability_disabled",message:"capability not available in this session"});continue}D(s,{code:"not_granted",message:"capability not available in this session"})}await A,parent.postMessage({__frame_ready:!0},C),e.then(s=>s?.installSizeReporter?.(y,O))})}})();</script><!-- /frame-runtime --><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>Zarif vs Mahdia — Textionship</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap">
+<style>
+:root {
+  --bg: #12151c; --surface: #191d26; --surface-2: #1f2430;
+  --ink: #eceef2; --ink-dim: #aeb4c2; --muted: #78808f;
+  --line: rgba(236,238,242,0.09);
+  --a: #ffb238; --a-soft: rgba(255,178,56,0.16);
+  --b: #ff5d7e; --b-soft: rgba(255,93,126,0.16);
+  --shadow: 0 20px 50px -25px rgba(0,0,0,0.6);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #eef1f6; --surface: #ffffff; --surface-2: #f4f6fa;
+    --ink: #1a1e27; --ink-dim: #454c5b; --muted: #6b7280;
+    --line: rgba(26,30,39,0.10);
+    --a: #b8760f; --a-soft: rgba(184,118,15,0.12);
+    --b: #d1355a; --b-soft: rgba(209,53,90,0.10);
+    --shadow: 0 20px 40px -28px rgba(20,25,40,0.25);
+  }
+}
+:root[data-theme="light"] {
+  --bg: #eef1f6; --surface: #ffffff; --surface-2: #f4f6fa;
+  --ink: #1a1e27; --ink-dim: #454c5b; --muted: #6b7280;
+  --line: rgba(26,30,39,0.10);
+  --a: #b8760f; --a-soft: rgba(184,118,15,0.12);
+  --b: #d1355a; --b-soft: rgba(209,53,90,0.10);
+  --shadow: 0 20px 40px -28px rgba(20,25,40,0.25);
+}
+:root[data-theme="dark"] {
+  --bg: #12151c; --surface: #191d26; --surface-2: #1f2430;
+  --ink: #eceef2; --ink-dim: #aeb4c2; --muted: #78808f;
+  --line: rgba(236,238,242,0.09);
+  --a: #ffb238; --a-soft: rgba(255,178,56,0.16);
+  --b: #ff5d7e; --b-soft: rgba(255,93,126,0.16);
+  --shadow: 0 20px 50px -25px rgba(0,0,0,0.6);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: "Work Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px 90px; }
+.hero { max-width: 1080px; margin: 0 auto; padding: 64px 20px 40px; text-align: center; }
+.eyebrow { font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 0.18em; color: var(--muted); margin: 0 0 18px; }
+.matchup {
+  font-family: "Big Shoulders Display", sans-serif; font-weight: 800;
+  font-size: clamp(48px, 11vw, 118px); line-height: 0.92; margin: 0; text-wrap: balance;
+  display: flex; align-items: baseline; justify-content: center; gap: 0.28em; flex-wrap: wrap;
+}
+.matchup .a { color: var(--a); }
+.matchup .b { color: var(--b); }
+.matchup .vs { font-family: "Work Sans", sans-serif; font-weight: 500; font-style: italic; font-size: 0.28em; color: var(--muted); }
+.hero-range { color: var(--ink-dim); font-size: 15px; margin: 18px 0 0; }
+.scoreline { margin-top: 44px; display: grid; grid-template-columns: 1fr minmax(160px, 320px) 1fr; align-items: center; gap: 18px; }
+.scoreline-num { font-family: "Big Shoulders Display", sans-serif; font-weight: 700; font-size: clamp(34px, 7vw, 64px); line-height: 1; }
+.scoreline-num.a { color: var(--a); text-align: right; }
+.scoreline-num.b { color: var(--b); text-align: left; }
+.scoreline-mid { display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
+.scoreline-label { font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: 0.14em; color: var(--muted); text-align: center; }
+.hero-total { color: var(--muted); font-size: 14px; margin-top: 26px; }
+.vsbar { height: 8px; border-radius: 5px; overflow: hidden; display: flex; background: var(--surface-2); }
+.vsbar-a { background: var(--a); }
+.vsbar-b { background: var(--b); }
+.sec-h {
+  font-family: "Big Shoulders Display", sans-serif; font-weight: 700; font-size: 28px; letter-spacing: 0.01em;
+  margin: 56px 0 18px; padding-bottom: 12px; border-bottom: 1px solid var(--line); color: var(--ink);
+}
+section.grid:first-of-type .sec-h { margin-top: 8px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.tiles-1 { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 16px; }
+.tiles + .tiles-1 { margin-top: 16px; }
+.tile {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  padding: 20px 22px 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 14px;
+}
+.tile.wide { grid-column: 1 / -1; }
+.tile-h h3 { margin: 0 0 4px; font-size: 16px; font-weight: 600; color: var(--ink); }
+.tile-sub { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+.cmp { display: grid; grid-template-columns: 1fr 1fr; align-items: baseline; }
+.cmp-num { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 30px; }
+.cmp-num.sig { font-family: "Big Shoulders Display", sans-serif; font-size: 26px; font-weight: 700; }
+.cmp-num.small { font-size: 20px; }
+.cmp-num.a { color: var(--a); }
+.cmp-num.b { color: var(--b); text-align: right; }
+.cmp-sub { display: grid; grid-template-columns: 1fr 1fr; font-size: 12px; color: var(--muted); margin-top: -6px; }
+.cmp-sub-side:last-child { text-align: right; }
+.tile-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.crown { font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: 0.05em; font-weight: 700; padding: 4px 9px; border-radius: 20px; }
+.crown.a { color: var(--a); background: var(--a-soft); }
+.crown.b { color: var(--b); background: var(--b-soft); }
+.note { font-size: 12px; color: var(--muted); }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.col-h { font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 8px; }
+.col-h.a { color: var(--a); }
+.col-h.b { color: var(--b); }
+.wordlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.wordlist li { display: flex; justify-content: space-between; font-size: 14px; border-bottom: 1px dashed var(--line); padding-bottom: 5px; }
+.wordlist .w { color: var(--ink); }
+.wordlist .c { font-family: "JetBrains Mono", monospace; color: var(--muted); font-size: 12.5px; }
+.emoji-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.emoji-chip { display: flex; align-items: baseline; gap: 4px; background: var(--surface-2); border-radius: 10px; padding: 5px 9px; }
+.emoji-chip .e { font-size: 18px; }
+.emoji-chip .c { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--muted); }
+.mini-row { display: flex; justify-content: space-between; font-size: 14px; padding: 5px 0; border-bottom: 1px dashed var(--line); }
+.mini-row span { color: var(--muted); font-family: "JetBrains Mono", monospace; }
+.mini-row b { font-family: "JetBrains Mono", monospace; }
+.hourchart { display: flex; align-items: flex-end; gap: 3px; height: 120px; }
+.hcol { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; }
+.hbars { flex: 1; display: flex; align-items: flex-end; gap: 1px; width: 100%; }
+.hbar { flex: 1; border-radius: 2px 2px 0 0; min-height: 2px; }
+.hbar.a { background: var(--a); opacity: 0.9; }
+.hbar.b { background: var(--b); opacity: 0.9; }
+.hour-ticks { display: flex; justify-content: space-between; margin-top: 8px; font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--muted); }
+.gap-hero { font-family: "Big Shoulders Display", sans-serif; font-size: 44px; font-weight: 800; color: var(--ink); }
+.gap-detail p { font-size: 13.5px; color: var(--ink-dim); margin: 6px 0; line-height: 1.5; }
+.gap-detail em { font-style: italic; color: var(--ink); }
+.who { font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 12px; margin-right: 4px; }
+.who.a { color: var(--a); background: var(--a-soft); }
+.who.b { color: var(--b); background: var(--b-soft); }
+.legend { display: flex; justify-content: center; gap: 22px; margin-top: 22px; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.dot.a { background: var(--a); }
+.dot.b { background: var(--b); }
+footer.page-foot { text-align: center; color: var(--muted); font-size: 12px; margin-top: 70px; }
+@media (max-width: 640px) {
+  .two-col { grid-template-columns: 1fr; }
+  .scoreline { grid-template-columns: 1fr; text-align: center; }
+  .scoreline-num.a, .scoreline-num.b { text-align: center; }
+}
+</style>
+
+<section class="hero">
+  <p class="eyebrow">FINAL SCORE &middot; 799 DAYS ON THE BOARD</p>
+  <h1 class="matchup"><span class="a">ZARIF</span><span class="vs">vs</span><span class="b">MAHDIA</span></h1>
+  <p class="hero-range">Apr 29, 2024 &nbsp;&mdash;&nbsp; Jul 7, 2026</p>
+  <div class="scoreline">
+    <div class="scoreline-num a">79,548</div>
+    <div class="scoreline-mid"><span class="scoreline-label">MESSAGES SENT</span><div class="vsbar"><div class="vsbar-a" style="width:50.8%"></div><div class="vsbar-b" style="width:49.2%"></div></div></div>
+    <div class="scoreline-num b">77,069</div>
+  </div>
+  <p class="hero-total">156,617 texts total across 717 days of talking</p>
+</section>
+
+<div class="legend"><span><i class="dot a"></i>Zarif</span><span><i class="dot b"></i>Mahdia</span></div>
+<div class="wrap">
+
+<section class="grid">
+  <h2 class="sec-h">Volume &amp; Effort</h2>
+  <div class="tiles">
+    <article class="tile"><header class="tile-h"><h3>Words Typed</h3><p class="tile-sub">Total words sent, whole history</p></header><div class="cmp"><div class="cmp-num a">395,285</div><div class="cmp-num b">366,507</div></div><div class="vsbar"><div class="vsbar-a" style="width:51.9%"></div><div class="vsbar-b" style="width:48.1%"></div></div><div class="tile-foot"><span class="crown a">★ Zarif</span></div></article>
+    <article class="tile"><header class="tile-h"><h3>Words per Message</h3><p class="tile-sub">Essay writer vs. one-liner</p></header><div class="cmp"><div class="cmp-num a">5</div><div class="cmp-num b">4.8</div></div><div class="vsbar"><div class="vsbar-a" style="width:51.0%"></div><div class="vsbar-b" style="width:49.0%"></div></div><div class="tile-foot"><span class="crown a">★ Zarif</span></div></article>
+    <article class="tile"><header class="tile-h"><h3>Personal Record</h3><p class="tile-sub">The single busiest day, each</p></header><div class="cmp"><div class="cmp-num a">738</div><div class="cmp-num b">742</div></div><div class="cmp-sub"><div class="cmp-sub-side">Dec 14, 2025</div><div class="cmp-sub-side">May 23, 2024</div></div><div class="tile-foot"><span class="note">Busiest day overall: Dec 14, 2025 &mdash; 1341 messages combined</span></div></article>
+  </div>
+</section>
+
+
+<section class="grid">
+  <h2 class="sec-h">Vocabulary</h2>
+  <div class="tiles-1">
+    <article class="tile wide"><header class="tile-h"><h3>Most Used Words</h3><p class="tile-sub">Top real words, common filler stripped out</p></header><div class="two-col"><div><div class="col-h a">Zarif</div><ol class="wordlist a"><li><span class="w">love</span><span class="c">2495</span></li><li><span class="w">yes</span><span class="c">1929</span></li><li><span class="w">time</span><span class="c">1308</span></li><li><span class="w">sorry</span><span class="c">1132</span></li><li><span class="w">beebz</span><span class="c">1119</span></li></ol></div><div><div class="col-h b">Mahdia</div><ol class="wordlist b"><li><span class="w">love</span><span class="c">2477</span></li><li><span class="w">bug</span><span class="c">1871</span></li><li><span class="w">yuh</span><span class="c">1563</span></li><li><span class="w">time</span><span class="c">1115</span></li><li><span class="w">yes</span><span class="c">1108</span></li></ol></div></div></article>
+  </div>
+  <div class="tiles">
+    <article class="tile"><header class="tile-h"><h3>Their Word</h3><p class="tile-sub">The word each of you says that the other basically never does</p></header><div class="cmp"><div class="cmp-num a sig">&ldquo;tmrw&rdquo;</div><div class="cmp-num b sig">&ldquo;idt&rdquo;</div></div><div class="cmp-sub"><div class="cmp-sub-side">said 247&times;, Mahdia almost never</div><div class="cmp-sub-side">said 125&times;, Zarif almost never</div></div></article>
+    <article class="tile"><header class="tile-h"><h3>Vocabulary Size</h3><p class="tile-sub">Unique words used across the whole thread</p></header><div class="cmp"><div class="cmp-num a">16,329</div><div class="cmp-num b">12,887</div></div><div class="vsbar"><div class="vsbar-a" style="width:55.9%"></div><div class="vsbar-b" style="width:44.1%"></div></div><div class="tile-foot"><span class="crown a">★ Zarif</span></div></article>
+    <article class="tile"><header class="tile-h"><h3>Signature Emoji</h3><p class="tile-sub">Most-used emoji, ranked</p></header><div class="two-col"><div><div class="col-h a">Zarif</div><div class="emoji-row"><span class="emoji-chip"><span class="e">😊</span><span class="c">324</span></span><span class="emoji-chip"><span class="e">❤️</span><span class="c">84</span></span><span class="emoji-chip"><span class="e">🤗</span><span class="c">82</span></span><span class="emoji-chip"><span class="e">😅</span><span class="c">76</span></span><span class="emoji-chip"><span class="e">🥺</span><span class="c">70</span></span><span class="emoji-chip"><span class="e">👀</span><span class="c">63</span></span></div></div><div><div class="col-h b">Mahdia</div><div class="emoji-row"><span class="emoji-chip"><span class="e">😭</span><span class="c">368</span></span><span class="emoji-chip"><span class="e">😂</span><span class="c">228</span></span><span class="emoji-chip"><span class="e">😊</span><span class="c">195</span></span><span class="emoji-chip"><span class="e">💀</span><span class="c">153</span></span><span class="emoji-chip"><span class="e">👀</span><span class="c">142</span></span><span class="emoji-chip"><span class="e">😔</span><span class="c">114</span></span></div></div></div></article>
+  </div>
+</section>
+
+
+<section class="grid">
+  <h2 class="sec-h">Timing</h2>
+  <div class="tiles-1">
+    <article class="tile wide"><header class="tile-h"><h3>Night Owl Index</h3><p class="tile-sub">Messages sent by hour of day (both scaled to the same peak)</p></header><div class="hourchart"><div class="hcol"><div class="hbars"><div class="hbar a" style="height:99.4%"></div><div class="hbar b" style="height:100.0%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:90.1%"></div><div class="hbar b" style="height:90.1%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:55.3%"></div><div class="hbar b" style="height:53.9%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:25.3%"></div><div class="hbar b" style="height:26.2%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:12.8%"></div><div class="hbar b" style="height:12.6%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:8.3%"></div><div class="hbar b" style="height:9.3%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:5.3%"></div><div class="hbar b" style="height:4.4%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:3.6%"></div><div class="hbar b" style="height:4.0%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:6.3%"></div><div class="hbar b" style="height:6.3%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:13.1%"></div><div class="hbar b" style="height:12.0%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:25.6%"></div><div class="hbar b" style="height:23.6%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:46.5%"></div><div class="hbar b" style="height:43.6%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:57.9%"></div><div class="hbar b" style="height:54.5%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:49.4%"></div><div class="hbar b" style="height:46.3%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:56.8%"></div><div class="hbar b" style="height:49.0%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:46.1%"></div><div class="hbar b" style="height:44.6%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:52.4%"></div><div class="hbar b" style="height:49.5%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:56.0%"></div><div class="hbar b" style="height:56.3%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:48.0%"></div><div class="hbar b" style="height:44.5%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:48.3%"></div><div class="hbar b" style="height:44.7%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:53.5%"></div><div class="hbar b" style="height:51.4%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:60.4%"></div><div class="hbar b" style="height:58.3%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:54.9%"></div><div class="hbar b" style="height:58.1%"></div></div></div><div class="hcol"><div class="hbars"><div class="hbar a" style="height:58.7%"></div><div class="hbar b" style="height:58.9%"></div></div></div></div><div class="hour-ticks"><span>12a</span><span>6a</span><span>12p</span><span>6p</span></div><div class="tile-foot"><span class="note">Peak hour &mdash; Zarif: 12AM &nbsp;/&nbsp; Mahdia: 12AM.</span></div></article>
+  </div>
+  <div class="tiles">
+    <article class="tile"><header class="tile-h"><h3>Fastest Replier</h3><p class="tile-sub">Average reply time in an active conversation</p></header><div class="cmp"><div class="cmp-num a">4m 14s</div><div class="cmp-num b">5m 34s</div></div><div class="tile-foot"><span class="crown a">★ Zarif</span><span class="note">average time to reply, mid-conversation</span></div></article>
+    <article class="tile"><header class="tile-h"><h3>Chattiest Day</h3><p class="tile-sub">Weekday each of you texts most</p></header><div class="cmp"><div class="cmp-num a small">Thursday</div><div class="cmp-num b small">Thursday</div></div><div class="cmp-sub"><div class="cmp-sub-side">11,946 messages</div><div class="cmp-sub-side">11,729 messages</div></div></article>
+  </div>
+</section>
+
+
+<section class="grid">
+  <h2 class="sec-h">Affection</h2>
+  <div class="tiles">
+    <article class="tile"><header class="tile-h"><h3>"I Love You" Counter</h3><p class="tile-sub">Times each of you flat-out said it</p></header><div class="cmp"><div class="cmp-num a">330</div><div class="cmp-num b">167</div></div><div class="vsbar"><div class="vsbar-a" style="width:66.4%"></div><div class="vsbar-b" style="width:33.599999999999994%"></div></div><div class="tile-foot"><span class="crown a">★ Zarif</span></div></article>
+    <article class="tile"><header class="tile-h"><h3>Most Loved</h3><p class="tile-sub">❤️ tapbacks given to the other person</p></header><div class="cmp"><div class="cmp-num a">1,113</div><div class="cmp-num b">2,131</div></div><div class="vsbar"><div class="vsbar-a" style="width:34.3%"></div><div class="vsbar-b" style="width:65.7%"></div></div><div class="tile-foot"><span class="crown b">★ Mahdia</span></div></article>
+    <article class="tile"><header class="tile-h"><h3>Most Adored</h3><p class="tile-sub">❤️ tapbacks received from the other person</p></header><div class="cmp"><div class="cmp-num a">2,140</div><div class="cmp-num b">1,104</div></div><div class="vsbar"><div class="vsbar-a" style="width:66.0%"></div><div class="vsbar-b" style="width:34.0%"></div></div><div class="tile-foot"><span class="crown a">★ Zarif</span></div></article>
+  </div>
+</section>
+
+
+<section class="grid">
+  <h2 class="sec-h">Personality Quirks</h2>
+  <div class="tiles">
+    <article class="tile"><header class="tile-h"><h3>One-Word Wonder</h3><p class="tile-sub">Replies that were a single word ("k", "lol", "same"...)</p></header><div class="cmp"><div class="cmp-num a">17,905</div><div class="cmp-num b">15,382</div></div><div class="vsbar"><div class="vsbar-a" style="width:53.8%"></div><div class="vsbar-b" style="width:46.2%"></div></div><div class="tile-foot"><span class="crown a">★ Zarif</span></div></article>
+    <article class="tile"><header class="tile-h"><h3>Excitement Index</h3><p class="tile-sub">Punctuation habits: question marks and exclamation points</p></header><div class="two-col"><div><div class="col-h a">Zarif</div><div class="mini-row"><span>?</span><b>7,191</b></div><div class="mini-row"><span>!</span><b>2,702</b></div></div><div><div class="col-h b">Mahdia</div><div class="mini-row"><span>?</span><b>2,461</b></div><div class="mini-row"><span>!</span><b>2,323</b></div></div></div></article>
+    <article class="tile"><header class="tile-h"><h3>ALL CAPS ALERTS</h3><p class="tile-sub">Messages sent entirely in caps lock</p></header><div class="cmp"><div class="cmp-num a">1,067</div><div class="cmp-num b">674</div></div><div class="vsbar"><div class="vsbar-a" style="width:61.3%"></div><div class="vsbar-b" style="width:38.7%"></div></div><div class="tile-foot"><span class="crown a">★ Zarif</span></div></article>
+    <article class="tile"><header class="tile-h"><h3>Overthinker Award</h3><p class="tile-sub">Messages that got edited after sending</p></header><div class="cmp"><div class="cmp-num a">1,603</div><div class="cmp-num b">1,601</div></div><div class="vsbar"><div class="vsbar-a" style="width:50.0%"></div><div class="vsbar-b" style="width:50.0%"></div></div><div class="tile-foot"><span class="crown a">★ Zarif</span></div></article>
+    <article class="tile"><header class="tile-h"><h3>Photo Fiend</h3><p class="tile-sub">Photos, videos &amp; voice memos sent</p></header><div class="cmp"><div class="cmp-num a">3,182</div><div class="cmp-num b">2,102</div></div><div class="vsbar"><div class="vsbar-a" style="width:60.2%"></div><div class="vsbar-b" style="width:39.8%"></div></div><div class="tile-foot"><span class="crown a">★ Zarif</span></div></article>
+    <article class="tile"><header class="tile-h"><h3>Reaction Machine</h3><p class="tile-sub">Total tapbacks handed out (any type)</p></header><div class="cmp"><div class="cmp-num a">2,656</div><div class="cmp-num b">4,910</div></div><div class="vsbar"><div class="vsbar-a" style="width:35.1%"></div><div class="vsbar-b" style="width:64.9%"></div></div><div class="tile-foot"><span class="crown b">★ Mahdia</span></div></article>
+  </div>
+</section>
+
+
+<section class="grid">
+  <h2 class="sec-h">Relationship Meta</h2>
+  <div class="tiles">
+    <article class="tile"><header class="tile-h"><h3>Conversation Starter</h3><p class="tile-sub">Who re-opens the chat after a 4+ hour gap</p></header><div class="cmp"><div class="cmp-num a">514</div><div class="cmp-num b">432</div></div><div class="vsbar"><div class="vsbar-a" style="width:54.3%"></div><div class="vsbar-b" style="width:45.7%"></div></div><div class="tile-foot"><span class="crown a">★ Zarif</span></div></article>
+  </div>
+  <div class="tiles-1">
+    <article class="tile"><header class="tile-h"><h3>Longest Everyday Streak</h3><p class="tile-sub">Consecutive days with at least one text</p></header><div class="gap-hero">182 days</div><div class="gap-detail"><p>Texted every single day from <b>Jan 7, 2026</b> to <b>Jul 7, 2026</b> &mdash; no exceptions.</p></div></article>
+  </div>
+</section>
+
+<footer class="page-foot">Built from 156,617 real messages &middot; 799 days &middot; every stat on this page is true</footer>
+</div>
+
+</body></html>
