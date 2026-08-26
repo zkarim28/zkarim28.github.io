@@ -729,6 +729,94 @@ span.typed { color: var(--cyan); }
   border-top: 1px solid var(--border);
 }
 
+/* ===== Experience ===== */
+#experience {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 60px;
+}
+
+.exp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.exp-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 22px 26px;
+  transition: var(--ease);
+}
+.exp-item:hover {
+  border-color: rgba(0,212,255,0.4);
+  box-shadow: var(--shadow-cyan);
+}
+
+.exp-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.exp-header h4 {
+  margin: 0;
+  color: var(--cyan);
+}
+.exp-header .exp-role {
+  color: var(--text-primary);
+  font-weight: 400;
+}
+.exp-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  white-space: nowrap;
+}
+.exp-meta .mono-tag {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.exp-loc {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.exp-bullets {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.exp-bullets li {
+  position: relative;
+  padding-left: 18px;
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.exp-bullets li:last-child { margin-bottom: 0; }
+.exp-bullets li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--cyan);
+}
+
+@media (max-width: 576px) {
+  .exp-header { flex-direction: column; }
+  .exp-meta { align-items: flex-start; }
+}
+
 /* ===== Resume ===== */
 #resume {
   background: var(--bg-primary);
