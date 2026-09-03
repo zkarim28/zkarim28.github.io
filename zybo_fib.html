@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Zynq / Vivado / Vitis — ECE 5996 Resource Guide</title>
+<style>
+  :root{
+    --bg:#f7f7f5;
+    --panel:#ffffff;
+    --ink:#1b1d1f;
+    --ink-soft:#565c63;
+    --border:#e4e2dd;
+    --accent:#b45309;
+    --accent-soft:#fef3e6;
+    --link:#1155cc;
+    --code-bg:#f1efe9;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#15171a;
+      --panel:#1d2024;
+      --ink:#eceef0;
+      --ink-soft:#a3a9b0;
+      --border:#2c3036;
+      --accent:#e0952f;
+      --accent-soft:#2a2214;
+      --link:#7aa7ff;
+      --code-bg:#121417;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height:1.55;
+  }
+  a{color:var(--link)}
+
+  /* ---------- layout ---------- */
+  .shell{
+    display:grid;
+    grid-template-columns: 260px minmax(0,1fr);
+    max-width:1200px;
+    margin:0 auto;
+  }
+  nav.toc{
+    position:sticky;
+    top:0;
+    align-self:start;
+    height:100vh;
+    overflow-y:auto;
+    padding:28px 18px 40px 24px;
+    border-right:1px solid var(--border);
+  }
+  nav.toc h2{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    margin:0 0 12px;
+  }
+  nav.toc ol{
+    list-style:none;
+    margin:0;
+    padding:0;
+    counter-reset:sec;
+  }
+  nav.toc li{margin-bottom:2px}
+  nav.toc a{
+    display:block;
+    counter-increment:sec;
+    padding:7px 10px;
+    border-radius:8px;
+    text-decoration:none;
+    color:var(--ink-soft);
+    font-size:13.5px;
+  }
+  nav.toc a:before{
+    content: counter(sec) ". ";
+    color: var(--accent);
+    font-weight:600;
+  }
+  nav.toc a:hover{background:var(--accent-soft); color:var(--ink)}
+  nav.toc a.active{background:var(--accent-soft); color:var(--ink); font-weight:600}
+
+  main{padding: 36px 40px 90px}
+
+  header.hero{
+    padding: 10px 0 34px;
+    border-bottom:1px solid var(--border);
+    margin-bottom: 30px;
+  }
+  header.hero h1{
+    font-size: 30px;
+    margin: 0 0 8px;
+    letter-spacing:-.01em;
+  }
+  header.hero p{
+    color:var(--ink-soft);
+    margin:0;
+    font-size:15px;
+  }
+  .top-links{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:18px;
+  }
+
+  section{
+    margin-bottom: 56px;
+    scroll-margin-top: 20px;
+  }
+  section h2{
+    font-size:22px;
+    margin: 0 0 4px;
+    padding-bottom:10px;
+    border-bottom: 2px solid var(--accent);
+    display:inline-block;
+  }
+  section .kicker{
+    display:block;
+    color:var(--ink-soft);
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.07em;
+    margin-bottom:6px;
+  }
+
+  .step{
+    margin: 22px 0;
+    padding: 18px 20px;
+    background: var(--panel);
+    border:1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+  }
+  .step p{margin:0 0 12px}
+  .step p:last-child{margin-bottom:0}
+  .step ul{margin: 8px 0 0; padding-left: 20px}
+  .note{
+    margin-top:10px;
+    padding: 10px 14px;
+    background: var(--code-bg);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+  }
+  .note b{color:var(--ink)}
+
+  .imgrow{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    margin-top:14px;
+  }
+  figure{
+    margin:0;
+    flex: 1 1 260px;
+    max-width: 480px;
+  }
+  figure img{
+    display:block;
+    width:100%;
+    height:auto;
+    border-radius:10px;
+    border:1px solid var(--border);
+    cursor: zoom-in;
+    background:#fff;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  figure img:hover{
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+  figcaption{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:6px;
+  }
+
+  .linkcard{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 14px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius: 10px;
+    text-decoration:none;
+    color:var(--ink);
+    font-size:13.5px;
+    font-weight:500;
+    box-shadow: var(--shadow);
+  }
+  .linkcard:hover{border-color:var(--accent)}
+  .linkcard .icon{
+    width:26px;height:26px;flex:none;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:7px;
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:14px;
+  }
+  .linkcard small{display:block; color:var(--ink-soft); font-weight:400}
+
+  code, .inline-code{
+    background:var(--code-bg);
+    padding:1px 6px;
+    border-radius:5px;
+    font-size:.92em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  hr.sep{
+    border:none;
+    border-top:1px dashed var(--border);
+    margin: 40px 0;
+  }
+
+  /* lightbox */
+  .lightbox{
+    position:fixed; inset:0; z-index:50;
+    background: rgba(0,0,0,.82);
+    display:none;
+    align-items:center; justify-content:center;
+    padding: 4vh 4vw;
+    cursor: zoom-out;
+  }
+  .lightbox.open{display:flex}
+  .lightbox img{
+    max-width:100%; max-height:100%;
+    border-radius:8px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  }
+  .lightbox .hint{
+    position:fixed; top:18px; right:22px;
+    color:#fff; opacity:.7; font-size:13px;
+  }
+
+  footer{
+    padding: 30px 40px 60px;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    border-top:1px solid var(--border);
+  }
+
+  @media (max-width: 860px){
+    .shell{grid-template-columns: 1fr}
+    nav.toc{position:static; height:auto; border-right:none; border-bottom:1px solid var(--border)}
+    main{padding: 24px 18px 70px}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <nav class="toc" aria-label="Table of contents">
+    <h2>Sections</h2>
+    <ol>
+      <li><a href="#my-video">My Video</a></li>
+      <li><a href="#setup">How to Setup</a></li>
+      <li><a href="#first-diagram">My First Block Diagram</a></li>
+      <li><a href="#addresses">Assign AXI Addresses</a></li>
+      <li><a href="#automation">Running Block Automation</a></li>
+      <li><a href="#bitstream">Generate Bitstream</a></li>
+      <li><a href="#vitis-setup">Vitis: PS-Side Setup</a></li>
+      <li><a href="#vitis">VITIS (Code)</a></li>
+      <li><a href="#own-hdl">Combining Your Own HDL</a></li>
+      <li><a href="#lecture">Great Pictures for Lecture</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <h1>Zynq · Vivado · Vitis — Resource Guide</h1>
+      <p>ECE 5996 M.Eng. Project — a walkthrough of building a Zynq block diagram on the Zybo Z7-10, wiring up GPIO/BRAM over AXI, generating a bitstream, and bringing in your own HDL, with the reference videos and code alongside.</p>
+      <div class="top-links">
+        <a class="linkcard" href="https://www.youtube.com/watch?v=UZ3FnZNlcWk" target="_blank" rel="noopener">
+          <span class="icon">▶</span>
+          <span>Zynq Part 1<small>Vivado block diagram — no Verilog/VHDL necessary</small></span>
+        </a>
+        <a class="linkcard" href="https://www.youtube.com/watch?v=bsrdtXwjV3s" target="_blank" rel="noopener">
+          <span class="icon">▶</span>
+          <span>Zynq Part 2<small>Vitis example with PL fabric GPIO and BRAM</small></span>
+        </a>
+        <a class="linkcard" href="https://www.youtube.com/watch?v=UqXXWI28HyQ" target="_blank" rel="noopener">
+          <span class="icon">▶</span>
+          <span>Zynq Part 3<small>Combining your own HDL with the block diagram</small></span>
+        </a>
+      </div>
+    </header>
+
+    <section id="my-video">
+      <h2>My Video</h2>
+      <div class="step">
+        <div class="imgrow">
+          <figure style="max-width:100%; flex-basis:100%">
+            <video controls preload="metadata" style="width:100%; max-height:70vh; border-radius:10px; border:1px solid var(--border); background:#000;">
+              <source src="assets/video/zybo_fib/IMG_0976.mp4" type="video/mp4">
+              Your browser can't play this video inline — <a href="assets/video/zybo_fib/IMG_0976.mp4" target="_blank" rel="noopener">open the video directly</a>.
+            </video>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="terms">
+      <span class="kicker">Basic terms</span>
+      <div class="step">
+        <ul>
+          <li><b>PS</b> — Processor Side</li>
+          <li><b>PL</b> — Programmable Logic</li>
+          <li><b>AXI</b> (Advanced eXtensible Interface) — can have its own address on the AXI bus that the PL can access</li>
+        </ul>
+        <div class="note"><b>Disclaimer:</b> Vivado is a steep learning curve!</div>
+      </div>
+    </section>
+
+    <section id="setup">
+      <h2>How to Setup</h2>
+
+      <div class="step">
+        <p>Open Vivado</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image13.png" loading="lazy" alt="Vivado start screen"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Create Project</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image51.png" loading="lazy" alt="Create Project wizard"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>To make a "block diagram only" project, check the box <b>"Do not specify sources at this time."</b></p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image57.png" loading="lazy" alt="Do not specify sources checkbox"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>On the top left, navigate to the <b>Boards</b> tab, then type <code>zybo</code> in the search bar to find the <b>Zybo Z7-10</b>. (If not found, click the refresh button on the bottom left.) Click the download button under the "Status" column. Once complete, click into the Display Name box of the "Zybo Z7-10" row to select it, then proceed.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image7.png" loading="lazy" alt="Boards tab search for Zybo Z7-10"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Click <b>Finish</b> (the extra settings like "Speed Grade" have already been completed for you).</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image48.png" loading="lazy" alt="Finish project wizard"></figure></div>
+      </div>
+    </section>
+
+    <section id="first-diagram">
+      <h2>My First Block Diagram</h2>
+
+      <div class="step">
+        <p>You are currently on the main page:</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image15.png" loading="lazy" alt="Vivado main project page"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Click on <b>"Create Block Design."</b> Type in a name, then click OK.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image50.png" loading="lazy" alt="Create Block Design dialog"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>You will automatically open up to the Diagram page.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image6.png" loading="lazy" alt="Block Design diagram page"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Click on either "Plus" button to open the IP menu. In the search bar, type <code>zynq</code> and double-click <b>"ZYNQ7 Processing System."</b></p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_fib/image37.png" loading="lazy" alt="Plus button IP menu"></figure>
+          <figure><img src="assets/img/zybo_fib/image47.png" loading="lazy" alt="IP search for zynq"></figure>
+          <figure><img src="assets/img/zybo_fib/image61.png" loading="lazy" alt="ZYNQ7 Processing System block added"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>To determine the clock frequency sent from the PS to the PL fabric, double-click the <b>ZYNQ7 Processing System</b>, navigate to <b>Clock Configuration</b>, then find the <b>PL Fabric Clock</b> dropdown.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image38.png" loading="lazy" alt="Clock Configuration PL Fabric Clock dropdown"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Now for the AXI bus: every slave and master on the AXI can have its own clock and reset. The slave connects to the master; clock-domain crossing is handled for you. Here, we supply the same clock to both.</p>
+      </div>
+
+      <div class="step">
+        <p>At this point, the <b>"Processor System Reset"</b> and an <b>"AXI Interconnect"</b> have been added, without editing their internal settings.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image58.png" loading="lazy" alt="Processor System Reset and AXI Interconnect added"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Adding GPIOs is easy! Go to the <b>Board</b> tab on the top left, double-click <b>"4 LEDs,"</b> and click OK in the "Connect Board Component" popup.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image22.png" loading="lazy" alt="Connect Board Component 4 LEDs"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>The GPIO component and ports have been added.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image36.png" loading="lazy" alt="GPIO component and ports added"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Hook up the clock, reset, and AXI.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image60.png" loading="lazy" alt="Clock, reset, and AXI connections"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Click the <b>"Regenerate Layout"</b> button to make it look pretty.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image39.png" loading="lazy" alt="Regenerate Layout result"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Add the following blocks to the diagram: <b>"Block Memory Generator"</b> and <b>"AXI BRAM Controller."</b></p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image5.png" loading="lazy" alt="Block Memory Generator and AXI BRAM Controller"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Double-click into the <b>"AXI BRAM Controller"</b> and edit the <b>"Number of BRAM interfaces"</b> to <code>1</code>:</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image28.png" loading="lazy" alt="AXI BRAM Controller number of interfaces = 1"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Connect the AXI, ZYNQ clock and interconnect reset, and BRAM port.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image21.png" loading="lazy" alt="AXI, clock, reset, and BRAM port connections"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>After a "Regenerate," we have the following.</p>
+        <div class="note">Processor can use the interface to access LEDs and memory. GPIO converts AXI register space into inputs and outputs. On output, when the processor writes a value to that AXI address, the register write drives the outputs — so <code>1111</code> in binary drives all 4 LEDs.</div>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image31.png" loading="lazy" alt="Diagram after regenerate, GPIO driving LEDs"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>To also accept switch input on the GPIO: double-click into the <b>"AXI GPIO,"</b> navigate to <b>"IP Configuration,"</b> then check <b>"Enable Dual Channel"</b> and <b>"All Inputs."</b></p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image9.png" loading="lazy" alt="AXI GPIO Enable Dual Channel and All Inputs"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Go to the <b>Board</b> tab (top left) and double-click <b>"4 Switches"</b> under GPIO. Vivado will automatically detect the new GPIO port and select it.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image53.png" loading="lazy" alt="Board tab 4 Switches connection"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Here is the final block diagram!</p>
+        <div class="note">Why use block memory instead of the processor's own memory? If you have a module or algorithm, block memory is easier to access and saves the CPU's memory for CPU tasks. The CPU can write to memory at a specific address, and read back from that same address later.</div>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image54.png" loading="lazy" alt="Final block diagram"></figure></div>
+      </div>
+    </section>
+
+    <section id="addresses">
+      <h2>Assign Addresses for the AXI Bus</h2>
+
+      <div class="step">
+        <p>Navigate to the <b>"Address Editor"</b> tab on the right side window. Expand all if you'd like. Right-click in the window and select <b>"Assign All."</b></p>
+        <div class="note">The base address is used by the CPU to address a peripheral via the bus. Why a high address too? Each peripheral gets a <i>range</i> of addresses.</div>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image25.png" loading="lazy" alt="Address Editor Assign All"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>In the "Range" column, I clicked the GPIO's dropdown (showing "64") and decreased the range down to <code>4K</code> — we don't need that much range for simple LEDs.</p>
+        <div class="note">In block RAM, every byte has an address. So for a 32-bit address, you increment by 4 to get the next 32-bit word.</div>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image14.png" loading="lazy" alt="Reducing GPIO address range to 4K"></figure></div>
+      </div>
+    </section>
+
+    <section id="automation">
+      <h2>Running Block Automation</h2>
+
+      <div class="step">
+        <p>Return to the <b>"Diagram"</b> tab and click <b>"Run Block Automation"</b> in the green highlighted bar, then simply click OK:</p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_fib/image26.png" loading="lazy" alt="Run Block Automation bar"></figure>
+          <figure><img src="assets/img/zybo_fib/image55.png" loading="lazy" alt="Run Block Automation dialog"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>Once Block Automation is complete, right-click in the diagram whitespace and select <b>"Validate Design."</b> Don't worry about the following issues — this is a known issue with Zybo boards:</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image44.png" loading="lazy" alt="Validate Design known Zybo warnings"></figure></div>
+      </div>
+    </section>
+
+    <section id="bitstream">
+      <h2>Generate Bitstream</h2>
+
+      <div class="step">
+        <p>You need a top-level HDL file — so far we just have a diagram. Navigate to the <b>"Sources"</b> tab on the top left and right-click the yellow block-design entry.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image49.png" loading="lazy" alt="Sources tab right-click"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Click <b>"Ok"</b> on the popup. You should now see a "wrapper" in bold text under the "Sources" tab.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image41.png" loading="lazy" alt="HDL wrapper created under Sources"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>You can even double-click the wrapper to view the top-level Verilog code!</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image17.png" loading="lazy" alt="Top-level Verilog wrapper code"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>On the bottom left, click <b>"Generate Bitstream"</b> and click <b>"Save"</b> in the popup.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image16.png" loading="lazy" alt="Generate Bitstream button"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Click <b>"Yes"</b> in the next popup window.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image29.png" loading="lazy" alt="Yes confirmation popup"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Click <b>"Ok"</b> on the next window.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image59.png" loading="lazy" alt="Ok confirmation window"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Please wait (12:11 AM → 12:...)</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image1.png" loading="lazy" alt="Bitstream generation progress"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Simply hit <b>"Ok."</b></p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image42.png" loading="lazy" alt="Bitstream generation complete dialog"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>You will then see the chip/fabric view:</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image24.png" loading="lazy" alt="Chip fabric view"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Go <b>File → Export Hardware</b>, Next. Then check <b>"Include bitstream,"</b> Next, Finish.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image20.png" loading="lazy" alt="Export Hardware wizard"></figure></div>
+        <p>This creates a wrapped-up file to use in Vitis — bitstream included, so you can program the FPGA from Vitis!</p>
+      </div>
+    </section>
+
+    <section id="vitis-setup">
+      <h2>Vitis — Interfacing from the PS Side</h2>
+
+      <div class="step">
+        <p>At the top of Vivado, go to <b>Tools → Launch Vitis IDE</b>.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image11.png" loading="lazy" alt="Launch Vitis IDE menu"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Once open, click <b>"Open Workspace."</b></p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image32.png" loading="lazy" alt="Open Workspace button"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Create a new folder to be your workspace and click OK.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image56.png" loading="lazy" alt="Create workspace folder"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>At this point I switched to <b>Vitis Classic</b> (the Unified IDE is newer, and worth learning separately — it's deprecated).</p>
+        <p>Click <b>"Create application project."</b></p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image40.png" loading="lazy" alt="Create application project"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Navigate to the <b>"Create a new platform from hardware (XSA)"</b> tab, then Browse.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image62.png" loading="lazy" alt="Create new platform from XSA"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Navigate to the <code>.xsa</code> file we generated earlier.</p>
+        <div class="note">When I tried this in the Unified IDE, a missing-tool issue came up. Running <code>sudo dnf install xlsclients</code> fixed it.</div>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image43.png" loading="lazy" alt="Selecting the XSA file"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>The "Platform name" should auto-populate. Click Next.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image2.png" loading="lazy" alt="Platform name auto-populated"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>The platform project is done — moving on to the "App" of the System Project. Type in a name for the Application project, then click Next.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image35.png" loading="lazy" alt="Application project name"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>After the "App" is made, move on to the "Domain." Keep all settings the same. Click Finish.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image33.png" loading="lazy" alt="Domain settings, click Finish"></figure></div>
+      </div>
+    </section>
+
+    <section id="vitis">
+      <h2>VITIS (Code)</h2>
+      <div class="step">
+        <p>From here, follow along with the video:</p>
+        <div class="imgrow" style="margin-bottom:14px">
+          <a class="linkcard" href="https://www.youtube.com/watch?v=bsrdtXwjV3s" target="_blank" rel="noopener">
+            <span class="icon">▶</span>
+            <span>Zynq Part 2<small>Zynq Vitis example with PL fabric GPIO and BRAM</small></span>
+          </a>
+        </div>
+        <p>The full code from the video, ready to copy and paste:</p>
+        <a class="linkcard" href="https://docs.google.com/document/d/1O3b0Q0d4PDEJ7y-VeW5eMOkEYwJTaMZ_YPrpYh9qNfM/edit?usp=sharing" target="_blank" rel="noopener">
+          <span class="icon">📄</span>
+          <span>Zybo example code<small>Google Doc</small></span>
+        </a>
+      </div>
+    </section>
+
+    <section id="own-hdl">
+      <h2>Combining Your Own HDL</h2>
+      <div class="step" style="margin-bottom:14px">
+        <a class="linkcard" href="https://www.youtube.com/watch?v=UqXXWI28HyQ" target="_blank" rel="noopener">
+          <span class="icon">▶</span>
+          <span>Zynq Part 3<small>Combining my own HDL with the Vivado block diagram</small></span>
+        </a>
+      </div>
+
+      <div class="step">
+        <p>Revisit the diagram. Right-click on only the small port of the processor clock, then click <b>"Create Port."</b></p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image18.png" loading="lazy" alt="Create Port on processor clock"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Leave it as output.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image10.png" loading="lazy" alt="Leave port as output"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Do the same for the <code>peripheral_aresetn[0:0]</code> pin on the "Processor System Reset" module.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image46.png" loading="lazy" alt="Create Port on peripheral_aresetn"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Double-click the <b>"Block Memory Generator."</b> Change the "Memory Type" to <b>"True Dual Port RAM."</b></p>
+        <div class="note">We'll add an extra port on the BRAM, accessed by both the PS and our own hardware. Every byte in this RAM has a different address — the bottom two bits are the byte address within the word. Important to know, since normally an address refers to an entire word.</div>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image27.png" loading="lazy" alt="True Dual Port RAM setting"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Right-click on the new port and select <b>"Make External."</b></p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image23.png" loading="lazy" alt="Make External on new BRAM port"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Click the plus under "Sources."</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image12.png" loading="lazy" alt="Plus under Sources"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Add in the files from this repo:</p>
+        <div class="imgrow" style="margin-bottom:14px">
+          <a class="linkcard" href="https://github.com/HDLForBeginners/Examples/tree/main/ZynqSeries" target="_blank" rel="noopener">
+            <span class="icon">🐙</span>
+            <span>HDLForBeginners/Examples<small>github.com — ZynqSeries folder</small></span>
+          </a>
+        </div>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image45.png" loading="lazy" alt="Adding source files from repo"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>There's a new top level now. The source folder should update its hierarchy — create the HDL wrapper again.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image19.png" loading="lazy" alt="Creating HDL wrapper again"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Generate the bitstream again (this takes some time). Once complete, export hardware again — it will have a new name, <code>zynq_example_top</code>.</p>
+        <p>Back in Vitis, right-click <code>zynq_example_wrapper</code> in the explorer and click <b>"Update Hardware Specification."</b></p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image52.png" loading="lazy" alt="Update Hardware Specification"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Browse to find the latest hardware we just exported.</p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_fib/image4.png" loading="lazy" alt="Browse for latest exported hardware"></figure>
+          <figure><img src="assets/img/zybo_fib/image30.png" loading="lazy" alt="Latest hardware selected"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>It will say "out of date" — just build the project again.</p>
+        <div class="imgrow" style="margin:14px 0">
+          <a class="linkcard" href="https://docs.google.com/document/d/1L8YwWFQdsWCo9tkcGwMqIF1RmaDhtrlLkp27fO6kjWQ/edit?usp=sharing" target="_blank" rel="noopener">
+            <span class="icon">📄</span>
+            <span>Zybo fib C code<small>Google Doc</small></span>
+          </a>
+        </div>
+        <p>Build and run.</p>
+      </div>
+
+      <div class="step">
+        <p>You then have this:</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image3.png" loading="lazy" alt="Running result on board"></figure></div>
+        <p>The clock was made to be slow, so the Fibonacci numbers come in slowly — I think that was set in the Verilog code.</p>
+      </div>
+    </section>
+
+    <section id="lecture">
+      <h2>Great Pictures for Lecture</h2>
+      <div class="step">
+        <p>Zybo System</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image34.png" loading="lazy" alt="Zybo system diagram"></figure></div>
+      </div>
+      <div class="step">
+        <p>Vitis System Flow Diagram</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image8.png" loading="lazy" alt="Vitis system flow diagram"></figure></div>
+      </div>
+    </section>
+
+    <footer>
+      Zynq / Vivado / Vitis notes for ECE 5996. This page isn't linked from the site navigation. Click any screenshot to zoom in.
+    </footer>
+  </main>
+</div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+  <span class="hint">Click anywhere to close (Esc also works)</span>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+  // Lightbox
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightbox-img');
+  document.querySelectorAll('main figure img').forEach(img => {
+    img.addEventListener('click', () => {
+      lbImg.src = img.src;
+      lbImg.alt = img.alt;
+      lb.classList.add('open');
+    });
+  });
+  lb.addEventListener('click', () => lb.classList.remove('open'));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') lb.classList.remove('open');
+  });
+
+  // Active TOC highlighting
+  const sections = document.querySelectorAll('main section[id]');
+  const tocLinks = document.querySelectorAll('nav.toc a');
+  const byId = href => document.querySelector(`nav.toc a[href="#${href}"]`);
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const link = byId(entry.target.id);
+      if (!link) return;
+      if (entry.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-10% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
