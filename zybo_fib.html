@@ -132,6 +132,12 @@
     letter-spacing:.07em;
     margin-bottom:6px;
   }
+  .step + .kicker{
+    margin-top:38px;
+    padding-top:4px;
+    color:var(--accent);
+    font-weight:600;
+  }
 
   .step{
     margin: 22px 0;
@@ -642,6 +648,84 @@ PuTTy to get UART output from the board</p>
           <span class="icon">📄</span>
           <span>Zybo example code<small>Google Doc</small></span>
         </a>
+      </div>
+
+      <span class="kicker">BSP settings &amp; importing driver examples</span>
+
+      <div class="step">
+        <p>Under the <b>Explorer</b> tab on the left, click <code>zynq_example.prj</code> — the <b>"Application Project Settings"</b> page opens.</p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_fib/image65.png" loading="lazy" alt="Explorer tab, zynq_example.prj selected"></figure>
+          <figure><img src="assets/img/zybo_fib/image66.png" loading="lazy" alt="Application Project Settings page"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>Click <b>"Navigate to BSP Settings"</b> to open the <b>"Board Support Package"</b> (BSP) screen.</p>
+        <p>Scroll down the BSP page to the <b>Documentation and Examples</b> table. Click <b>"Import Examples"</b> for the <code>axi_gpio_0</code> <i>gpio</i> driver; in the popup select <b>"xgpio_example"</b> and click OK. Repeat for the <code>axi_bram_ctrl_0</code> <i>bram</i> driver to get <b>"xbram_example."</b></p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_fib/image67.png" loading="lazy" alt="Board Support Package screen with Drivers and Import Examples"></figure>
+          <figure><img src="assets/img/zybo_fib/image68.png" loading="lazy" alt="Import Examples popup for axi_gpio_0, xgpio_example checked"></figure>
+          <figure><img src="assets/img/zybo_fib/image69.png" loading="lazy" alt="Import Examples popup for axi_bram_ctrl_0, xbram_example checked"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>They are added as new systems under the <b>Explorer</b> tab.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image70.png" loading="lazy" alt="xbram_example and xgpio_example systems added under Explorer"></figure></div>
+        <div class="note">Essentially lots of copy-pasting from the imported example code to learn how to use the drivers. Everything was consolidated into my own example system, then built and run. For each peripheral you add the <code>#include</code>, create an instance of the driver "grabber" object (e.g. <code>XGpio</code>), initialize it, and address it with the <code>XPAR_…</code> define.</div>
+      </div>
+
+      <span class="kicker">Finding the AXI addresses</span>
+
+      <div class="step">
+        <p>Back on <code>zynq_example.prj</code> "Application Project Settings," click <b>"Hardware Specification."</b> The <b>Address Map</b> for processor <code>ps7_cortexa9</code> lists every peripheral's base and high address — e.g. <code>axi_gpio_0</code> at <code>0x41200000</code>.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image71.png" loading="lazy" alt="Hardware Platform Specification Address Map"></figure></div>
+        <div class="note">The address you allocated back in Vivado's Address Editor is exactly what shows up here in Vitis.</div>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image72.png" loading="lazy" alt="Vivado Address Editor overlaid on the Vitis address map"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>To see the addresses as they are <code>#define</code>d in the headers, click the search icon above the right-side <b>Outline</b> column and look up <code>xparameters.h</code>.</p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_fib/image73.png" loading="lazy" alt="Find Actions dialog searching for xparameters.h"></figure>
+          <figure><img src="assets/img/zybo_fib/image74.png" loading="lazy" alt="xparameters.h open showing XPAR base address defines"></figure>
+        </div>
+        <div class="note">All kinds of addresses live here — <code>XPAR_..._BASEADDR</code>, <code>XPAR_..._DEVICE_ID</code>, and so on. These are the names you pass to the driver init calls.</div>
+      </div>
+
+      <span class="kicker">Building &amp; running Hello World</span>
+
+      <div class="step">
+        <p>Navigate to the <b>Assistant</b> tab on the left (AMD logo). Expand the example system you created first (mine is <code>zynq_example_system</code>) → the application (<code>zynq_example</code>), right-click <b>"Debug"</b> and click <b>Build</b>.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image75.png" loading="lazy" alt="Assistant tab, right-click Debug, Build"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Open <b>PuTTY</b> for your serial port (on my Linux machine it was <code>/dev/ttyUSB1</code> — run <code>dmesg | grep tty</code> if you're not sure), <code>115200</code> baud, connection type <b>Serial</b>. It opens blank with no errors. If you get an error, check the port.</p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_fib/image76.png" loading="lazy" alt="dmesg tty output and PuTTY Configuration window"></figure>
+          <figure><img src="assets/img/zybo_fib/image77.png" loading="lazy" alt="Blank PuTTY terminal on /dev/ttyUSB1"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>Return to the <b>Assistant</b>, right-click <b>"Debug"</b> and under the <b>Run</b> dropdown select <b>"Launch Hardware (Single Application Debug)."</b></p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image78.png" loading="lazy" alt="Assistant Run menu, Launch Hardware (Single Application Debug)"></figure></div>
+        <div class="note">Congrats — you just printed "hello world" to the serial.</div>
+      </div>
+
+      <span class="kicker">The example code</span>
+
+      <div class="step">
+        <p>After this step I recommend pasting in the <a href="https://docs.google.com/document/d/1O3b0Q0d4PDEJ7y-VeW5eMOkEYwJTaMZ_YPrpYh9qNfM/edit?usp=sharing" target="_blank" rel="noopener">Zybo example code</a>, then building and running. It has two parts.</p>
+        <p><b>Part 1 —</b> the four switches light up the onboard LEDs and are also encoded as a 4-bit hex value to the serial:</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image79.png" loading="lazy" alt="helloworld.c with GPIO code, PuTTY output, and Zybo board LEDs lit by switches"></figure></div>
+      </div>
+
+      <div class="step">
+        <p><b>Part 2 —</b> writing directly to BRAM (CPU → AXI → BRAM) with <code>XBram_WriteReg</code>, then reading it back with <code>XBram_ReadReg</code>. This is the concept that carries over to the Fibonacci hardware.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image80.png" loading="lazy" alt="BRAM write/read loop and PuTTY output showing read-back values"></figure></div>
       </div>
     </section>
 
