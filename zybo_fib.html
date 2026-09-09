@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Zynq / Vivado / Vitis — ECE 5996 Resource Guide</title>
+<title>Zybo-Z7 Zynq Beginner Guide (Fibonacci)</title>
 <style>
   :root{
     --bg:#f7f7f5;
@@ -265,7 +265,7 @@
   <nav class="toc" aria-label="Table of contents">
     <h2>Sections</h2>
     <ol>
-      <li><a href="#my-video">My Video</a></li>
+      <li><a href="#my-video">Video Demo</a></li>
       <li><a href="#setup">How to Setup</a></li>
       <li><a href="#first-diagram">My First Block Diagram</a></li>
       <li><a href="#addresses">Assign AXI Addresses</a></li>
@@ -280,8 +280,21 @@
 
   <main>
     <header class="hero">
-      <h1>Zynq · Vivado · Vitis — Resource Guide</h1>
-      <p>ECE 5996 M.Eng. Project — a walkthrough of building a Zynq block diagram on the Zybo Z7-10, wiring up GPIO/BRAM over AXI, generating a bitstream, and bringing in your own HDL, with the reference videos and code alongside.</p>
+      <h1>Zybo-Z7 Zynq Beginner Guide (Fibonacci)</h1>
+      <p>Walkthrough of Zynq block diagrams for Zybo Z7-10, wiring up GPIO/BRAM over AXI, generating a bitstream, and bringing in your own HDL, with the reference videos and code alongside.     The website below is a long set of instructions on how to
+Vivado
+Block Diagram → HDL Wrappers
+Generate Bitstream
+GPIOs
+AXI Bus
+AXI Address
+Block RAM!
+LEDs
+Switches
+Vitis Classic
+Build and run C code
+Utilizing hardware functions
+PuTTy to get UART output from the board</p>
       <div class="top-links">
         <a class="linkcard" href="https://www.youtube.com/watch?v=UZ3FnZNlcWk" target="_blank" rel="noopener">
           <span class="icon">▶</span>
@@ -299,7 +312,7 @@
     </header>
 
     <section id="my-video">
-      <h2>My Video</h2>
+      <h2>Fibonacci Demo</h2>
       <div class="step">
         <div class="imgrow">
           <figure style="max-width:100%; flex-basis:100%">
@@ -312,7 +325,7 @@
       </div>
     </section>
 
-    <section id="terms">
+    <!-- <section id="terms">
       <span class="kicker">Basic terms</span>
       <div class="step">
         <ul>
@@ -322,7 +335,7 @@
         </ul>
         <div class="note"><b>Disclaimer:</b> Vivado is a steep learning curve!</div>
       </div>
-    </section>
+    </section> -->
 
     <section id="setup">
       <h2>How to Setup</h2>
@@ -335,6 +348,7 @@
       <div class="step">
         <p>Create Project</p>
         <div class="imgrow"><figure><img src="assets/img/zybo_fib/image51.png" loading="lazy" alt="Create Project wizard"></figure></div>
+        <div class="note">Vivado projects are opened inside vivado and are of type .xpr.</div>
       </div>
 
       <div class="step">
@@ -355,6 +369,15 @@
 
     <section id="first-diagram">
       <h2>My First Block Diagram</h2>
+      <div class="note">
+        <ul>        
+          Block design flow
+        <li>1 Instantiate and configure IP blocks</li>
+        <li>2 Create connections between ports</li>
+        <li>3 Generate bitstream (run Synthesis if prompted)</li>
+        <li>4 Export hardware -> transferring .xsa to Vitis</li>
+        </ul>
+      </div>
 
       <div class="step">
         <p>You are currently on the main page:</p>
@@ -392,6 +415,7 @@
       <div class="step">
         <p>At this point, the <b>"Processor System Reset"</b> and an <b>"AXI Interconnect"</b> have been added, without editing their internal settings.</p>
         <div class="imgrow"><figure><img src="assets/img/zybo_fib/image58.png" loading="lazy" alt="Processor System Reset and AXI Interconnect added"></figure></div>
+        <div class="note">Can drag a net and let go in free space to keep that selected so you can connect it to multiple ports.</div>
       </div>
 
       <div class="step">
@@ -537,6 +561,8 @@
         <p>Go <b>File → Export Hardware</b>, Next. Then check <b>"Include bitstream,"</b> Next, Finish.</p>
         <div class="imgrow"><figure><img src="assets/img/zybo_fib/image20.png" loading="lazy" alt="Export Hardware wizard"></figure></div>
         <p>This creates a wrapped-up file to use in Vitis — bitstream included, so you can program the FPGA from Vitis!</p>
+        <div class="note">Vivado exported hardware are of type <code>.xsa</code>. These are used in Vitis to build software applications off of the hardware.</div>
+        <div class="note">Dont name everything the default "design_1_wrapper" name because multiple projects having this can cause errors. If you get a domain error when creating Vitis project, try re-exporting the hardware. </div>
       </div>
     </section>
 
@@ -588,6 +614,16 @@
       <div class="step">
         <p>After the "App" is made, move on to the "Domain." Keep all settings the same. Click Finish.</p>
         <div class="imgrow"><figure><img src="assets/img/zybo_fib/image33.png" loading="lazy" alt="Domain settings, click Finish"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>When you create an application project in Vitis from the .xsa exported from the hardware, you should have 3 folders created:</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image63.png" loading="lazy" alt="Domain settings, click Finish"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>The wrapper contains the exported hardware, while the system has the c application and source code for the processor side.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_fib/image64.png" loading="lazy" alt="Domain settings, click Finish"></figure></div>
       </div>
     </section>
 
