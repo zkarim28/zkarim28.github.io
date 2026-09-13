@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="theme-color" content="#f5f1e7">
+  <title>A little pause, for Wasie.</title>
+  <style>
+    :root { --paper:#f5f1e7; --ink:#303b2d; --muted:#717568; --orange:#b95736; --line:#c9ccb9; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; color:var(--ink); background:var(--paper); font-family:Arial,Helvetica,sans-serif; }
+    body::before { content:""; position:fixed; inset:0; pointer-events:none; z-index:10; opacity:.14; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23888888' filter='url(%23n)' opacity='.35' d='M0 0h180v180H0z'/%3E%3C/svg%3E"); }
+    button,a { -webkit-tap-highlight-color:transparent; }
+    button { font:inherit; cursor:pointer; }
+    button:focus-visible,a:focus-visible { outline:3px solid var(--orange); outline-offset:7px; }
+    [hidden] { display:none !important; }
+    .top { display:flex; justify-content:space-between; gap:16px; padding:28px 5vw; font-size:10px; letter-spacing:.2em; text-transform:uppercase; }
+    .top span:last-child { color:var(--muted); }
+    .hero { min-height:calc(100svh - 70px); display:grid; place-items:center; position:relative; overflow:hidden; padding:75px 24px 95px; }
+    .intro { max-width:640px; text-align:center; position:relative; z-index:2; }
+    .eyebrow { font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--orange); font-weight:bold; }
+    h1,h2,h3,.hand { font-family:Georgia,'Times New Roman',serif; font-weight:normal; }
+    h1 { font-size:clamp(68px,9vw,126px); letter-spacing:-.065em; line-height:.98; margin:26px 0; }
+    h1 em { font-weight:normal; }
+    .intro p:not(.eyebrow) { max-width:350px; margin:0 auto; font-size:15px; line-height:1.85; color:var(--muted); }
+    .pause { display:inline-flex; align-items:center; gap:15px; margin:30px 0 18px; padding:18px 28px; border:0; border-radius:40px; background:var(--ink); color:var(--paper); box-shadow:0 7px 20px #303b2d18; transition:transform .2s,background .2s; }
+    .pause:hover { transform:translateY(-3px); background:#46553f; }
+    .pause-icon { display:flex; gap:4px; }
+    .pause-icon::before,.pause-icon::after { content:""; width:4px; height:15px; background:currentColor; }
+    .intro small { display:block; font-family:Georgia,serif; font-style:italic; color:var(--muted); font-size:13px; }
+    .floating { position:absolute; width:clamp(130px,17vw,235px); padding:10px 10px 28px; background:#fffcf5; box-shadow:0 12px 35px #303b2d20; animation:drift 7s ease-in-out infinite alternate; }
+    .floating img { display:block; width:100%; aspect-ratio:4/5; object-fit:cover; }
+    .floating.left { left:5%; top:20%; --angle:-12deg; }
+    .floating.left img { object-position:25% center; }
+    .floating.right { right:5%; bottom:15%; --angle:10deg; animation-delay:-3s; }
+    .floating figcaption { text-align:center; margin-top:13px; font:italic 14px Georgia,serif; }
+    @keyframes drift { from { transform:rotate(var(--angle)) translateY(-8px); } to { transform:rotate(var(--angle)) translateY(8px); } }
+    body.paused .floating { animation-play-state:paused; }
+    .bottom-note { position:absolute; bottom:25px; font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); }
+    .journey { max-width:1080px; margin:auto; padding:50px 30px 0; }
+    .journey-intro { text-align:center; padding:70px 0 95px; }
+    h2 { font-size:clamp(38px,6vw,65px); line-height:1.1; letter-spacing:-.04em; margin:20px 0; }
+    .journey-intro p:last-child { color:var(--muted); line-height:1.8; }
+    .trail { position:relative; }
+    .trail::before { content:""; position:absolute; left:50%; top:0; bottom:0; border-left:2px dashed var(--line); }
+    .chapter { display:grid; grid-template-columns:1fr 1fr; gap:110px; align-items:center; position:relative; padding:40px 0 100px; }
+    .chapter::before { content:attr(data-stop); position:absolute; left:50%; top:80px; transform:translateX(-50%); background:var(--paper); border:1px solid var(--line); width:38px; height:38px; border-radius:50%; display:grid; place-items:center; font:italic 13px Georgia,serif; color:var(--orange); }
+    h3 { font-size:clamp(32px,4vw,47px); line-height:1.1; letter-spacing:-.035em; margin:15px 0 22px; }
+    .copy p:not(.eyebrow) { font-size:15px; line-height:1.95; color:#62685b; }
+    .photo { margin:0; padding:12px 12px 18px; background:#fffcf7; box-shadow:0 10px 30px #303b2d16; transform:rotate(2deg); position:relative; }
+    .photo::before { content:""; position:absolute; top:-12px; left:36%; width:28%; height:26px; background:#d9c9a699; transform:rotate(-4deg); z-index:1; }
+    .photo img { width:100%; display:block; max-height:480px; object-fit:contain; background:#ede9de; }
+    figcaption { font:italic 14px/1.6 Georgia,serif; padding-top:12px; text-align:center; color:#747568; }
+    .chapter:nth-child(even) .copy { order:2; }
+    .chapter:nth-child(even) .memory { order:1; }
+    .chapter:nth-child(even) .photo { transform:rotate(-2deg); }
+    .letter-piece { padding:45px 32px; background:#e8eadf; transform:rotate(-3deg); text-align:center; border:1px solid #d5d9c6; }
+    .letter-piece .big { font:italic 40px/1.3 Georgia,serif; margin:22px 0; }
+    .letter-piece .stamp { font-size:10px; letter-spacing:.2em; text-transform:uppercase; }
+    .video-memory { margin:0; padding:12px 12px 18px; background:#fffcf7; box-shadow:0 10px 30px #303b2d16; }
+    .video-link { display:block; position:relative; }
+    .video-link img { display:block; width:100%; aspect-ratio:16/9; object-fit:cover; }
+    .video-play { position:absolute; inset:0; display:grid; place-items:center; background:#0002; }
+    .video-play::before { content:"▶"; display:grid; place-items:center; width:64px; height:64px; padding-left:4px; border-radius:50%; background:var(--ink); color:var(--paper); font-size:25px; box-shadow:0 4px 20px #0003; }
+    .video-link:hover .video-play::before { background:var(--orange); }
+    .video-memory video { display:block; width:100%; max-height:520px; background:#20251e; }
+    .video-memory a { color:var(--ink); text-underline-offset:3px; }
+    .small-photo { width:57%; margin:-40px -12px 0 auto; transform:rotate(7deg)!important; }
+    .interlude { padding:65px 0 80px; text-align:center; }
+    .gallery { display:grid; grid-template-columns:repeat(3,1fr); gap:26px; margin-top:45px; }
+    .gallery .photo img { aspect-ratio:4/5; object-fit:cover; }
+    .gallery .photo:nth-child(2) { transform:rotate(-3deg); margin-top:25px; }
+    .closing { max-width:630px; margin:50px auto 0; padding:70px 10px 110px; text-align:center; border-top:1px solid var(--line); }
+    .closing p:not(.eyebrow) { font:20px/1.85 Georgia,serif; color:#62685b; }
+    .signature { font:italic 32px Georgia,serif; margin:28px 0 45px; }
+    .again { border:0; border-bottom:1px solid var(--line); padding:10px 0; background:none; color:var(--muted); font-size:12px; }
+    footer { text-align:center; padding:20px; font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); }
+    @media(min-width:1500px) { .floating.left { left:12%; } .floating.right { right:12%; } }
+    @media(max-width:900px) { .floating { width:140px; opacity:.7; } .floating.left { left:-55px; top:10%; } .floating.right { right:-60px; bottom:10%; } .chapter { gap:70px; } }
+    @media(max-width:600px) { .top { padding:24px 20px; font-size:8px; } .hero { padding-top:55px; } .intro { max-width:310px; } .intro p:not(.eyebrow) { max-width:260px; font-size:14px; } .floating { width:110px; opacity:.5; } .floating.left { top:2%; } .floating.right { bottom:6%; } .journey { padding:20px 24px 0; } .journey-intro { padding:55px 0; } .trail::before { left:0; } .chapter { grid-template-columns:1fr; gap:26px; padding:30px 0 60px 30px; } .chapter::before { left:0; top:30px; width:28px; height:28px; font-size:10px; } .chapter .copy,.chapter .memory { order:initial!important; } .copy .eyebrow { margin-top:6px; } .small-photo { margin-right:0; } .gallery { grid-template-columns:1fr; max-width:310px; margin:35px auto 0; gap:35px; } .gallery .photo:nth-child(2) { margin-top:0; } .closing { margin-top:0; padding-top:50px; } }
+    @media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } *,*::before,*::after { animation:none!important; transition:none!important; } }
+  </style>
+</head>
+<body>
+  <header class="top"><span>For my big brother</span><span>A birthday letter · from Zarif</span></header>
+  <main>
+    <section class="hero" aria-labelledby="greeting">
+      <figure class="floating left" aria-hidden="true"><img src="assets/img/wasie/france_2016.JPG" alt=""><figcaption>you &amp; me, way back when</figcaption></figure>
+      <div class="intro">
+        <p class="eyebrow">Happy birthday, Wasie</p>
+        <h1 id="greeting">Hey brother.<br>Take a <em>pause.</em></h1>
+        <p>Life has moved pretty fast.<br>Before the next thing, the next plan, the next big adventure… stay here for a minute.</p>
+        <button class="pause" id="pause" aria-expanded="false" aria-controls="journey"><span class="pause-icon" aria-hidden="true"></span><span id="pause-label">Pause for a little while</span></button>
+        <small>A few years. A lot of memories. One little trail.</small>
+      </div>
+      <figure class="floating right" aria-hidden="true"><img src="assets/img/wasie/hike%20aug%202024.JPG" alt=""><figcaption>so much road behind us</figcaption></figure>
+      <span class="bottom-note">Made to be opened slowly</span>
+    </section>
+    <div class="journey" id="journey" hidden>
+      <div class="journey-intro" id="start" tabindex="-1">
+        <p class="eyebrow">Okay. The rest can wait.</p>
+        <h2>Let’s rewind a little.</h2>
+        <p>Back to November 2022.<br>And all the life that happened after.</p>
+      </div>
+      <!-- Chapters follow the requested order. -->
+      <div class="trail">
+        <section class="chapter" data-stop="01">
+          <div class="copy"><p class="eyebrow">The starting point · November 2022</p><h3>Remember that<br>birthday video?</h3><p>I sent you a compilation of everyone saying happy birthday. All those people, all that love, squeezed into one video.</p><p>That was 2022. And looking back now, I keep thinking: how has so much happened since then?</p></div>
+          <figure class="memory video-memory"><a class="video-link" href="https://youtu.be/hw03_BOC2Us" target="_blank" rel="noopener noreferrer" aria-label="Watch Wasie’s birthday video on YouTube (opens in a new tab)"><img loading="lazy" src="assets/img/wasie/bd.png" alt="A preview of the birthday video"><span class="video-play" aria-hidden="true"></span></a><figcaption>So many voices. All for you.<br><a href="https://youtu.be/hw03_BOC2Us" target="_blank" rel="noopener noreferrer">Watch on YouTube</a></figcaption></figure>
+        </section>
+        <section class="chapter" data-stop="02">
+          <div class="copy"><p class="eyebrow">A new beginning</p><h3>You got into<br>med school.</h3><p>A whole new chapter opened up. The kind you work toward for so long, and then suddenly it’s real.</p><p>I’m proud of you for getting there. And for everything you put into the journey after that.</p></div>
+          <div class="memory letter-piece"><span class="stamp">One very big yes</span><p class="big">Future doctor.<br>Always my<br>big brother.</p><span class="stamp">Med school acceptance</span></div>
+        </section>
+        <section class="chapter" data-stop="03">
+          <div class="copy"><p class="eyebrow">Then came the celebrations</p><h3>The mehendi.<br>What a night.</h3><p>Some memories don’t need much explaining. These pictures do a pretty good job.</p><p>You, surrounded by your people. And, apparently, being lifted by them too.</p></div>
+          <div class="memory"><figure class="photo"><img loading="lazy" src="assets/img/wasie/Mehendi_lifted.jpg" alt="Wasie lifted above the crowd at the mehendi"><figcaption>Quite literally, on top of the world.</figcaption></figure><figure class="photo small-photo"><img loading="lazy" src="assets/img/wasie/mehendi_flop.jpg" alt="Wasie laughing at the mehendi"><figcaption>This one deserves a spot too.</figcaption></figure></div>
+        </section>
+        <section class="chapter" data-stop="04">
+          <div class="copy"><p class="eyebrow">Behind the scenes</p><h3>But first,<br>dance practice.</h3><p>Before the celebration, there was the practice. A little behind-the-scenes memory that deserves its own stop.</p><p>Press play. Some moments are better in motion.</p></div>
+          <figure class="memory video-memory"><video controls playsinline preload="none" poster="assets/img/wasie/dance_pra_poster.jpg" aria-label="Dance practice video"><source src="assets/img/wasie/dance_pra.mp4" type="video/mp4">Your browser does not support this video. <a href="assets/img/wasie/dance_pra.mp4">Watch the dance practice clip</a>.</video><figcaption>The practice before the party.</figcaption></figure>
+        </section>
+        <section class="chapter" data-stop="05">
+          <div class="copy"><p class="eyebrow">Keep the celebration going</p><h3>And then,<br>the reception.</h3><p>A new chapter, a full dance floor, and another memory I’m so glad we get to keep.</p><p>If there’s a photo that feels like the opposite of a pause button, it might be this one.</p></div>
+          <div class="memory"><figure class="photo"><img loading="lazy" src="assets/img/wasie/Reception_dance.jpg" alt="A joyful group dance at the reception"><figcaption>A still photo. A lot of energy.</figcaption></figure></div>
+        </section>
+        <section class="chapter" data-stop="06">
+          <div class="copy"><p class="eyebrow">The dream became real · 2025</p><h3>You matched<br>at Columbia.</h3><p>Your dream residency. And then, in 2025, it wasn’t just a dream anymore. You matched at Columbia.</p><p>Before the cap and gown, there was this moment. Another reason to stop, take it in, and say: look at you, Wasie. You made it happen.</p></div>
+          <div class="memory"><figure class="photo"><img loading="lazy" src="assets/img/wasie/residency.jpg" alt="A memory of Wasie’s Columbia residency match in 2025"><figcaption>Columbia. Your dream. Your next chapter.</figcaption></figure></div>
+        </section>
+        <section class="chapter" data-stop="07">
+          <div class="copy"><p class="eyebrow">Look how far you’ve come</p><h3>Med school graduate.<br>That’s you.</h3><p>From getting in to making it through. There’s a whole story between those two moments, and these photos are only a little piece of it.</p><p>But let’s pause here especially. You did it, Wasie. I hope you let yourself feel proud of that.</p></div>
+          <div class="memory"><figure class="photo"><img loading="lazy" src="assets/img/wasie/grad_flowers.jpg" alt="Wasie in graduation robes holding flowers and his diploma"><figcaption>Doctor. Brother. A very proud moment.</figcaption></figure><figure class="photo small-photo"><img loading="lazy" src="assets/img/wasie/grad_flop.JPG" alt="Wasie posing outdoors in his graduation gown"><figcaption>Had to include this one.</figcaption></figure></div>
+        </section>
+      </div>
+      <section class="interlude" aria-labelledby="in-between"><p class="eyebrow">And between the big things</p><h2 id="in-between">There was just… us.</h2><p class="hand">The ordinary moments get a place in the letter, too.</p><div class="gallery"><figure class="photo"><img loading="lazy" src="assets/img/wasie/cooking%202024.JPG" alt="Wasie cooking in the kitchen"><figcaption>Something cooking. 2024.</figcaption></figure><figure class="photo"><img loading="lazy" src="assets/img/wasie/pok_my_bday.jpg" alt="Sharing birthday cake together"><figcaption>Another birthday, another memory.</figcaption></figure><figure class="photo"><img loading="lazy" src="assets/img/wasie/zarif_grad.JPG" alt="Together at Zarif’s Cornell graduation"><figcaption>You were there for my chapters, too.</figcaption></figure></div></section>
+      <section class="closing"><p class="eyebrow">Back to right now</p><h2>Happy birthday,<br><em>big brother.</em></h2><p>Four years ago, I put everyone’s birthday wishes into a video. This time, I wanted to give you a little space to look back.</p><p>At everything you’ve done. At the people beside you. At the little moments we might otherwise hurry past.</p><p>There’s so much ahead of you. But for today, I hope you take a breath, take it all in, and know how much you’re loved.</p><div class="signature">Love, Zarif</div><button class="again" id="again">↶ Take the trail again</button></section>
+    </div>
+    <noscript><p style="text-align:center;padding:30px">Turn on JavaScript to open your birthday letter.</p></noscript>
+  </main>
+  <footer>A little pause. A lot of love.</footer>
+  <script>
+    const pause = document.getElementById('pause');
+    const journey = document.getElementById('journey');
+    const start = document.getElementById('start');
+    function visitTrail() {
+      start.focus({ preventScroll: true });
+      start.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
+    }
+    pause.addEventListener('click', () => {
+      document.body.classList.add('paused');
+      journey.hidden = false;
+      pause.setAttribute('aria-expanded', 'true');
+      document.getElementById('pause-label').textContent = 'Paused. Let’s look back.';
+      requestAnimationFrame(visitTrail);
+    });
+    document.getElementById('again').addEventListener('click', visitTrail);
+  </script>
+</body>
+</html>
