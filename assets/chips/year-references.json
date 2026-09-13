@@ -1,0 +1,134 @@
+{
+  "Intel-D87C51FC-Early-integrated-microcontroller-8051-MCS-51": {
+    "chipYear": 1980,
+    "yearStatus": "Family introduced",
+    "yearNote": "MCS-51 / 8051 family introduction; not the introduction or manufacture date of this D87C51FC variant.",
+    "yearSource": "https://timeline.intel.com/"
+  },
+  "AD9361-SDR-Analog-Devices-DAC-ADC-65nm": {
+    "chipYear": 2013,
+    "yearStatus": "Introduced",
+    "yearNote": "Analog Devices announced the AD9361 on October 22, 2013.",
+    "yearSource": "https://investor.analog.com/news-releases/news-release-details/analog-devices-integrated-transceiver-and-support-ecosystem"
+  },
+  "Zilog-Z80-Z0840004PSC": {
+    "chipYear": 1976,
+    "yearStatus": "Family introduced",
+    "yearNote": "The original Z80 entered production in 1976, as described by its designers; this is a family date.",
+    "yearSource": "https://archive.computerhistory.org/resources/text/Oral_History/Zilog_Z80/102658073.05.01.pdf"
+  },
+  "STM-STM32F103VGT6": {
+    "chipYear": 2007,
+    "yearStatus": "Family introduced",
+    "yearNote": "STM32 family launch on June 11, 2007; exact variant and photographed sample dates remain unverified.",
+    "yearSource": "https://blog.st.com/the-stm32-celebrates-its-10th-birthday/"
+  },
+  "STM32F100C4T6B": {
+    "chipYear": 2007,
+    "yearStatus": "Family introduced",
+    "yearNote": "STM32 family launch on June 11, 2007; exact variant and photographed sample dates remain unverified.",
+    "yearSource": "https://blog.st.com/the-stm32-celebrates-its-10th-birthday/"
+  },
+  "Espressif-ESP8266-wifi-serial-rs232-ESP8089-IoT": {
+    "chipYear": 2014,
+    "yearStatus": "Introduced",
+    "yearNote": "Espressif dates the launch of ESP8266EX to May 2014.",
+    "yearSource": "https://www.espressif.com/en/company/about-us/milestones"
+  },
+  "Casio-F-91W-OKI-quartz-watch": {
+    "chipYear": 2006,
+    "yearStatus": "Die designed",
+    "yearNote": "Zeptobars identifies the photographed die as a 2006 design; the watch model debuted in 1989.",
+    "yearSource": "https://zeptobars.com/en/read/Casio-F-91W-OKI-quartz-watch"
+  },
+  "Motorola-MC14490-CMOS-button-debouncer-Bounce-Eliminator": {
+    "chipYear": 1984,
+    "yearStatus": "Sample manufactured",
+    "yearNote": "Zeptobars describes this part as made in 1984.",
+    "yearSource": "https://zeptobars.com/en/read/Motorola-MC14490-CMOS-button-debouncer-Bounce-Eliminator"
+  },
+  "Motorola-MC358G-ECL-J-K-Flip-Flop-1964": {
+    "chipYear": 1964,
+    "yearStatus": "Source-reported date",
+    "yearNote": "Zeptobars reports 1964 while explicitly noting scarce supporting information.",
+    "yearSource": "https://zeptobars.com/en/read/Motorola-MC358G-ECL-J-K-Flip-Flop-1964"
+  },
+  "1US222-K122UN2-audio-amplifier": {
+    "chipYear": 1971,
+    "yearStatus": "Sample manufactured",
+    "yearNote": "The source decodes the date code as June 1971.",
+    "yearSource": "https://zeptobars.com/en/read/1US222-K122UN2-audio-amplifier"
+  },
+  "K544UD1A-JFET-Russian-opamp-uA740C": {
+    "chipYear": 2016,
+    "yearStatus": "Sample manufactured",
+    "yearNote": "The source explicitly states that this sample was manufactured in 2016.",
+    "yearSource": "https://zeptobars.com/en/read/K544UD1A-JFET-Russian-opamp-uA740C"
+  },
+  "Ti-555-SE555P": {
+    "chipYear": 1996,
+    "yearStatus": "Sample date",
+    "yearNote": "The article identifies the photographed SE555P as the 1996 version.",
+    "yearSource": "https://zeptobars.com/en/read/Ti-555-SE555P"
+  },
+  "LM1813-National-Semiconductor-anti-skid-Ford-Bob-Miller": {
+    "chipYear": 1974,
+    "yearStatus": "Documented by",
+    "yearNote": "The source describes the LM1813 as National Semiconductor’s largest analog die as of 1974; introduction date is not established.",
+    "yearSource": "https://zeptobars.com/en/read/LM1813-National-Semiconductor-anti-skid-Ford-Bob-Miller"
+  },
+  "LM330-LM130-LM2930-national-semiconductor-1976-Bob-Miller-Robert-Dobkin": {
+    "chipYear": 1976,
+    "yearStatus": "Family production",
+    "yearNote": "Zeptobars reports production of the LM330 / LM2930 (LM130) family since 1976.",
+    "yearSource": "https://zeptobars.com/en/read/LM330-LM130-LM2930-national-semiconductor-1976-Bob-Miller-Robert-Dobkin"
+  },
+  "ST-UA741-opamp-operational-amplifier": {
+    "chipYear": 2001,
+    "yearStatus": "Source-reported date",
+    "yearNote": "The article associates this ST implementation with 2001; it separately dates the original 741 design to 1968.",
+    "yearSource": "https://zeptobars.com/en/read/ST-UA741-opamp-operational-amplifier"
+  },
+  "z80-cmos-KR1858VM3-transistor-integral-belarus": {
+    "chipYear": 1995,
+    "yearStatus": "Sample manufactured",
+    "yearNote": "The source states that this part was manufactured by the Belarusian Transistor fab in 1995.",
+    "yearSource": "https://zeptobars.com/en/read/z80-cmos-KR1858VM3-transistor-integral-belarus"
+  },
+  "t34vm1-z80-angstrem-mme": {
+    "chipYear": 1991,
+    "yearStatus": "Documented production",
+    "yearNote": "The source reports Angstrem production in 1991 and possibly later.",
+    "yearSource": "https://zeptobars.com/en/read/t34vm1-z80-angstrem-mme"
+  },
+  "K553UD1A-ua709-opamp": {
+    "chipYear": 1978,
+    "yearStatus": "Sample manufactured",
+    "yearNote": "The source identifies June 1978 as the manufacture date.",
+    "yearSource": "https://zeptobars.com/en/read/K553UD1A-ua709-opamp"
+  },
+  "Ti-TMS0119-single-chip-calculator-Texas-Instruments-1971-TI-2500": {
+    "chipYear": 1971,
+    "yearStatus": "Family milestone",
+    "yearNote": "The source dates TI’s single-chip calculator integration milestone to 1971; exact sample date is not established.",
+    "yearSource": "https://zeptobars.com/en/read/Ti-TMS0119-single-chip-calculator-Texas-Instruments-1971-TI-2500"
+  },
+  "140UD9-opamp-soviet-CA3047": {
+    "chipYear": 1989,
+    "yearStatus": "Source-reported date",
+    "yearNote": "The article title dates the device to 1989 without specifying whether this is production or design.",
+    "yearSource": "https://zeptobars.com/en/read/140UD9-opamp-soviet-CA3047"
+  },
+  "1977-Unisonic-Blackjack-Rockwell-A4821-PMOS-uC": {
+    "chipYear": 1977,
+    "yearStatus": "Host device year",
+    "yearNote": "1977 dates the Unisonic Blackjack device in the source title; exact chip introduction is not established.",
+    "yearSource": "https://zeptobars.com/en/read/1977-Unisonic-Blackjack-Rockwell-A4821-PMOS-uC"
+  },
+  "mifare-rfid-metro-mikron-sitronics": {
+    "chipYear": 2013,
+    "yearStatus": "Observed in use",
+    "yearNote": "The author reports finding these Russian-made RFID chips in Moscow metro tickets from February 2013.",
+    "yearSource": "https://zeptobars.com/en/read/mifare-rfid-metro-mikron-sitronics"
+  }
+}
