@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Zybo-Z7: Making and Adding a New IP</title>
+<style>
+  :root{
+    --bg:#f7f7f5;
+    --panel:#ffffff;
+    --ink:#1b1d1f;
+    --ink-soft:#565c63;
+    --border:#e4e2dd;
+    --accent:#b45309;
+    --accent-soft:#fef3e6;
+    --link:#1155cc;
+    --code-bg:#f1efe9;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#15171a;
+      --panel:#1d2024;
+      --ink:#eceef0;
+      --ink-soft:#a3a9b0;
+      --border:#2c3036;
+      --accent:#e0952f;
+      --accent-soft:#2a2214;
+      --link:#7aa7ff;
+      --code-bg:#121417;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height:1.55;
+  }
+  a{color:var(--link)}
+
+  .shell{
+    display:grid;
+    grid-template-columns: 280px minmax(0,1fr);
+    max-width:1240px;
+    margin:0 auto;
+  }
+  nav.toc{
+    position:sticky;
+    top:0;
+    align-self:start;
+    height:100vh;
+    overflow-y:auto;
+    padding:28px 18px 40px 24px;
+    border-right:1px solid var(--border);
+  }
+  nav.toc h2{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    margin:0 0 12px;
+  }
+  nav.toc ol{
+    list-style:none;
+    margin:0;
+    padding:0;
+    counter-reset:sec;
+  }
+  nav.toc li{margin-bottom:2px}
+  nav.toc a{
+    display:block;
+    counter-increment:sec;
+    padding:7px 10px;
+    border-radius:8px;
+    text-decoration:none;
+    color:var(--ink-soft);
+    font-size:13.5px;
+  }
+  nav.toc a:before{
+    content: counter(sec) ". ";
+    color: var(--accent);
+    font-weight:600;
+  }
+  nav.toc a:hover{background:var(--accent-soft); color:var(--ink)}
+  nav.toc a.active{background:var(--accent-soft); color:var(--ink); font-weight:600}
+
+  main{padding: 36px 40px 90px}
+
+  header.hero{
+    padding: 10px 0 34px;
+    border-bottom:1px solid var(--border);
+    margin-bottom: 30px;
+  }
+  header.hero h1{
+    font-size: 30px;
+    margin: 0 0 8px;
+    letter-spacing:-.01em;
+  }
+  header.hero p{
+    color:var(--ink-soft);
+    margin:0;
+    font-size:15px;
+  }
+  .back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    text-decoration:none;
+    color:var(--ink-soft);
+    font-size:20px;
+    font-weight:700;
+    margin-bottom:20px;
+  }
+  .back-link:hover{color:var(--accent)}
+
+  .overview-list{
+    margin: 18px 0 0;
+    padding: 18px 20px;
+    background: var(--panel);
+    border:1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+  }
+  .overview-list ol{margin:0; padding-left:20px}
+  .overview-list li{margin-bottom:4px}
+
+  section{
+    margin-bottom: 46px;
+    scroll-margin-top: 20px;
+  }
+  section h2{
+    font-size:22px;
+    margin: 0 0 4px;
+    padding-bottom:10px;
+    border-bottom: 2px solid var(--accent);
+    display:inline-block;
+  }
+  .step-num{
+    display:inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: 8px;
+  }
+
+  .step{
+    margin: 16px 0;
+    padding: 18px 20px;
+    background: var(--panel);
+    border:1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+  }
+  .step p{margin:0 0 12px}
+  .step p:last-child{margin-bottom:0}
+  .step ul, .step ol{margin: 8px 0 0; padding-left: 20px}
+  .note{
+    margin-top:10px;
+    padding: 10px 14px;
+    background: var(--code-bg);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+  }
+  .note b{color:var(--ink)}
+
+  .imgrow{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    margin-top:14px;
+  }
+  figure{
+    margin:0;
+    flex: 1 1 260px;
+    max-width: 480px;
+  }
+  figure img{
+    display:block;
+    width:100%;
+    height:auto;
+    border-radius:10px;
+    border:1px solid var(--border);
+    cursor: zoom-in;
+    background:#fff;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  figure img:hover{
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+  figcaption{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:6px;
+  }
+
+  code, .inline-code{
+    background:var(--code-bg);
+    padding:1px 6px;
+    border-radius:5px;
+    font-size:.92em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  pre.code-block{
+    background:var(--code-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px 16px;
+    overflow-x:auto;
+    font-size:12.5px;
+    line-height:1.55;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    margin-top:10px;
+    white-space:pre;
+  }
+  pre.code-block code{background:none;padding:0;border-radius:0;font-size:1em}
+
+  .linkcard{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 14px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius: 10px;
+    text-decoration:none;
+    color:var(--ink);
+    font-size:13.5px;
+    font-weight:500;
+    box-shadow: var(--shadow);
+  }
+  .linkcard:hover{border-color:var(--accent)}
+  .linkcard .icon{
+    width:26px;height:26px;flex:none;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:7px;
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:14px;
+  }
+  .linkcard small{display:block; color:var(--ink-soft); font-weight:400}
+
+  hr.sep{
+    border:none;
+    border-top:1px dashed var(--border);
+    margin: 40px 0;
+  }
+
+  .lightbox{
+    position:fixed; inset:0; z-index:50;
+    background: rgba(0,0,0,.82);
+    display:none;
+    align-items:center; justify-content:center;
+    padding: 4vh 4vw;
+    cursor: zoom-out;
+  }
+  .lightbox.open{display:flex}
+  .lightbox img{
+    max-width:100%; max-height:100%;
+    border-radius:8px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  }
+  .lightbox .hint{
+    position:fixed; top:18px; right:22px;
+    color:#fff; opacity:.7; font-size:13px;
+  }
+
+  footer{
+    padding: 30px 40px 60px;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    border-top:1px solid var(--border);
+  }
+
+  @media (max-width: 860px){
+    .shell{grid-template-columns: 1fr}
+    nav.toc{position:static; height:auto; border-right:none; border-bottom:1px solid var(--border)}
+    main{padding: 24px 18px 70px}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <nav class="toc" aria-label="Table of contents">
+    <h2>Steps</h2>
+    <ol>
+      <li><a href="#open-project">Open the Project</a></li>
+      <li><a href="#create-ip">Create a New IP</a></li>
+      <li><a href="#add-ip-repo">Add the IP to Your Repository</a></li>
+      <li><a href="#add-to-diagram">Add IP to the Block Diagram</a></li>
+      <li><a href="#gen-bitstream">Generate Bitstream</a></li>
+      <li><a href="#export-hw">Export Hardware</a></li>
+      <li><a href="#vitis-open">Open Vitis</a></li>
+      <li><a href="#vitis-import-hw">Import the Hardware into Vitis</a></li>
+      <li><a href="#vitis-axi-addr">Find the AXI Address</a></li>
+      <li><a href="#vitis-reading-data">Read the IP from C</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <a class="back-link" href="zybo.html">&larr; Back to Zybo-Z7 Docs</a>
+      <h1>Zybo-Z7: Making and Adding a New IP</h1>
+      <p>Start-to-end walkthrough for the Zybo Z7-10: package a brand-new AXI4 peripheral in Vivado, wire it into the block diagram, generate a bitstream, export the hardware, then bring it into Vitis Classic and read the IP's registers from C. Worked example: a simple free-running down-counter IP.</p>
+    </header>
+
+    <div class="overview-list">
+      <b>The full flow, at a glance:</b>
+      <ol>
+        <li>Open the project in Vivado</li>
+        <li>Create and package a new AXI4 IP</li>
+        <li>Point Vivado's IP repository at it</li>
+        <li>Drop it into the block diagram and run connection automation</li>
+        <li>Generate the bitstream</li>
+        <li>Export the hardware platform (.xsa)</li>
+        <li>Open Vitis Classic</li>
+        <li>Import the new hardware / update the platform</li>
+        <li>Find the IP's AXI base address</li>
+        <li>Write the driver header/source and read the register from C</li>
+      </ol>
+    </div>
+
+    <section id="open-project">
+      <span class="step-num">Step 1</span>
+      <h2>Open the Project</h2>
+
+      <div class="step">
+        <p>Open <b>"Vivado 2024.1"</b> from your Xilinx Design Tools, then click <b>"Open Project"</b> (or pick one directly from <b>"Recent Projects"</b>).</p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p01_img1.png" loading="lazy" alt="Xilinx Design Tools launcher tile for Vivado 2024.1"></figure>
+          <figure><img src="assets/img/zybo_reference/p01_img2.png" loading="lazy" alt="Vivado welcome screen with Quick Start and Recent Projects"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>If you selected "Open Project," navigate through your <b>HW</b> folder to find the <code>.xpr</code> project file.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_reference/p01_img3.png" loading="lazy" alt="Open Project dialog navigating to a .xpr file"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>You're brought to the <b>"Project Manager"</b> page. Click <b>"Open Block Design"</b> under <b>"IP INTEGRATOR"</b> in the Flow Navigator sidebar.</p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p02_img1.png" loading="lazy" alt="Vivado Project Manager page after opening a project"></figure>
+          <figure><img src="assets/img/zybo_reference/p02_img2.png" loading="lazy" alt="Flow Navigator sidebar with Open Block Design highlighted"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>Your previous block diagram opens up. To view the whole thing, click <b>"Zoom Fit"</b> or use <code>Ctrl+0</code>.</p>
+        <div class="note">To find your Verilog, block diagram, and wrapper files, click on <b>"Sources"</b> in the top-left window of the Project Manager.</div>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p03_img1.png" loading="lazy" alt="Block diagram open in Vivado with Sources panel visible"></figure>
+          <figure><img src="assets/img/zybo_reference/p03_img2.png" loading="lazy" alt="Zoom Fit (Ctrl+0) tooltip on the Diagram toolbar"></figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="create-ip">
+      <span class="step-num">Step 2</span>
+      <h2>Create a New IP</h2>
+
+      <div class="step">
+        <p>Navigate to <b>Tools → "Create and Package New IP."</b> Click <b>"Next."</b></p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p04_img2.png" loading="lazy" alt="Tools menu with Create and Package New IP highlighted"></figure>
+          <figure><img src="assets/img/zybo_reference/p04_img3.png" loading="lazy" alt="Create and Package New IP wizard intro page"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>Select <b>"Create a new AXI4 peripheral,"</b> then press <b>"Next."</b></p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_reference/p05_img1.png" loading="lazy" alt="Create Peripheral, Package IP or Package a Block Design options page"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Type in a name for your block. If you don't have an "IP Location" already, Vivado automatically creates an <code>ip_repo</code> for you. Click <b>"Next."</b></p>
+        <div class="note">Your <code>ip_repo</code> is typically found in your hardware folder, but you can point it anywhere.</div>
+        <div class="imgrow"><figure><img src="assets/img/zybo_reference/p05_img2.png" loading="lazy" alt="Peripheral Details page: name, version, description, IP location"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Edit your interface parameters as needed. Click <b>"Next."</b></p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_reference/p05_img3.png" loading="lazy" alt="Add Interfaces page configuring the AXI4-Lite slave interface"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Select <b>"Edit IP"</b> to be taken immediately to the new hardware project containing your IP. Click <b>"Finish."</b></p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p06_img1.png" loading="lazy" alt="Create Peripheral summary page with Edit IP selected"></figure>
+          <figure><img src="assets/img/zybo_reference/p06_img2.png" loading="lazy" alt="Package IP project manager view for the new peripheral"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>Double-click <code>{ip_name}.v</code> in "Sources," and also <code>{ip_name}_slave_lite_v1_0_S00_AXI.v</code>:</p>
+        <ul>
+          <li><code>{ip_name}.v</code> — the direct connection to the AXI bus.</li>
+          <li><code>{ip_name}_slave_lite_v1_0_S00_AXI.v</code> — a handshake FSM implementing the AXI bus protocol.</li>
+        </ul>
+        <div class="imgrow"><figure><img src="assets/img/zybo_reference/p07_img1.png" loading="lazy" alt="Generated AXI4-Lite slave Verilog source open in Vivado"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Implement your logic in the "...slave..." file, writing it out to the AXI data output. In this worked example, we create a free-running down-counter.</p>
+        <div class="note">Leave <code>slv_reg1</code>–<code>slv_reg3</code> in place as 0. Only <code>slv_reg0</code> is replaced with a register named <code>count_value</code>.</div>
+        <div class="imgrow"><figure><img src="assets/img/zybo_reference/p08_img1.png" loading="lazy" alt="Edited slave AXI Verilog with a free-running down counter and RDATA mux"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>Return to the main project: <b>File → Project → Open</b> or <b>Open Recent</b>. If prompted, click <b>"Yes"</b> to open the next project.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_reference/p08_img2.png" loading="lazy" alt="File > Project > Open Recent menu listing the main hardware project"></figure></div>
+      </div>
+    </section>
+
+    <section id="add-ip-repo">
+      <span class="step-num">Step 3</span>
+      <h2>Add the IP to Your Repository</h2>
+
+      <div class="step">
+        <p>In your main project, navigate to <b>Tools → Settings</b> (gear icon), then <b>"IP" → "Repository."</b></p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p09_img2.png" loading="lazy" alt="Tools menu with Settings highlighted"></figure>
+          <figure><img src="assets/img/zybo_reference/p09_img3.png" loading="lazy" alt="Settings window with Project Settings > IP > Repository in the left tree"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>Click the plus icon and find the folder named <code>{ip_name}_{version_number}</code> (e.g. <code>down_counter_1_0</code>). Click <b>"Refresh All,"</b> then <b>"Apply"</b> and <b>"OK."</b></p>
+        <div class="note">If you've already pointed to the <code>ip_repo</code> in this project, the new IP may have been picked up already!</div>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p10_img1.png" loading="lazy" alt="IP > Repository settings page listing repository paths, plus Refresh All"></figure>
+          <figure><img src="assets/img/zybo_reference/p10_img2.png" loading="lazy" alt="File explorer selecting the down_counter_1_0 IP folder"></figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="add-to-diagram">
+      <span class="step-num">Step 4</span>
+      <h2>Add IP to the Block Diagram</h2>
+
+      <div class="step">
+        <p>Right-click anywhere on the block diagram, click <b>"Add IP...,"</b> and type in your IP's name.</p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p11_img2.png" loading="lazy" alt="Block diagram right-click menu with Add IP highlighted"></figure>
+          <figure><img src="assets/img/zybo_reference/p11_img3.png" loading="lazy" alt="IP search box finding down_counter_v1.0"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>A green bar appears at the top of the Diagram tab. Click <b>"Run Connection Automation"</b> to wire the pins.</p>
+        <div class="note">If your AXI bus doesn't have enough ports, that's fine — automation creates a new Master port, clock, and reset for the peripheral.</div>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p12_img1.png" loading="lazy" alt="down_counter_0 added to diagram with Designer Assistance banner"></figure>
+          <figure><img src="assets/img/zybo_reference/p12_img2.png" loading="lazy" alt="axi_interconnect_gp0 block before connection automation"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>In the popup, make sure all checkboxes for the IP are checked, then click <b>"OK."</b></p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_reference/p13_img1.png" loading="lazy" alt="Run Connection Automation dialog for down_counter_0/S00_AXI"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>The AXI bus expands. Click <b>"Regenerate Layout"</b> to make the connections easier to see.</p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p14_img1.png" loading="lazy" alt="axi_interconnect_gp0 block expanded after connection automation"></figure>
+          <figure><img src="assets/img/zybo_reference/p15_img1.png" loading="lazy" alt="Full block diagram with down_counter_0 after regenerate"></figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="gen-bitstream">
+      <span class="step-num">Step 5</span>
+      <h2>Generate Bitstream</h2>
+      <div class="note">Automatically runs Linting, Synthesis, Implementation, and Place and Route.</div>
+
+      <div class="step">
+        <p>Right-click in the block diagram whitespace and select <b>"Validate Design."</b> Hopefully no errors.</p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p15_img2.png" loading="lazy" alt="Right-click Validate Design menu option"></figure>
+          <figure><img src="assets/img/zybo_reference/p16_img1.png" loading="lazy" alt="Validate Design successful dialog, no errors or critical warnings"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>In the Flow Navigator, click <b>"Generate Bitstream"</b> under <b>"PROGRAM AND DEBUG."</b> Save if prompted, click <b>"Yes"</b> to run synthesis and implementation first, and set the number of jobs your machine can handle.</p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p16_img2.png" loading="lazy" alt="Flow Navigator with Generate Bitstream highlighted"></figure>
+          <figure><img src="assets/img/zybo_reference/p17_img1.png" loading="lazy" alt="Save Project before generating bitstream dialog"></figure>
+          <figure><img src="assets/img/zybo_reference/p17_img3.png" loading="lazy" alt="Launch Runs dialog with number of jobs setting"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>Track progress in the <b>"Design Runs"</b> tab. When complete, you'll see a completion popup — select whichever option and click <b>"OK."</b></p>
+        <div class="note">Synthesis is fast on cached IP blocks; new blocks take longer. A design not meeting timing isn't always a dealbreaker, depending on context.</div>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p18_img1.png" loading="lazy" alt="Design Runs tab tracking synthesis of each IP block"></figure>
+          <figure><img src="assets/img/zybo_reference/p18_img2.png" loading="lazy" alt="Bitstream Generation Completed dialog"></figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="export-hw">
+      <span class="step-num">Step 6</span>
+      <h2>Export Hardware</h2>
+
+      <div class="step">
+        <p>Navigate to <b>File → Export → Export Hardware</b>. Select <b>"Include Bitstream."</b></p>
+        <div class="note">A bitstream is exactly how we configure the logic on the FPGA to make the hardware happen.</div>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p19_img1.png" loading="lazy" alt="File > Export > Export Hardware menu"></figure>
+          <figure><img src="assets/img/zybo_reference/p21_img1.png" loading="lazy" alt="Output page with Include Bitstream selected"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>Name it whatever you want, click <b>"Next,"</b> then <b>"Finish."</b></p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p22_img1.png" loading="lazy" alt="Files page setting the XSA file name and export directory"></figure>
+          <figure><img src="assets/img/zybo_reference/p23_img1.png" loading="lazy" alt="Exporting Hardware Platform confirmation page, click Finish"></figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="vitis-open">
+      <span class="step-num">Step 7</span>
+      <h2>Open Vitis</h2>
+
+      <div class="step">
+        <p>Open Vitis and navigate to the appropriate workspace. Click <b>"Launch,"</b> then <b>"Continue With classic Vitis."</b></p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p23_img2.png" loading="lazy" alt="Vitis Classic 2024.1 launcher tile"></figure>
+          <figure><img src="assets/img/zybo_reference/p24_img1.png" loading="lazy" alt="Vitis IDE Launcher selecting a workspace directory"></figure>
+          <figure><img src="assets/img/zybo_reference/p24_img3.png" loading="lazy" alt="Vitis Classic deprecation notice, Continue With classic Vitis"></figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="vitis-import-hw">
+      <span class="step-num">Step 8</span>
+      <h2>Import the Hardware into Vitis</h2>
+
+      <div class="step">
+        <p>You're opened up to the Vitis workspace. Find the green icon — here it's named <code>design_1_wrapper</code>. Right-click it and select <b>"Update Hardware Specification."</b></p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p25_img1.png" loading="lazy" alt="Vitis IDE main window with Explorer, source editor, and build console"></figure>
+          <figure><img src="assets/img/zybo_reference/p26_img1.png" loading="lazy" alt="Right-click design_1_wrapper, Update Hardware Specification menu"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>Click <b>"Browse,"</b> find the <code>.xsa</code> file you just exported, then click <b>"Ok."</b></p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p26_img2.png" loading="lazy" alt="Update Hardware Specification dialog with Browse button"></figure>
+          <figure><img src="assets/img/zybo_reference/p26_img3.png" loading="lazy" alt="File browser listing exported .xsa hardware platform files"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>Your hardware will show as <b>(Out-of-date)</b> — that's fine, it's fixed by building.</p>
+        <div class="note">You must build to load in a MACRO to easily access your new AXI address.</div>
+        <div class="imgrow"><figure><img src="assets/img/zybo_reference/p27_img1.png" loading="lazy" alt="Hardware specification updated confirmation, design_1_wrapper marked out-of-date"></figure></div>
+      </div>
+
+      <div class="step">
+        <p>In the <b>Assistant</b> panel, right-click <b>"Debug"</b> within the [Application] and click <b>"Build."</b></p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_reference/p27_img3.png" loading="lazy" alt="Assistant panel, right-click Debug, Build"></figure></div>
+      </div>
+    </section>
+
+    <section id="vitis-axi-addr">
+      <span class="step-num">Step 9</span>
+      <h2>Find the AXI Address</h2>
+
+      <div class="step">
+        <p>In the <b>"Explorer"</b> tab, expand the hardware dropdown and double-click <code>platform.spr</code>. Click on <b>"Hardware Specification"</b> at the bottom left.</p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p28_img1.png" loading="lazy" alt="Explorer tree with design_1_wrapper expanded showing platform.spr"></figure>
+          <figure><img src="assets/img/zybo_reference/p28_img2.png" loading="lazy" alt="Platform: design_1_wrapper page with Main and Hardware Specification tabs"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>Scroll down the "Hardware Specification" page to see your IP's new address in the <b>Address Map</b> table.</p>
+        <div class="imgrow"><figure><img src="assets/img/zybo_reference/p29_img1.png" loading="lazy" alt="Address Map table showing down_counter_0 base and high address"></figure></div>
+      </div>
+    </section>
+
+    <section id="vitis-reading-data">
+      <span class="step-num">Step 10</span>
+      <h2>Read the IP from C</h2>
+
+      <div class="step">
+        <p>Create a new folder in <code>src</code> named after your IP (right-click <code>src</code> → <b>New → Folder</b>), then add a <code>.h</code> and <code>.c</code> file inside it (right-click → <b>New → File</b>).</p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p29_img2.png" loading="lazy" alt="Right-click src, New > Folder menu"></figure>
+          <figure><img src="assets/img/zybo_reference/p29_img3.png" loading="lazy" alt="Right-click new folder, New > File menu"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>Example <code>.h</code> file contents:</p>
+        <pre class="code-block"><code>#ifndef DOWN_COUNTER_H_
+#define DOWN_COUNTER_H_
+
+#include "xil_types.h"
+
+/*
+ * Reads register 0 of the down_counter AXI4-Lite IP: a value that
+ * decrements on its own inside the FPGA fabric, once per AXI clock,
+ * from 1000 down to 0 (see count_value in
+ * down_counter_slave_lite_v1_0_S00_AXI.v).
+ */
+u32 DownCounter_Read(u32 baseAddr);
+
+#endif /* DOWN_COUNTER_H_ */</code></pre>
+        <p>Example <code>.c</code> file contents:</p>
+        <pre class="code-block"><code>#include "down_counter.h"
+#include "xil_io.h"
+
+#define DOWN_COUNTER_REG0_OFFSET 0x0
+
+u32 DownCounter_Read(u32 baseAddr)
+{
+    return Xil_In32(baseAddr + DOWN_COUNTER_REG0_OFFSET);
+}</code></pre>
+        <p>Somewhere at the top of your main C file, add this line:</p>
+        <pre class="code-block"><code>#define DOWN_COUNTER_BASEADDR XPAR_DOWN_COUNTER_0_S00_AXI_BASEADDR</code></pre>
+      </div>
+
+      <div class="step">
+        <p>Verify the address macro is proper by finding <code>xparameters.h</code> in the right-hand "Outline" column and double-clicking it. Search for your IP.</p>
+        <div class="note">If you can't find it, cancel out of the tab, build the project, and open it again.</div>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_reference/p31_img1.png" loading="lazy" alt="video_demo.c including down_counter.h and xparameters.h, Outline panel listing headers"></figure>
+          <figure><img src="assets/img/zybo_reference/p31_img2.png" loading="lazy" alt="xparameters.h snippet showing base/high address defines"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>Example use of the code to read and print to the serial:</p>
+        <pre class="code-block"><code>u32 countVal = DownCounter_Read(DOWN_COUNTER_BASEADDR);
+xil_printf("down_counter = %lu\n\r", (unsigned long) countVal);</code></pre>
+        <div class="note fix">That's it — your new IP is packaged, wired into the fabric, exported, and readable from C on the Zybo Z7-10.</div>
+      </div>
+    </section>
+
+    <a class="linkcard" href="zybo_reference.html">
+      <span class="icon">📑</span>
+      <span>Zybo-Z7 Quick Reference<small>zybo_reference.html — same steps split by Vivado/Vitis for fast lookup</small></span>
+    </a>
+
+    <footer>
+      Zybo-Z7 / Vivado / Vitis: full IP-creation walkthrough. Not linked from the site navigation. Click any screenshot to zoom in.
+    </footer>
+  </main>
+</div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+  <span class="hint">Click anywhere to close (Esc also works)</span>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightbox-img');
+  document.querySelectorAll('main figure img').forEach(img => {
+    img.addEventListener('click', () => {
+      lbImg.src = img.src;
+      lbImg.alt = img.alt;
+      lb.classList.add('open');
+    });
+  });
+  lb.addEventListener('click', () => lb.classList.remove('open'));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') lb.classList.remove('open');
+  });
+
+  const sections = document.querySelectorAll('main section[id]');
+  const tocLinks = document.querySelectorAll('nav.toc a');
+  const byId = href => document.querySelector(`nav.toc a[href="#${href}"]`);
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const link = byId(entry.target.id);
+      if (!link) return;
+      if (entry.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-10% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
