@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Zybo-Z7 / Vivado Bugs &amp; Quirks</title>
+<style>
+  :root{
+    --bg:#f7f7f5;
+    --panel:#ffffff;
+    --ink:#1b1d1f;
+    --ink-soft:#565c63;
+    --border:#e4e2dd;
+    --accent:#b45309;
+    --accent-soft:#fef3e6;
+    --link:#1155cc;
+    --code-bg:#f1efe9;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#15171a;
+      --panel:#1d2024;
+      --ink:#eceef0;
+      --ink-soft:#a3a9b0;
+      --border:#2c3036;
+      --accent:#e0952f;
+      --accent-soft:#2a2214;
+      --link:#7aa7ff;
+      --code-bg:#121417;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height:1.55;
+  }
+  a{color:var(--link)}
+
+  /* ---------- layout ---------- */
+  .shell{
+    display:grid;
+    grid-template-columns: 260px minmax(0,1fr);
+    max-width:1200px;
+    margin:0 auto;
+  }
+  nav.toc{
+    position:sticky;
+    top:0;
+    align-self:start;
+    height:100vh;
+    overflow-y:auto;
+    padding:28px 18px 40px 24px;
+    border-right:1px solid var(--border);
+  }
+  nav.toc h2{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    margin:0 0 12px;
+  }
+  nav.toc ol{
+    list-style:none;
+    margin:0;
+    padding:0;
+    counter-reset:sec;
+  }
+  nav.toc li{margin-bottom:2px}
+  nav.toc a{
+    display:block;
+    counter-increment:sec;
+    padding:7px 10px;
+    border-radius:8px;
+    text-decoration:none;
+    color:var(--ink-soft);
+    font-size:13.5px;
+  }
+  nav.toc a:before{
+    content: counter(sec) ". ";
+    color: var(--accent);
+    font-weight:600;
+  }
+  nav.toc a:hover{background:var(--accent-soft); color:var(--ink)}
+  nav.toc a.active{background:var(--accent-soft); color:var(--ink); font-weight:600}
+
+  main{padding: 36px 40px 90px}
+
+  header.hero{
+    padding: 10px 0 34px;
+    border-bottom:1px solid var(--border);
+    margin-bottom: 30px;
+  }
+  header.hero h1{
+    font-size: 30px;
+    margin: 0 0 8px;
+    letter-spacing:-.01em;
+  }
+  header.hero p{
+    color:var(--ink-soft);
+    margin:0;
+    font-size:15px;
+  }
+  .top-links{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:18px;
+  }
+
+  section{
+    margin-bottom: 56px;
+    scroll-margin-top: 20px;
+  }
+  section h2{
+    font-size:22px;
+    margin: 0 0 4px;
+    padding-bottom:10px;
+    border-bottom: 2px solid var(--accent);
+    display:inline-block;
+  }
+  section .kicker{
+    display:block;
+    color:var(--ink-soft);
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.07em;
+    margin-bottom:6px;
+  }
+
+  .step{
+    margin: 22px 0;
+    padding: 18px 20px;
+    background: var(--panel);
+    border:1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+  }
+  .step p{margin:0 0 12px}
+  .step p:last-child{margin-bottom:0}
+  .step ul{margin: 8px 0 0; padding-left: 20px}
+  .note{
+    margin-top:10px;
+    padding: 10px 14px;
+    background: var(--code-bg);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+  }
+  .note b{color:var(--ink)}
+
+  .imgrow{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    margin-top:14px;
+  }
+  figure{
+    margin:0;
+    flex: 1 1 260px;
+    max-width: 480px;
+  }
+  figure img{
+    display:block;
+    width:100%;
+    height:auto;
+    border-radius:10px;
+    border:1px solid var(--border);
+    cursor: zoom-in;
+    background:#fff;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  figure img:hover{
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+  figcaption{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:6px;
+  }
+
+  .linkcard{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 14px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius: 10px;
+    text-decoration:none;
+    color:var(--ink);
+    font-size:13.5px;
+    font-weight:500;
+    box-shadow: var(--shadow);
+  }
+  .linkcard:hover{border-color:var(--accent)}
+  .linkcard .icon{
+    width:26px;height:26px;flex:none;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:7px;
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:14px;
+  }
+  .linkcard small{display:block; color:var(--ink-soft); font-weight:400}
+
+  code, .inline-code{
+    background:var(--code-bg);
+    padding:1px 6px;
+    border-radius:5px;
+    font-size:.92em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .badge{
+    display:inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: 10px;
+  }
+
+  hr.sep{
+    border:none;
+    border-top:1px dashed var(--border);
+    margin: 40px 0;
+  }
+
+  /* lightbox */
+  .lightbox{
+    position:fixed; inset:0; z-index:50;
+    background: rgba(0,0,0,.82);
+    display:none;
+    align-items:center; justify-content:center;
+    padding: 4vh 4vw;
+    cursor: zoom-out;
+  }
+  .lightbox.open{display:flex}
+  .lightbox img{
+    max-width:100%; max-height:100%;
+    border-radius:8px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  }
+  .lightbox .hint{
+    position:fixed; top:18px; right:22px;
+    color:#fff; opacity:.7; font-size:13px;
+  }
+
+  footer{
+    padding: 30px 40px 60px;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    border-top:1px solid var(--border);
+  }
+
+  @media (max-width: 860px){
+    .shell{grid-template-columns: 1fr}
+    nav.toc{position:static; height:auto; border-right:none; border-bottom:1px solid var(--border)}
+    main{padding: 24px 18px 70px}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <nav class="toc" aria-label="Table of contents">
+    <h2>Sections</h2>
+    <ol>
+      <li><a href="#duplicate-wrapper">Duplicate Top-Level Wrapper</a></li>
+      <li><a href="#ip-repo">Stale / Missing IP Repositories</a></li>
+      <li><a href="#txt-ip">IP Not Showing Up (.txt Files)</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <h1>Zybo-Z7 / Vivado — Bugs &amp; Quirks</h1>
+      <p>A running list of strange Vivado/Vitis behavior found while working on the Zybo Z7 HDMI driver project, and how to get past each one. Referenced from <a href="zybo.html">zybo.html</a>.</p>
+    </header>
+
+    <section id="duplicate-wrapper">
+      <span class="badge">Strange quirk</span>
+      <h2>Duplicate Top-Level Wrapper</h2>
+
+      <div class="step">
+        <p>Sometimes clicking <b>"Create HDL Wrapper"</b> creates a duplicate top-level module. Leaving the duplicate around can cause <code>does not exist</code> errors like the ones below.</p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_bugs/does_not_exist_errors.png" loading="lazy" alt="Synth 8-11365 named port connection does not exist errors"></figure>
+        </div>
+      </div>
+
+      <span class="kicker">How to fix duplicate wrappers</span>
+
+      <div class="step">
+        <p>Double-click on both wrapper modules to compare their date/time of synthesis — this tells you which one is stale.</p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_bugs/duplicate_wrappers_sources.png" loading="lazy" alt="Two design_1_wrapper entries under Design Sources"></figure>
+          <figure><img src="assets/img/zybo_bugs/create_hdl_wrapper_menu.png" loading="lazy" alt="Right-click Create HDL Wrapper menu"></figure>
+        </div>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_bugs/wrapper1_synth_date.png" loading="lazy" alt="First wrapper header showing Vivado 2023.1.2, synth date Jul 4 2024"><figcaption>Older wrapper — Vivado 2023.1.2, synthesized Jul 4 2024.</figcaption></figure>
+          <figure><img src="assets/img/zybo_bugs/wrapper2_synth_date.png" loading="lazy" alt="Second wrapper header showing Vivado 2024.1, synth date Sep 17 2026, host Ivan's laptop"><figcaption>Newer wrapper — Vivado 2024.1, synthesized more recently on a different host.</figcaption></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>Right-click the <b>older/stale</b> wrapper file and choose <b>"Remove File from Project…"</b> to delete the earlier synthesized file.</p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_bugs/remove_file_from_project.png" loading="lazy" alt="Remove File from Project menu option"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>Check the box <b>"Also delete the project local file/directory from disk."</b></p>
+        <div class="note">This avoids a conflict between modules of the same name living in different files.</div>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_bugs/remove_sources_dialog.png" loading="lazy" alt="Remove Sources confirmation dialog with delete-from-disk checkbox"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>If the change doesn't take effect automatically, right-click anywhere in the <b>Sources</b> area and select <b>"Refresh Hierarchy."</b></p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_bugs/refresh_hierarchy_menu.png" loading="lazy" alt="Refresh Hierarchy option in Sources right-click menu"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>The file structure automatically "refreshes" — the block diagram's <code>.bd</code> now points to the correct wrapper Verilog file.</p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_bugs/wrapper_fixed_sources.png" loading="lazy" alt="Design Sources showing single correct design_1_wrapper after cleanup"></figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="ip-repo">
+      <span class="badge">Maintenance</span>
+      <h2>Ensuring IPs Are Up to Date / Pointing to the Correct Location</h2>
+
+      <div class="step">
+        <p>Navigate to <b>Tools → Settings…</b></p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_bugs/tools_settings_menu.png" loading="lazy" alt="Tools menu with Settings highlighted"></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <p>Navigate to <b>IP → Repository</b>. Click <b>"Refresh All"</b> to re-scan the listed IP repositories, or click the plus icon to add a new path pointing to new IPs.</p>
+        <div class="note">A repository path shown in red (like the <code>lorenz_dda_driver_1_0</code> entry below) means Vivado can't currently resolve it — check the path still exists on disk.</div>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_bugs/ip_repository_settings.png" loading="lazy" alt="Settings dialog on IP Repository page with Refresh All button"></figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="txt-ip">
+      <span class="badge">Strange bug</span>
+      <h2>IP Not Showing Up in Vivado</h2>
+
+      <div class="step">
+        <p>If an IP somehow isn't showing up in Vivado despite the repository path being correct, make sure none of the source <code>.v</code> files in that IP's folder accidentally got saved/renamed with a trailing <code>.txt</code> extension (e.g. <code>axi_leronz_dda.v.txt</code> instead of <code>axi_leronz_dda.v</code>).</p>
+        <div class="imgrow">
+          <figure><img src="assets/img/zybo_bugs/txt_extension_ip_bug.png" loading="lazy" alt="Explorer showing axi_leronz_dda.v.txt file with wrong extension"></figure>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      Vivado / Vitis quirks log for the Zybo Z7 HDMI driver project. Not linked from the site navigation. Click any screenshot to zoom in.
+    </footer>
+  </main>
+</div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+  <span class="hint">Click anywhere to close (Esc also works)</span>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+  // Lightbox
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightbox-img');
+  document.querySelectorAll('main figure img').forEach(img => {
+    img.addEventListener('click', () => {
+      lbImg.src = img.src;
+      lbImg.alt = img.alt;
+      lb.classList.add('open');
+    });
+  });
+  lb.addEventListener('click', () => lb.classList.remove('open'));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') lb.classList.remove('open');
+  });
+
+  // Active TOC highlighting
+  const sections = document.querySelectorAll('main section[id]');
+  const tocLinks = document.querySelectorAll('nav.toc a');
+  const byId = href => document.querySelector(`nav.toc a[href="#${href}"]`);
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const link = byId(entry.target.id);
+      if (!link) return;
+      if (entry.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-10% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
