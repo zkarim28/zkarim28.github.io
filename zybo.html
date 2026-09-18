@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Zybo-Z7 Docs</title>
+<style>
+  :root{
+    --bg:#f7f7f5;
+    --panel:#ffffff;
+    --ink:#1b1d1f;
+    --ink-soft:#565c63;
+    --border:#e4e2dd;
+    --accent:#b45309;
+    --accent-soft:#fef3e6;
+    --link:#1155cc;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#15171a;
+      --panel:#1d2024;
+      --ink:#eceef0;
+      --ink-soft:#a3a9b0;
+      --border:#2c3036;
+      --accent:#e0952f;
+      --accent-soft:#2a2214;
+      --link:#7aa7ff;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height:1.55;
+  }
+  a{color:var(--link)}
+  main{
+    max-width:720px;
+    margin:0 auto;
+    padding:60px 24px 90px;
+  }
+  header{margin-bottom:36px}
+  header h1{font-size:28px;margin:0 0 8px;letter-spacing:-.01em}
+  header p{color:var(--ink-soft);margin:0;font-size:15px}
+
+  .list{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .doclink{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:16px 18px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    text-decoration:none;
+    color:var(--ink);
+    box-shadow:var(--shadow);
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  .doclink:hover{border-color:var(--accent); transform: translateY(-1px)}
+  .doclink .icon{
+    width:34px;height:34px;flex:none;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:9px;
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:16px;
+  }
+  .doclink .txt strong{display:block;font-size:15px}
+  .doclink .txt span{display:block;color:var(--ink-soft);font-size:13px;margin-top:2px}
+
+  .placeholder{
+    padding:16px 18px;
+    border:1px dashed var(--border);
+    border-radius:12px;
+    color:var(--ink-soft);
+    font-size:13.5px;
+  }
+
+  footer{
+    margin-top:50px;
+    padding-top:20px;
+    border-top:1px solid var(--border);
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Zybo-Z7 Docs</h1>
+    <p>Index of Zybo-Z7 / Zynq / Vivado / Vitis write-ups. Add a link here whenever a new one gets made.</p>
+  </header>
+
+  <div class="list">
+    <a class="doclink" href="zybo_fib.html">
+      <span class="icon">📘</span>
+      <span class="txt">
+        <strong>Zybo-Z7 Zynq Beginner Guide (Fibonacci)</strong>
+        <span>Vivado block diagram basics, GPIO/BRAM over AXI, bitstream generation, Vitis Classic setup, and combining your own HDL.</span>
+      </span>
+    </a>
+
+    <a class="doclink" href="zybo_hdmi_fix.html">
+      <span class="icon">🛠️</span>
+      <span class="txt">
+        <strong>HDMI Driver: Git Cleanup &amp; Synthesis Debug Log</strong>
+        <span>Reconciling diverged branches, a SyncAsync.vhd IP-packaging bug between axi_dynclk/rgb2dvi, stale HDMI-RX constraints, and a broken Vitis Classic workspace.</span>
+      </span>
+    </a>
+
+    <div class="placeholder">More Zybo write-ups go here as they're made.</div>
+  </div>
+
+  <footer>Not linked from site navigation — bookmark this page directly.</footer>
+</main>
+</body>
+</html>

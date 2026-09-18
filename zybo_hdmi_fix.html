@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Zybo-Z7 HDMI Driver: Git Cleanup &amp; Synthesis Debug Log</title>
+<style>
+  :root{
+    --bg:#f7f7f5;
+    --panel:#ffffff;
+    --ink:#1b1d1f;
+    --ink-soft:#565c63;
+    --border:#e4e2dd;
+    --accent:#b45309;
+    --accent-soft:#fef3e6;
+    --link:#1155cc;
+    --code-bg:#f1efe9;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#15171a;
+      --panel:#1d2024;
+      --ink:#eceef0;
+      --ink-soft:#a3a9b0;
+      --border:#2c3036;
+      --accent:#e0952f;
+      --accent-soft:#2a2214;
+      --link:#7aa7ff;
+      --code-bg:#121417;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height:1.55;
+  }
+  a{color:var(--link)}
+
+  /* ---------- layout ---------- */
+  .shell{
+    display:grid;
+    grid-template-columns: 260px minmax(0,1fr);
+    max-width:1200px;
+    margin:0 auto;
+  }
+  nav.toc{
+    position:sticky;
+    top:0;
+    align-self:start;
+    height:100vh;
+    overflow-y:auto;
+    padding:28px 18px 40px 24px;
+    border-right:1px solid var(--border);
+  }
+  nav.toc h2{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    margin:0 0 12px;
+  }
+  nav.toc ol{
+    list-style:none;
+    margin:0;
+    padding:0;
+    counter-reset:sec;
+  }
+  nav.toc li{margin-bottom:2px}
+  nav.toc a{
+    display:block;
+    counter-increment:sec;
+    padding:7px 10px;
+    border-radius:8px;
+    text-decoration:none;
+    color:var(--ink-soft);
+    font-size:13.5px;
+  }
+  nav.toc a:before{
+    content: counter(sec) ". ";
+    color: var(--accent);
+    font-weight:600;
+  }
+  nav.toc a:hover{background:var(--accent-soft); color:var(--ink)}
+  nav.toc a.active{background:var(--accent-soft); color:var(--ink); font-weight:600}
+
+  main{padding: 36px 40px 90px}
+
+  header.hero{
+    padding: 10px 0 34px;
+    border-bottom:1px solid var(--border);
+    margin-bottom: 30px;
+  }
+  header.hero h1{
+    font-size: 30px;
+    margin: 0 0 8px;
+    letter-spacing:-.01em;
+  }
+  header.hero p{
+    color:var(--ink-soft);
+    margin:0;
+    font-size:15px;
+  }
+  .top-links{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:18px;
+  }
+
+  section{
+    margin-bottom: 56px;
+    scroll-margin-top: 20px;
+  }
+  section h2{
+    font-size:22px;
+    margin: 0 0 4px;
+    padding-bottom:10px;
+    border-bottom: 2px solid var(--accent);
+    display:inline-block;
+  }
+  section .kicker{
+    display:block;
+    color:var(--ink-soft);
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.07em;
+    margin-bottom:6px;
+  }
+  .step + .kicker{
+    margin-top:38px;
+    padding-top:4px;
+    color:var(--accent);
+    font-weight:600;
+  }
+
+  .step{
+    margin: 22px 0;
+    padding: 18px 20px;
+    background: var(--panel);
+    border:1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+  }
+  .step p{margin:0 0 12px}
+  .step p:last-child{margin-bottom:0}
+  .step ul{margin: 8px 0 0; padding-left: 20px}
+  .note{
+    margin-top:10px;
+    padding: 10px 14px;
+    background: var(--code-bg);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+  }
+  .note b{color:var(--ink)}
+  .note.warn{border-left-color:#dc2626}
+  .note.fix{border-left-color:#15803d}
+
+  code, .inline-code{
+    background:var(--code-bg);
+    padding:1px 6px;
+    border-radius:5px;
+    font-size:.92em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  pre.code-block{
+    background:var(--code-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px 16px;
+    overflow-x:auto;
+    font-size:12.5px;
+    line-height:1.55;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    margin-top:10px;
+    white-space:pre;
+  }
+  pre.code-block code{background:none;padding:0;border-radius:0;font-size:1em}
+  .diff-add{color:#15803d}
+  .diff-del{color:#b91c1c}
+
+  .linkcard{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 14px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius: 10px;
+    text-decoration:none;
+    color:var(--ink);
+    font-size:13.5px;
+    font-weight:500;
+    box-shadow: var(--shadow);
+  }
+  .linkcard:hover{border-color:var(--accent)}
+  .linkcard .icon{
+    width:26px;height:26px;flex:none;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:7px;
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:14px;
+  }
+  .linkcard small{display:block; color:var(--ink-soft); font-weight:400}
+
+  hr.sep{
+    border:none;
+    border-top:1px dashed var(--border);
+    margin: 40px 0;
+  }
+
+  footer{
+    padding: 30px 40px 60px;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    border-top:1px solid var(--border);
+  }
+
+  @media (max-width: 860px){
+    .shell{grid-template-columns: 1fr}
+    nav.toc{position:static; height:auto; border-right:none; border-bottom:1px solid var(--border)}
+    main{padding: 24px 18px 70px}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <nav class="toc" aria-label="Table of contents">
+    <h2>Sections</h2>
+    <ol>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#git-cleanup">Cleaning Stale Build Artifacts</a></li>
+      <li><a href="#branch-merge">Reconciling Diverged Branches</a></li>
+      <li><a href="#zarif-branch">Creating the "zarif" Branch</a></li>
+      <li><a href="#finding-ip">Finding the Lorenz DDA IP</a></li>
+      <li><a href="#synth-errors">Diagnosing Synthesis/Implementation Errors</a></li>
+      <li><a href="#syncasync-fix">Root Cause: SyncAsync.vhd Mismatch</a></li>
+      <li><a href="#regen">Regenerating IP Output Products</a></li>
+      <li><a href="#commit-push">Committing &amp; Pushing the Fix</a></li>
+      <li><a href="#vitis-broken">Vitis Classic: Missing Platform Project</a></li>
+      <li><a href="#open-items">Open Items / Follow-ups</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <h1>Zybo-Z7 HDMI Driver: Git Cleanup &amp; Synthesis Debug Log</h1>
+      <p>A session log (assisted by Claude Code) covering: cleaning up stray Vivado/Eclipse build artifacts in <code>hdmi_driver/</code>, reconciling a diverged git branch, standing up a new <code>zarif</code> working branch, tracking down a real IP-packaging bug (<code>SyncAsync.vhd</code> version mismatch between <code>axi_dynclk</code> and <code>rgb2dvi</code>) that was silently corrupting synthesis, removing stale HDMI-RX constraints from an output-only design, and diagnosing a broken Vitis Classic workspace with an orphaned platform-project reference.</p>
+    </header>
+
+    <section id="overview">
+      <h2>Overview</h2>
+      <div class="step">
+        <p>Repo: <code>~/Meng/MEng_ZYBO</code> (GitHub: <code>IvannnHuang/MEng_ZYBO</code>). Two parallel Vivado/Vitis project trees live in this repo:</p>
+        <ul>
+          <li><code>hdmi_driver/</code> — the Zybo-Z7 HDMI output-only project (RX intentionally removed).</li>
+          <li><code>lorenz_ip_hdmi/</code> — a separate project combining the Lorenz DDA custom IP with HDMI output.</li>
+        </ul>
+        <div class="note">Both are full Vivado project directories, so the git history is full of generated binary artifacts (<code>.dcp</code>, <code>.rpt</code>, <code>.pb</code>, bitstreams, IP caches) — this is the existing convention for this repo, not something introduced in this session.</div>
+      </div>
+    </section>
+
+    <section id="git-cleanup">
+      <h2>Cleaning Stale Build Artifacts</h2>
+      <div class="step">
+        <p>Asked to remove all changes under <code>hdmi_driver/</code>. Checked first: nothing tracked was actually modified — every change was <b>untracked</b> Vivado/Eclipse build/IDE output (<code>.cache</code>, <code>.runs</code>, <code>.metadata</code>, logs, simulation scratch files).</p>
+        <pre class="code-block"><code>git diff --name-status -- hdmi_driver/          <span class="diff-del"># (empty — nothing tracked modified)</span>
+git diff --cached --name-status -- hdmi_driver/ <span class="diff-del"># (empty — nothing staged)</span>
+git clean -ndx -- hdmi_driver/                  <span class="diff-add"># dry run: lists ~60 untracked build dirs/files</span></code></pre>
+        <p>Since it was safe (only generated/regenerable content), ran the real clean:</p>
+        <pre class="code-block"><code>git clean -fdx -- hdmi_driver/</code></pre>
+        <div class="note fix"><b>Result:</b> <code>hdmi_driver/</code> restored to its last-committed state. Unrelated staged work under <code>lorenz_ip_hdmi/</code> was left untouched.</div>
+      </div>
+    </section>
+
+    <section id="branch-merge">
+      <h2>Reconciling Diverged Branches</h2>
+      <div class="step">
+        <p><code>git pull</code> refused with "You have divergent branches and need to specify how to reconcile them." Local <code>main</code> had one unpushed commit, origin had a different one, both built on the same parent:</p>
+        <pre class="code-block"><code>git log --oneline -5
+872b68a lorenz ip path fixed. Synthed.                       <span class="diff-add"># local HEAD</span>
+6fd0c9d lorenz (chaoticaly) displays to HDMI.                <span class="diff-add"># common ancestor</span>
+...
+git log --oneline -5 origin/main
+4063259 updated ip block repackaged but can't synth...       <span class="diff-add"># origin HEAD</span>
+6fd0c9d lorenz (chaoticaly) displays to HDMI.</code></pre>
+        <p>Before picking merge vs. rebase, checked what each commit actually touched:</p>
+        <pre class="code-block"><code>git diff --name-only 6fd0c9d 872b68a | cut -d/ -f1 | sort -u
+lorenz_ip_hdmi
+
+git diff --name-only 6fd0c9d 4063259 | cut -d/ -f1 | sort -u
+hdmi_driver</code></pre>
+        <div class="note fix">No overlap at all — the local commit only touched <code>lorenz_ip_hdmi/</code>, origin's commit only touched <code>hdmi_driver/</code>. A merge was guaranteed conflict-free, so:</div>
+        <pre class="code-block"><code>git pull --no-rebase --no-edit
+<span class="diff-add">Merge made by the 'ort' strategy.</span></code></pre>
+        <p>Working tree came out clean, branch ended up 2 commits ahead of <code>origin/main</code> (the incoming commit + the merge commit).</p>
+      </div>
+    </section>
+
+    <section id="zarif-branch">
+      <h2>Creating the "zarif" Branch</h2>
+      <div class="step">
+        <p>Branched off <code>main</code> to isolate ongoing work:</p>
+        <pre class="code-block"><code>git checkout -b zarif</code></pre>
+      </div>
+      <div class="step">
+        <p>Vivado was actively running (synthesis) and had already dirtied <code>hdmi_driver/</code> with fresh build output by the time we were ready to push. Stashed it (including untracked files) rather than committing half-finished build state, then pushed the branch:</p>
+        <pre class="code-block"><code>git stash push -u -m "hdmi_driver vivado build artifacts before pushing zarif"
+git push -u origin zarif
+<span class="diff-add">* [new branch]      zarif -> zarif</span></code></pre>
+        <div class="note">Two stashes ended up sitting in the stash list from this session/history — <code>stash@{0}</code> (the one above) and an older <code>stash@{1}</code> predating this session. Both were left alone rather than popped, since popping the stale one on top of a now-working synth result would just reintroduce old broken artifacts. See <a href="#open-items">Open Items</a>.</div>
+      </div>
+    </section>
+
+    <section id="finding-ip">
+      <h2>Finding the Lorenz DDA IP</h2>
+      <div class="step">
+        <p>Asked where the "lorenz_dda" IP actually lives — it wasn't showing up under that name. The real name in the block design is <code>lorenz_dda_driver</code> (and there's an unrelated, differently-spelled <code>axi_leronz_dda</code> module floating around too — not the same thing).</p>
+        <p>A repo-wide search turned up <i>many</i> copies, because Vivado generates/caches an IP's source in several places per build:</p>
+        <pre class="code-block"><code>find hdmi_driver -iname "*lorenz*"
+hdmi_driver/Zybo-Z7-HW/Zybo-Z7-HW.ipdefs/repo/vivado-library/ip/lorenz_dda_driver_1_0/hdl/lorenz_dda_driver.v   <span class="diff-add"># <- canonical source</span>
+hdmi_driver/Zybo-Z7-HW/Zybo-Z7-HW.gen/sources_1/bd/design_1/ip/design_1_lorenz_dda_driver_0_0/...                <span class="diff-del"># generated copy</span>
+hdmi_driver/Zybo-Z7-HW/Zybo-Z7-HW.srcs/sources_1/bd/design_1/ip/design_1_lorenz_dda_driver_0_0/...                <span class="diff-del"># generated copy</span>
+hdmi_driver/Zybo-Z7-HW/Zybo-Z7-HW.ip_user_files/...                                                                <span class="diff-del"># generated copy</span>
+hdmi_driver/Zybo-Z7-HW/Zybo-Z7-HW.tmp/lorenz_dda_driver/...                                                        <span class="diff-del"># stale scratch project</span></code></pre>
+        <div class="note fix"><b>Rule of thumb for this project:</b> the editable, canonical source for any packaged IP lives under <code>Zybo-Z7-HW.ipdefs/repo/vivado-library/ip/&lt;ip_name&gt;/</code> — that's what "Edit in IP Packager" points at. Everything under <code>.gen/</code>, <code>.srcs/</code>, <code>.ip_user_files/</code>, and <code>.tmp/</code> is a regenerated/cached copy that Vivado will silently overwrite. Never hand-edit those.</div>
+      </div>
+    </section>
+
+    <section id="synth-errors">
+      <h2>Diagnosing Synthesis/Implementation Errors</h2>
+      <div class="step">
+        <p>Two independent clusters of errors showed up on a build attempt:</p>
+        <p><b>Cluster 1 — synthesis, primary-unit collision:</b></p>
+        <pre class="code-block"><code>[Synth 8-9871] overwriting existing primary unit 'syncasync'
+  [".../ipshared/d57c/src/SyncAsync.vhd":61]
+
+[filemgmt 20-1741] File 'SyncAsync.vhd' is used by one or more modules,
+but with different contents, and may lead to unpredictable results:
+* design_1_axi_dynclk_0_0 (.../ipshared/2a7c/src/SyncAsync.vhd)
+* design_1_rgb2dvi_1_0    (.../ipshared/d57c/src/SyncAsync.vhd)</code></pre>
+        <p><b>Cluster 2 — implementation, constraint/black-box cascade:</b></p>
+        <pre class="code-block"><code>[Common 17-55] 'set_property' expects at least one object.
+  [".../Zybo-Z7-Master.xdc":70]
+[Vivado 12-4739] create_clock: No valid object(s) found for
+  '-objects [get_ports hdmi_in_clk_p]'.
+[Vivado 12-259] No clocks specified ... design_1_v_tc_out_0_clocks.xdc
+[Project 1-486] Could not resolve non-primitive black box cell 'axi_dynclk'
+[DRC INBB-3] Black Box Instances: Cell '.../axi_dynclk_0/U0' ... black box.</code></pre>
+        <p>Traced cluster 1 to two Digilent IP cores — <code>axi_dynclk</code> and <code>rgb2dvi</code> — each bundling their <i>own</i> copy of a file named <code>SyncAsync.vhd</code>, with different contents:</p>
+        <pre class="code-block"><code>diff ipshared/2a7c/src/SyncAsync.vhd ipshared/d57c/src/SyncAsync.vhd
+6c6
+&lt; -- Date: 15 December 2017      <span class="diff-del"># axi_dynclk's copy</span>
+---
+&gt; -- Date: 20 October 2014        <span class="diff-add"># rgb2dvi's copy</span>
+64,65c64
+&lt;    kStages : natural := 2;
+&lt;    kResetPolarity : std_logic := '1');   <span class="diff-del"># extra generic, only in the 2017 version</span>
+---
+&gt;    kStages : natural := 2);</code></pre>
+        <p>Vivado's global/OOC synthesis merges same-named VHDL primary units across IP, so whichever copy loses the collision gets used everywhere — non-deterministic and exactly what "may lead to unpredictable results" warns about.</p>
+        <p>Traced cluster 2 to <code>Zybo-Z7-Master.xdc</code> still having an active <b>HDMI RX</b> pin/clock block (lines 69–81) referencing ports like <code>hdmi_in_clk_p</code> that don't exist on the top-level wrapper — confirmed <code>dvi2rgb</code> (the HDMI-input IP) isn't instantiated anywhere in <code>design_1</code>'s block design:</p>
+        <pre class="code-block"><code>grep -l "dvi2rgb" Zybo-Z7-HW.srcs/.../design_1.bd
+<span class="diff-del">(no match — not referenced in the BD)</span></code></pre>
+        <div class="note">This matched intent — HDMI input had been <i>deliberately</i> removed from this board to make it an output-only design. The stray RX constraints were leftovers from the original Digilent RX/TX reference XDC, not something missed.</div>
+        <p>Fix: commented out the whole HDMI RX block in <code>Zybo-Z7-Master.xdc</code> (pins + the offending <code>create_clock</code> line). That also resolved the downstream "no clocks specified" error on <code>design_1_v_tc_out_0_clocks.xdc</code>, which was just inheriting the missing-clock failure.</p>
+      </div>
+    </section>
+
+    <section id="syncasync-fix">
+      <h2>Root Cause: SyncAsync.vhd Mismatch</h2>
+      <div class="step">
+        <p><b>First attempt (wrong):</b> misread the diff direction and copied <code>rgb2dvi</code>'s (older, 2014) <code>SyncAsync.vhd</code> over <code>axi_dynclk</code>'s. This broke synthesis differently:</p>
+        <pre class="code-block"><code>[Synth 8-2043] formal port/generic &lt;kresetpolarity&gt; is not declared in &lt;syncasync&gt;
+  [".../axi_dynclk.vhd":252]
+[Synth 8-439] module 'design_1_axi_dynclk_0_0' not found
+[Synth 8-6156] failed synthesizing module 'design_1'</code></pre>
+        <p>That error made the real relationship obvious: <code>axi_dynclk.vhd</code> itself instantiates <code>SyncAsync</code> with the <code>kResetPolarity</code> generic —</p>
+        <pre class="code-block"><code>SyncAsyncLocked: entity work.SyncAsync
+   generic map (
+      kResetTo => '0',
+      kStages => 2,
+      kResetPolarity => '0')   <span class="diff-add"># axi_dynclk.vhd already expects the newer interface</span></code></pre>
+        <p>So <code>axi_dynclk</code>'s <i>original</i> bundled file (the Dec 2017 version, with the generic) was the correct one all along — it was <code>rgb2dvi</code>'s bundled file that was the outdated mismatch. The earlier "overwriting existing primary unit" collision had been silently papering over this the whole time, because global synthesis happened to let <code>axi_dynclk</code>'s correct copy win by luck of file-processing order — until it didn't.</p>
+        <div class="note fix"><b>Correction:</b></div>
+        <pre class="code-block"><code><span class="diff-add"># restore axi_dynclk's original (correct) file from git history</span>
+git checkout HEAD -- ".../axi_dynclk/src/SyncAsync.vhd"
+
+<span class="diff-add"># propagate that correct file to rgb2dvi, which had the stale one</span>
+cp ".../axi_dynclk/src/SyncAsync.vhd" ".../rgb2dvi/src/SyncAsync.vhd"</code></pre>
+        <p>Verified this was safe: <code>rgb2dvi</code>'s own instantiation (in <code>SyncAsyncReset.vhd</code>) never sets <code>kResetPolarity</code> explicitly, so it just takes the new file's default value (<code>'1'</code>), reproducing the exact old behavior. Both files ended up byte-identical, correctly this time.</p>
+      </div>
+    </section>
+
+    <section id="regen">
+      <h2>Regenerating IP Output Products</h2>
+      <div class="step">
+        <p>Editing the IP-repo source doesn't retroactively fix already-generated output products — Vivado needs to notice the repo source changed and regenerate. The generated copy under <code>.gen/</code> kept showing the old content even after the repo-source edit, until this was done properly.</p>
+        <p>Also came up: <code>axi_dynclk_0</code> doesn't appear as a flat top-level entry in the plain "Sources" view (it's nested inside the block design), so it's easy to think there's nothing to reset. Two reliable ways to reach it:</p>
+        <ul>
+          <li><b>Tools → Report IP Status</b> — flags any out-of-date IP (including ones nested in a block design), right-click → Reset Output Products → Generate Output Products (or Upgrade Selected first, if offered).</li>
+          <li><b>Sources panel → "IP Sources" tab</b> — lists every IP instance flat, including ones buried in <code>design_1.bd</code>.</li>
+        </ul>
+        <div class="note warn">Do <b>not</b> try to "reset output products" on the top-level wrapper — it isn't an IP and has no output products of its own.</div>
+        <p>Sequence used: refresh the IP repo path (Settings → IP → Repository → refresh) so Vivado re-scans <code>vivado-library</code>, run Report IP Status, reset+regenerate the flagged IP (<code>rgb2dvi_0</code> the second time around, since that's the one whose repo source changed last), then re-run Synthesis → Implementation → Generate Bitstream.</p>
+        <div class="note fix">Synthesis succeeded after the corrected fix and a proper reset/regenerate cycle.</div>
+      </div>
+    </section>
+
+    <section id="commit-push">
+      <h2>Committing &amp; Pushing the Fix</h2>
+      <div class="step">
+        <p>Staged the entire post-synth <code>hdmi_driver/</code> state (290 files — consistent with how this repo already tracks full Vivado run artifacts) and committed:</p>
+        <pre class="code-block"><code>git add -A -- hdmi_driver/
+git commit -m "Fix axi_dynclk/rgb2dvi SyncAsync mismatch and remove stale HDMI RX constraints
+
+axi_dynclk.vhd instantiates SyncAsync with a kResetPolarity generic that
+rgb2dvi's bundled (older) SyncAsync.vhd didn't declare, causing a primary
+unit collision during synthesis and axi_dynclk resolving to a black box.
+Synced rgb2dvi to use the same SyncAsync.vhd as axi_dynclk (superset,
+default-compatible). Also commented out the HDMI RX pin/clock constraints
+in Zybo-Z7-Master.xdc since design_1 no longer instantiates dvi2rgb
+(HDMI input removed, output-only design)."
+
+git push origin zarif
+<span class="diff-add">f06019e..f3a2572  zarif -> zarif</span></code></pre>
+      </div>
+    </section>
+
+    <section id="vitis-broken">
+      <h2>Vitis Classic: Missing Platform Project</h2>
+      <div class="step">
+        <p>Opening the <code>hdmi_driver</code> workspace in Vitis Classic to look at the C sources, the application project wouldn't open/resolve correctly. Inspecting the workspace's Eclipse metadata explained why:</p>
+        <pre class="code-block"><code>ls hdmi_driver/.metadata/.plugins/org.eclipse.core.resources/.projects/
+design_1_wrapper        <span class="diff-del"># registered, but folder does NOT exist on disk</span>
+Zybo-Z7-10-HDMI_system  <span class="diff-del"># registered, but folder does NOT exist on disk</span>
+Zybo-Z7-10-HDMI         <span class="diff-add"># exists, has real source</span>
+RemoteSystemsTempFiles</code></pre>
+        <p>And the app project's own <code>.project</code> file explicitly depends on the missing one:</p>
+        <pre class="code-block"><code>&lt;projects&gt;
+    &lt;project&gt;design_1_wrapper&lt;/project&gt;
+&lt;/projects&gt;</code></pre>
+        <div class="note">Confirmed via git history that this predates the session — the platform (<code>design_1_wrapper</code>) and system (<code>Zybo-Z7-10-HDMI_system</code>) project directories were never present under <code>hdmi_driver/</code> at any point touched by the earlier <code>git clean</code> step. They were most likely deleted from disk outside of Eclipse at some point (e.g. a manual folder delete) without Eclipse's workspace registry being told, leaving orphaned bookkeeping entries (marker files, resource-tree snapshots) behind for projects that no longer exist.</div>
+        <p><b>Planned fix</b> (not yet executed — session ended here):</p>
+        <ol>
+          <li>In Vitis, right-click the ghost <code>design_1_wrapper</code> / <code>Zybo-Z7-10-HDMI_system</code> entries → <b>Delete</b> (clears stale metadata only; nothing real is on disk to lose).</li>
+          <li><b>File → New → Platform Project</b>, name it exactly <code>design_1_wrapper</code> (so the existing app-project dependency resolves), pointing at the freshly generated <code>hdmi_driver/Zybo-Z7-HW/lorenz_ivan_9_18.xsa</code>. Build it.</li>
+          <li>Confirm <code>Zybo-Z7-10-HDMI</code> now resolves against the new platform (check C/C++ Build Settings if not).</li>
+          <li>Fallback if the old app project shell still won't cooperate: create a brand-new Application Project against the new platform and copy the existing <code>.c</code>/<code>.h</code> files from <code>Zybo-Z7-10-HDMI/src/</code> into it — the source itself is intact, only the project scaffolding is broken.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="open-items">
+      <h2>Open Items / Follow-ups</h2>
+      <div class="step">
+        <ul>
+          <li>Vitis Classic platform-project recreation (above) still needs to actually be done in the GUI.</li>
+          <li>Two git stashes are sitting unresolved: <code>stash@{0}</code> ("hdmi_driver vivado build artifacts before pushing zarif," now superseded by real committed work) and an older <code>stash@{1}</code> predating this session. Candidates to drop, pending confirmation.</li>
+          <li><code>hdmi_driver/Zybo-Z7-10-HDMI/</code> (the Eclipse workspace project folder) got committed to git for the first time in the big 290-file commit. Worth deciding whether that IDE workspace noise should actually be tracked, or <code>git rm --cached</code> + <code>.gitignore</code>'d.</li>
+          <li><code>dvi2rgb</code> (the unused HDMI-RX IP core) still sits in the IP repo under <code>vivado-library/ip/dvi2rgb/</code> even though it's no longer instantiated. Harmless, but could be removed for a fully RX-scrubbed repo.</li>
+        </ul>
+      </div>
+    </section>
+
+    <footer>
+      Session notes for the MEng_ZYBO HDMI driver project, logged with Claude Code assistance. This page isn't linked from the site navigation.
+    </footer>
+  </main>
+</div>
+
+<script>
+  // Active TOC highlighting
+  const sections = document.querySelectorAll('main section[id]');
+  const tocLinks = document.querySelectorAll('nav.toc a');
+  const byId = href => document.querySelector(`nav.toc a[href="#${href}"]`);
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const link = byId(entry.target.id);
+      if (!link) return;
+      if (entry.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-10% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
