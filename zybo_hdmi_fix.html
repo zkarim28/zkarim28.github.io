@@ -106,6 +106,17 @@
     margin:0;
     font-size:15px;
   }
+  .back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    text-decoration:none;
+    color:var(--ink-soft);
+    font-size:20px;
+    font-weight:700;
+    margin-bottom:20px;
+  }
+  .back-link:hover{color:var(--accent)}
   .top-links{
     display:flex;
     flex-wrap:wrap;
@@ -239,14 +250,11 @@
     <h2>Sections</h2>
     <ol>
       <li><a href="#overview">Overview</a></li>
-      <li><a href="#git-cleanup">Cleaning Stale Build Artifacts</a></li>
-      <li><a href="#branch-merge">Reconciling Diverged Branches</a></li>
-      <li><a href="#zarif-branch">Creating the "zarif" Branch</a></li>
+      <li><a href="#duplicate-wrapper-warning">Duplicate Wrapper Bug</a></li>
       <li><a href="#finding-ip">Finding the Lorenz DDA IP</a></li>
       <li><a href="#synth-errors">Diagnosing Synthesis/Implementation Errors</a></li>
       <li><a href="#syncasync-fix">Root Cause: SyncAsync.vhd Mismatch</a></li>
       <li><a href="#regen">Regenerating IP Output Products</a></li>
-      <li><a href="#commit-push">Committing &amp; Pushing the Fix</a></li>
       <li><a href="#vitis-broken">Vitis Classic: Missing Platform Project</a></li>
       <li><a href="#open-items">Open Items / Follow-ups</a></li>
     </ol>
@@ -254,71 +262,26 @@
 
   <main>
     <header class="hero">
+      <a class="back-link" href="zybo.html">&larr; Back to Zybo-Z7 Docs</a>
       <h1>Zybo-Z7 HDMI Driver: Git Cleanup &amp; Synthesis Debug Log</h1>
-      <p>A session log (assisted by Claude Code) covering: cleaning up stray Vivado/Eclipse build artifacts in <code>hdmi_driver/</code>, reconciling a diverged git branch, standing up a new <code>zarif</code> working branch, tracking down a real IP-packaging bug (<code>SyncAsync.vhd</code> version mismatch between <code>axi_dynclk</code> and <code>rgb2dvi</code>) that was silently corrupting synthesis, removing stale HDMI-RX constraints from an output-only design, and diagnosing a broken Vitis Classic workspace with an orphaned platform-project reference.</p>
+      <p>How Zarif fixed the synthesis.</p>
     </header>
 
     <section id="overview">
       <h2>Overview</h2>
       <div class="step">
-        <p>Repo: <code>~/Meng/MEng_ZYBO</code> (GitHub: <code>IvannnHuang/MEng_ZYBO</code>). Two parallel Vivado/Vitis project trees live in this repo:</p>
-        <ul>
-          <li><code>hdmi_driver/</code> — the Zybo-Z7 HDMI output-only project (RX intentionally removed).</li>
-          <li><code>lorenz_ip_hdmi/</code> — a separate project combining the Lorenz DDA custom IP with HDMI output.</li>
-        </ul>
-        <div class="note">Both are full Vivado project directories, so the git history is full of generated binary artifacts (<code>.dcp</code>, <code>.rpt</code>, <code>.pb</code>, bitstreams, IP caches) — this is the existing convention for this repo, not something introduced in this session.</div>
+        <p><code>hdmi_driver/</code> is the Zybo-Z7 HDMI output-only project — HDMI input (RX) support was intentionally removed, leaving just the output path.</p>
       </div>
     </section>
 
-    <section id="git-cleanup">
-      <h2>Cleaning Stale Build Artifacts</h2>
+    <section id="duplicate-wrapper-warning">
+      <h2>Important: Rule Out the Duplicate Wrapper Bug First</h2>
       <div class="step">
-        <p>Asked to remove all changes under <code>hdmi_driver/</code>. Checked first: nothing tracked was actually modified — every change was <b>untracked</b> Vivado/Eclipse build/IDE output (<code>.cache</code>, <code>.runs</code>, <code>.metadata</code>, logs, simulation scratch files).</p>
-        <pre class="code-block"><code>git diff --name-status -- hdmi_driver/          <span class="diff-del"># (empty — nothing tracked modified)</span>
-git diff --cached --name-status -- hdmi_driver/ <span class="diff-del"># (empty — nothing staged)</span>
-git clean -ndx -- hdmi_driver/                  <span class="diff-add"># dry run: lists ~60 untracked build dirs/files</span></code></pre>
-        <p>Since it was safe (only generated/regenerable content), ran the real clean:</p>
-        <pre class="code-block"><code>git clean -fdx -- hdmi_driver/</code></pre>
-        <div class="note fix"><b>Result:</b> <code>hdmi_driver/</code> restored to its last-committed state. Unrelated staged work under <code>lorenz_ip_hdmi/</code> was left untouched.</div>
-      </div>
-    </section>
-
-    <section id="branch-merge">
-      <h2>Reconciling Diverged Branches</h2>
-      <div class="step">
-        <p><code>git pull</code> refused with "You have divergent branches and need to specify how to reconcile them." Local <code>main</code> had one unpushed commit, origin had a different one, both built on the same parent:</p>
-        <pre class="code-block"><code>git log --oneline -5
-872b68a lorenz ip path fixed. Synthed.                       <span class="diff-add"># local HEAD</span>
-6fd0c9d lorenz (chaoticaly) displays to HDMI.                <span class="diff-add"># common ancestor</span>
-...
-git log --oneline -5 origin/main
-4063259 updated ip block repackaged but can't synth...       <span class="diff-add"># origin HEAD</span>
-6fd0c9d lorenz (chaoticaly) displays to HDMI.</code></pre>
-        <p>Before picking merge vs. rebase, checked what each commit actually touched:</p>
-        <pre class="code-block"><code>git diff --name-only 6fd0c9d 872b68a | cut -d/ -f1 | sort -u
-lorenz_ip_hdmi
-
-git diff --name-only 6fd0c9d 4063259 | cut -d/ -f1 | sort -u
-hdmi_driver</code></pre>
-        <div class="note fix">No overlap at all — the local commit only touched <code>lorenz_ip_hdmi/</code>, origin's commit only touched <code>hdmi_driver/</code>. A merge was guaranteed conflict-free, so:</div>
-        <pre class="code-block"><code>git pull --no-rebase --no-edit
-<span class="diff-add">Merge made by the 'ort' strategy.</span></code></pre>
-        <p>Working tree came out clean, branch ended up 2 commits ahead of <code>origin/main</code> (the incoming commit + the merge commit).</p>
-      </div>
-    </section>
-
-    <section id="zarif-branch">
-      <h2>Creating the "zarif" Branch</h2>
-      <div class="step">
-        <p>Branched off <code>main</code> to isolate ongoing work:</p>
-        <pre class="code-block"><code>git checkout -b zarif</code></pre>
-      </div>
-      <div class="step">
-        <p>Vivado was actively running (synthesis) and had already dirtied <code>hdmi_driver/</code> with fresh build output by the time we were ready to push. Stashed it (including untracked files) rather than committing half-finished build state, then pushed the branch:</p>
-        <pre class="code-block"><code>git stash push -u -m "hdmi_driver vivado build artifacts before pushing zarif"
-git push -u origin zarif
-<span class="diff-add">* [new branch]      zarif -> zarif</span></code></pre>
-        <div class="note">Two stashes ended up sitting in the stash list from this session/history — <code>stash@{0}</code> (the one above) and an older <code>stash@{1}</code> predating this session. Both were left alone rather than popped, since popping the stale one on top of a now-working synth result would just reintroduce old broken artifacts. See <a href="#open-items">Open Items</a>.</div>
+        <div class="note warn"><b>Check this before anything else.</b> A duplicate top-level HDL wrapper was another reason synthesis kept breaking in this project — separate from the <code>SyncAsync.vhd</code> IP mismatch documented below. It's quick to rule out and easy to miss.</div>
+        <a class="linkcard" href="zybo_bugs.html#duplicate-wrapper">
+          <span class="icon">🐛</span>
+          <span>Duplicate Top-Level Wrapper<small>zybo_bugs.html — "does not exist" errors from a stale HDL wrapper</small></span>
+        </a>
       </div>
     </section>
 
@@ -417,26 +380,6 @@ cp ".../axi_dynclk/src/SyncAsync.vhd" ".../rgb2dvi/src/SyncAsync.vhd"</code></pr
       </div>
     </section>
 
-    <section id="commit-push">
-      <h2>Committing &amp; Pushing the Fix</h2>
-      <div class="step">
-        <p>Staged the entire post-synth <code>hdmi_driver/</code> state (290 files — consistent with how this repo already tracks full Vivado run artifacts) and committed:</p>
-        <pre class="code-block"><code>git add -A -- hdmi_driver/
-git commit -m "Fix axi_dynclk/rgb2dvi SyncAsync mismatch and remove stale HDMI RX constraints
-
-axi_dynclk.vhd instantiates SyncAsync with a kResetPolarity generic that
-rgb2dvi's bundled (older) SyncAsync.vhd didn't declare, causing a primary
-unit collision during synthesis and axi_dynclk resolving to a black box.
-Synced rgb2dvi to use the same SyncAsync.vhd as axi_dynclk (superset,
-default-compatible). Also commented out the HDMI RX pin/clock constraints
-in Zybo-Z7-Master.xdc since design_1 no longer instantiates dvi2rgb
-(HDMI input removed, output-only design)."
-
-git push origin zarif
-<span class="diff-add">f06019e..f3a2572  zarif -> zarif</span></code></pre>
-      </div>
-    </section>
-
     <section id="vitis-broken">
       <h2>Vitis Classic: Missing Platform Project</h2>
       <div class="step">
@@ -450,7 +393,7 @@ RemoteSystemsTempFiles</code></pre>
         <pre class="code-block"><code>&lt;projects&gt;
     &lt;project&gt;design_1_wrapper&lt;/project&gt;
 &lt;/projects&gt;</code></pre>
-        <div class="note">Confirmed via git history that this predates the session — the platform (<code>design_1_wrapper</code>) and system (<code>Zybo-Z7-10-HDMI_system</code>) project directories were never present under <code>hdmi_driver/</code> at any point touched by the earlier <code>git clean</code> step. They were most likely deleted from disk outside of Eclipse at some point (e.g. a manual folder delete) without Eclipse's workspace registry being told, leaving orphaned bookkeeping entries (marker files, resource-tree snapshots) behind for projects that no longer exist.</div>
+        <div class="note">The platform (<code>design_1_wrapper</code>) and system (<code>Zybo-Z7-10-HDMI_system</code>) project directories were never present on disk under <code>hdmi_driver/</code>. They were most likely deleted outside of Eclipse at some point (e.g. a manual folder delete) without Eclipse's workspace registry being told, leaving orphaned bookkeeping entries (marker files, resource-tree snapshots) behind for projects that no longer exist.</div>
         <p><b>Planned fix</b> (not yet executed — session ended here):</p>
         <ol>
           <li>In Vitis, right-click the ghost <code>design_1_wrapper</code> / <code>Zybo-Z7-10-HDMI_system</code> entries → <b>Delete</b> (clears stale metadata only; nothing real is on disk to lose).</li>
@@ -466,9 +409,7 @@ RemoteSystemsTempFiles</code></pre>
       <div class="step">
         <ul>
           <li>Vitis Classic platform-project recreation (above) still needs to actually be done in the GUI.</li>
-          <li>Two git stashes are sitting unresolved: <code>stash@{0}</code> ("hdmi_driver vivado build artifacts before pushing zarif," now superseded by real committed work) and an older <code>stash@{1}</code> predating this session. Candidates to drop, pending confirmation.</li>
-          <li><code>hdmi_driver/Zybo-Z7-10-HDMI/</code> (the Eclipse workspace project folder) got committed to git for the first time in the big 290-file commit. Worth deciding whether that IDE workspace noise should actually be tracked, or <code>git rm --cached</code> + <code>.gitignore</code>'d.</li>
-          <li><code>dvi2rgb</code> (the unused HDMI-RX IP core) still sits in the IP repo under <code>vivado-library/ip/dvi2rgb/</code> even though it's no longer instantiated. Harmless, but could be removed for a fully RX-scrubbed repo.</li>
+          <li><code>dvi2rgb</code> (the unused HDMI-RX IP core) still sits in the IP repo under <code>vivado-library/ip/dvi2rgb/</code> even though it's no longer instantiated. Harmless, but could be removed for a fully RX-scrubbed project.</li>
         </ul>
       </div>
     </section>

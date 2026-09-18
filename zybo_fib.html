@@ -106,6 +106,17 @@
     margin:0;
     font-size:15px;
   }
+  .back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    text-decoration:none;
+    color:var(--ink-soft);
+    font-size:20px;
+    font-weight:700;
+    margin-bottom:20px;
+  }
+  .back-link:hover{color:var(--accent)}
   .top-links{
     display:flex;
     flex-wrap:wrap;
@@ -286,6 +297,7 @@
 
   <main>
     <header class="hero">
+      <a class="back-link" href="zybo.html">&larr; Back to Zybo-Z7 Docs</a>
       <h1>Zybo-Z7 Zynq Beginner Guide (Fibonacci)</h1>
       <p>Walkthrough of Zynq block diagrams for Zybo Z7-10, wiring up GPIO/BRAM over AXI, generating a bitstream, and bringing in your own HDL, with the reference videos and code alongside.     The website below is a long set of instructions on how to
 Vivado

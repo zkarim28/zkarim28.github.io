@@ -106,6 +106,17 @@
     margin:0;
     font-size:15px;
   }
+  .back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    text-decoration:none;
+    color:var(--ink-soft);
+    font-size:20px;
+    font-weight:700;
+    margin-bottom:20px;
+  }
+  .back-link:hover{color:var(--accent)}
   .top-links{
     display:flex;
     flex-wrap:wrap;
@@ -154,6 +165,7 @@
     color: var(--ink-soft);
   }
   .note b{color:var(--ink)}
+  .note.fix{border-left-color:#15803d}
 
   .imgrow{
     display:flex;
@@ -286,6 +298,7 @@
 
   <main>
     <header class="hero">
+      <a class="back-link" href="zybo.html">&larr; Back to Zybo-Z7 Docs</a>
       <h1>Zybo-Z7 / Vivado — Bugs &amp; Quirks</h1>
       <p>A running list of strange Vivado/Vitis behavior found while working on the Zybo Z7 HDMI driver project, and how to get past each one. Referenced from <a href="zybo.html">zybo.html</a>.</p>
     </header>
@@ -343,6 +356,8 @@
           <figure><img src="assets/img/zybo_bugs/wrapper_fixed_sources.png" loading="lazy" alt="Design Sources showing single correct design_1_wrapper after cleanup"></figure>
         </div>
       </div>
+
+      <div class="note fix">Now, every time you run <b>"Create HDL Wrapper"</b> going forward, duplicates will no longer be created.</div>
     </section>
 
     <section id="ip-repo">
