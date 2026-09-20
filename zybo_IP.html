@@ -307,6 +307,7 @@
       <li><a href="#vitis-axi-addr">Find the AXI Address</a></li>
       <li><a href="#vitis-reading-data">Read the IP from C</a></li>
       <li><a href="#build-and-run">Build and Run</a></li>
+      <li><a href="#lorenz-ip">Variant: Lorenz Attractor IP</a></li>
     </ol>
   </nav>
 
@@ -371,6 +372,11 @@
     <section id="create-ip">
       <span class="step-num">Step 2</span>
       <h2>Create a New IP</h2>
+
+      <a class="linkcard" href="#lorenz-ip" style="margin-bottom:16px">
+        <span class="icon">🌀</span>
+        <span>Variant: a multi-register IP with custom HDL (Lorenz attractor)<small>Jump to the Lorenz IP walkthrough — same wizard, but with your own submodules and several live AXI registers instead of one</small></span>
+      </a>
 
       <div class="step">
         <p>Navigate to <b>Tools → "Create and Package New IP."</b> Click <b>"Next."</b></p>
@@ -670,6 +676,168 @@ xil_printf("down_counter = %lu\n\r", (unsigned long) countVal);</code></pre>
       <div class="step">
         <p>Use the <b>Application</b> dropdown in the bottom-left corner of Vitis and select <b>"Build and run."</b></p>
         <div class="note">There's often a JTAG/board-recognition error, or some other error, the first time you flash the board. Ignore it and just try again — it usually connects fine on the next attempt.</div>
+      </div>
+    </section>
+
+    <section id="lorenz-ip">
+      <span class="step-num">Variant</span>
+      <h2>Lorenz Attractor IP: Multiple Registers &amp; Custom HDL</h2>
+
+      <div class="step">
+        <p>This variant packages a real numeric solver — a fixed-point Lorenz-attractor ODE integrator — into an AXI4-Lite peripheral with <b>three live registers</b> (x, y, z) instead of one static counter. Steps 1, 3–9, and 11 above are identical no matter which IP you're building; only <b>Step 2</b> (packaging/customizing the IP) and <b>Step 10</b> (reading it from C) change, so this section only covers those two.</p>
+      </div>
+
+      <a class="linkcard" href="https://github.com/IvannnHuang/MEng_ZYBO/tree/main/lorenz_ip_hdmi/ip_repo/lorenz_reader_1_0/hdl" target="_blank" rel="noopener" style="margin-bottom:16px">
+        <span class="icon">🔗</span>
+        <span>Full source on GitHub<small>lorenz_reader_1_0/hdl — the solver/integrator/multiplier HDL and the edited AXI wrapper files below, in full</small></span>
+      </a>
+
+      <h3>Write the custom HDL first</h3>
+      <div class="step">
+        <p>Before opening the IP wizard, write your logic as ordinary Verilog/SystemVerilog sources and add them to your Vivado project like any other design source. For this IP that's three files: a signed fixed-point multiplier, a one-tap Euler integrator, and a top module wiring three of each into the Lorenz equations (dx = σ(y−x), dy = x(ρ−z)−y, dz = xy−βz), all in Q7.20 signed fixed point (27 bits: 7 integer bits including sign, 20 fractional).</p>
+        <pre class="code-block"><code>// signed_mult.v — Q7.20 signed multiplier
+module signed_mult (out, a, b);
+    output     signed  [26:0]    out;
+    input     signed    [26:0]     a;
+    input     signed    [26:0]     b;
+    wire     signed    [53:0]    mult_out;
+    assign mult_out = a * b;
+    assign out = {mult_out[53], mult_out[45:20]};  // re-align to Q7.20
+endmodule</code></pre>
+        <pre class="code-block"><code>// integrator.sv — one-tap Euler accumulator
+module integrator(out, funct, InitialOut, clk, reset);
+    input                   clk;
+    input                   reset;
+    input signed [26:0]  funct;      // dV/dt
+    input signed [26:0]  InitialOut; // reset value
+    output signed [26:0] out;
+
+    reg  signed [26:0] v1;
+    wire signed [26:0] v1new;
+    wire signed [26:0] adder_out;
+
+    always @(posedge clk) v1 <= v1new;
+
+    assign adder_out = v1 + funct;
+    assign v1new = reset ? InitialOut : adder_out;
+    assign out = v1;
+endmodule</code></pre>
+        <div class="note">The third file, <code>solver.sv</code>, instantiates three <code>integrator</code>s and three <code>signed_mult</code>s and wires them per the Lorenz equations above. It has no AXI awareness at all — it's a free-running numeric core with plain <code>clk</code>/<code>reset</code>/constant inputs and <code>x_next</code>/<code>y_next</code>/<code>z_next</code> outputs, which is what makes it easy to drop into the wizard-generated wrapper in the next step.</div>
+      </div>
+
+      <h3>Step 2 (Lorenz version): package the IP</h3>
+      <div class="step">
+        <p>Run the same wizard as <a href="#create-ip">Step 2</a> above (<b>Tools → Create and Package New IP → Create a new AXI4 peripheral</b>). When you get to <b>"Edit IP,"</b> add your three HDL files to the IP project via the <b>plus icon</b> in "Sources," alongside the generated <code>{ip_name}.v</code> and <code>{ip_name}_slave_lite_v1_0_S00_AXI.v</code>.</p>
+        <div class="note"><b>Naming gotcha:</b> get the IP's name right when you create it. If you rename the IP afterward (Package IP → Identification tab), Vivado renames the top-level wrapper file/module to match, but <i>not</i> the already-generated AXI slave submodule filename — so you can end up with a mismatch like <code>lorenz_reader.v</code> instantiating <code>lorenz_reader_slave_lite_v1_0_S00_AXI.v</code> (a leftover from an earlier working name). It still works fine, it's just confusing later.</div>
+      </div>
+
+      <div class="step">
+        <p>In <code>{ip_name}_slave_lite_v1_0_S00_AXI.v</code>, add one port per solver output in the wizard's <code>// Users to add ports here</code> slot — this is the one sanctioned spot in the port list to touch:</p>
+        <pre class="code-block"><code>// Users to add ports here
+input wire signed [26:0] x_next,
+input wire signed [26:0] y_next,
+input wire signed [26:0] z_next,
+
+// User ports ends</code></pre>
+      </div>
+
+      <div class="step">
+        <p>Latch those values into registers. This isn't a marked slot — just insert it in the module body, after the stock register declarations and before the stock AXI I/O assignments:</p>
+        <pre class="code-block"><code>reg signed [26:0] x_reg, y_reg, z_reg;
+always @(posedge S_AXI_ACLK) begin
+  if (S_AXI_ARESETN == 1'b0) begin
+    x_reg <= 27'sd0;
+    y_reg <= 27'sd0;
+    z_reg <= 27'sd0;
+  end else begin
+    x_reg <= x_next;
+    y_reg <= y_next;
+    z_reg <= z_next;
+  end
+end</code></pre>
+      </div>
+
+      <div class="step">
+        <p>Edit the register-read mux so each address returns the right signal, sign-extended from 27 to 32 bits:</p>
+        <pre class="code-block"><code>assign S_AXI_RDATA =
+    (araddr == 2'h0) ? {{5{x_reg[26]}}, x_reg} :
+    (araddr == 2'h1) ? {{5{y_reg[26]}}, y_reg} :
+    (araddr == 2'h2) ? {{5{z_reg[26]}}, z_reg} :
+    (araddr == 2'h3) ? slv_reg3 : 0;</code></pre>
+        <div class="note"><b>The easy-to-miss edit:</b> this line is generated by the wizard and sits <i>directly above</i> the <code>// Add user logic here</code> marker — it is not inside any marked "Users to add" slot. The stock version just returns <code>slv_reg0</code>/<code>slv_reg1</code>/<code>slv_reg2</code>/<code>slv_reg3</code> for the four addresses. If you only edit inside the commented slots, you'll miss this line and your registers will silently read back zero (or your leftover scratch values) no matter what your logic is doing. <code>down_counter</code>'s AXI slave file has the identical edit at the identical spot, just returning one counter register instead of three.</div>
+      </div>
+
+      <div class="step">
+        <p>In the top-level wrapper (<code>{ip_name}.v</code>), the wizard's own <code>// Add user logic here</code> slot near the bottom is <b>not</b> where this goes — your solver's outputs need to exist before the AXI submodule instantiation that consumes them. Instead, insert your constants and solver instance directly in the module body, right after the AXI port list closes and before that instantiation:</p>
+        <pre class="code-block"><code>localparam signed [26:0] SIGMA = 27'sd10485760; // 10.0
+localparam signed [26:0] RHO   = 27'sd29360128; // 28.0
+localparam signed [26:0] BETA  = 27'sd2796203;  // 8/3
+localparam signed [26:0] DT    = 27'sd8;        // 1/256 as a right-shift
+localparam signed [26:0] X0 = -27'sd1048576;    // -1.0
+localparam signed [26:0] Y0 = 27'sd104858;      // 0.1
+localparam signed [26:0] Z0 = 27'sd26214400;    // 25.0
+
+wire signed [26:0] x_next, y_next, z_next;
+
+solver solver_i (
+    .clk(s00_axi_aclk), .reset(~s00_axi_aresetn),
+    .x_next(x_next), .y_next(y_next), .z_next(z_next),
+    .x_0(X0), .y_0(Y0), .z_0(Z0),
+    .beta(BETA), .sig(SIGMA), .rho(RHO), .dt(DT)
+);</code></pre>
+        <p>Then add three extra connections to the existing AXI submodule instantiation, one per solver output — the stock instantiation only wires up the 21 standard <code>S_AXI_*</code> ports, so this has to be added by hand whenever a custom port is added to the submodule below it:</p>
+        <pre class="code-block"><code>lorenz_reader_slave_lite_v1_0_S00_AXI # (
+    .C_S_AXI_DATA_WIDTH(C_S00_AXI_DATA_WIDTH),
+    .C_S_AXI_ADDR_WIDTH(C_S00_AXI_ADDR_WIDTH)
+) lorenz_reader_slave_lite_v1_0_S00_AXI_inst (
+    .x_next(x_next),
+    .y_next(y_next),
+    .z_next(z_next),
+    .S_AXI_ACLK(s00_axi_aclk),
+    /* ...rest of the standard S_AXI_* ports, unchanged... */
+);</code></pre>
+        <div class="note">A free-running fixed-point integrator with no periodic reset will numerically drift to (0,0,0) after tens of millions of cycles. If that matters for your use case, add a counter that pulses <code>reset</code> back to the initial conditions every few thousand cycles rather than leaving it fully unsupervised.</div>
+      </div>
+
+      <div class="step">
+        <p>Continue with <a href="#add-ip-repo">Step 3</a> through <a href="#vitis-axi-addr">Step 9</a> above exactly as written — pointing the IP repository, adding the IP to the block diagram, running connection automation, generating the bitstream, exporting hardware, opening Vitis, updating the hardware specification, and finding the AXI base address are all identical regardless of which IP you built.</p>
+      </div>
+
+      <h3>Step 10 (Lorenz version): read x/y/z from C</h3>
+      <div class="step">
+        <p>With three live fixed-point registers instead of one plain counter, the driver code needs to convert Q7.20 fixed point back to a float:</p>
+        <pre class="code-block"><code>#ifndef LORENZ_H_
+#define LORENZ_H_
+
+#include "xil_types.h"
+
+#define LORENZ_X_OFFSET 0x0
+#define LORENZ_Y_OFFSET 0x4
+#define LORENZ_Z_OFFSET 0x8
+
+float Lorenz_ReadX(u32 baseAddr);
+float Lorenz_ReadY(u32 baseAddr);
+float Lorenz_ReadZ(u32 baseAddr);
+
+#endif /* LORENZ_H_ */</code></pre>
+        <pre class="code-block"><code>#include "lorenz.h"
+#include "xil_io.h"
+
+/* Registers are 27-bit signed Q7.20, sign-extended to 32 bits in
+ * hardware, so a plain signed 32-bit read already has the correct
+ * sign - just divide out the 20 fractional bits. */
+static float q7_20_to_float(s32 raw) {
+    return (float)raw / (float)(1 << 20);
+}
+
+float Lorenz_ReadX(u32 baseAddr) { return q7_20_to_float((s32)Xil_In32(baseAddr + LORENZ_X_OFFSET)); }
+float Lorenz_ReadY(u32 baseAddr) { return q7_20_to_float((s32)Xil_In32(baseAddr + LORENZ_Y_OFFSET)); }
+float Lorenz_ReadZ(u32 baseAddr) { return q7_20_to_float((s32)Xil_In32(baseAddr + LORENZ_Z_OFFSET)); }</code></pre>
+        <div class="note">The driver files Vivado auto-generates (<code>{ip_name}.h</code>/<code>.c</code>/<code>_selftest.c</code>) are left as the stock template and never learn about x/y/z on their own — they still just define four generic register offsets. Either hand-edit those generated files, or do what's shown here: write your own small header/source pair in <code>src</code> (same pattern as <a href="#vitis-reading-data">Step 10</a> above) that reads the registers directly.</div>
+      </div>
+
+      <div class="step">
+        <p>Finish with <a href="#build-and-run">Step 11</a> above (Build and run) unchanged.</p>
       </div>
     </section>
 
