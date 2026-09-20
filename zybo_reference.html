@@ -290,6 +290,7 @@
       <li><a href="#vitis-import-hw">Importing Vivado Hardware Files</a></li>
       <li><a href="#vitis-axi-addr">Accessing AXI Addresses</a></li>
       <li><a href="#vitis-reading-data">Reading Data from New IPs</a></li>
+      <li><a href="#makefile-cross-compat">Makefile Cross-Compatibility</a></li>
     </ol>
   </nav>
 
@@ -676,6 +677,12 @@ u32 DownCounter_Read(u32 baseAddr)
         <pre class="code-block"><code>u32 countVal = DownCounter_Read(DOWN_COUNTER_BASEADDR);
 xil_printf("down_counter = %lu\n\r", (unsigned long) countVal);</code></pre>
       </div>
+    </section>
+
+    <section id="makefile-cross-compat">
+      <span class="badge">Best Practices</span>
+      <h3>Makefile Cross-Compatibility</h3>
+      <div class="note fix">Important: sharing Vitis project files between Windows and Linux causes makefile errors due to cross-compatibility issues (path separators, line endings, etc.). A cleanup script is being developed to normalize makefiles between the two platforms for easier sharing. In the meantime, just stick to Windows if you can.</div>
     </section>
 
     <footer>

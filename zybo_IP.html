@@ -306,6 +306,7 @@
       <li><a href="#vitis-import-hw">Import the Hardware into Vitis</a></li>
       <li><a href="#vitis-axi-addr">Find the AXI Address</a></li>
       <li><a href="#vitis-reading-data">Read the IP from C</a></li>
+      <li><a href="#build-and-run">Build and Run</a></li>
     </ol>
   </nav>
 
@@ -401,6 +402,10 @@
           <figure><img src="assets/img/zybo_reference/p06_img1.png" loading="lazy" alt="Create Peripheral summary page with Edit IP selected"></figure>
           <figure><img src="assets/img/zybo_reference/p06_img2.png" loading="lazy" alt="Package IP project manager view for the new peripheral"></figure>
         </div>
+      </div>
+
+      <div class="step">
+        <p>If you want to import your own Verilog files instead of editing the generated sources in place, click the <b>plus icon</b> in the "Sources" pane to add them to the IP project.</p>
       </div>
 
       <div class="step">
@@ -655,6 +660,16 @@ u32 DownCounter_Read(u32 baseAddr)
         <pre class="code-block"><code>u32 countVal = DownCounter_Read(DOWN_COUNTER_BASEADDR);
 xil_printf("down_counter = %lu\n\r", (unsigned long) countVal);</code></pre>
         <div class="note fix">That's it — your new IP is packaged, wired into the fabric, exported, and readable from C on the Zybo Z7-10.</div>
+      </div>
+    </section>
+
+    <section id="build-and-run">
+      <span class="step-num">Step 11</span>
+      <h2>Build and Run</h2>
+
+      <div class="step">
+        <p>Use the <b>Application</b> dropdown in the bottom-left corner of Vitis and select <b>"Build and run."</b></p>
+        <div class="note">There's often a JTAG/board-recognition error, or some other error, the first time you flash the board. Ignore it and just try again — it usually connects fine on the next attempt.</div>
       </div>
     </section>
 
