@@ -105,6 +105,23 @@ select { font: inherit; font-size: .9rem; color: var(--text); background: var(--
 .figure { margin: 10px 0 4px; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 8px; text-align: center; }
 .figure img { max-width: 100%; max-height: 360px; width: auto; height: auto; display: block; margin: 0 auto; }
 .qtext { font-size: 1.12rem; line-height: 1.5; font-weight: 600; margin: 12px 0 16px; }
+.qtext p { margin: 0 0 10px; }
+.qtext p:last-child { margin-bottom: 0; }
+.qtext:has(p + *) { font-weight: 500; font-size: 1.02rem; }
+.qtext:has(p + *) p:first-child { font-weight: 600; }
+.qtext ul, .qtext ol { margin: 0 0 10px; padding-left: 1.3em; font-weight: 500; font-size: .96em; }
+.qtext li { margin: 2px 0; }
+.feedback ul, .feedback ol, .review .ans ul, .review .ans ol, .bq details ul, .bq details ol, .about ul, .about ol { margin: 0 0 8px; padding-left: 1.3em; }
+.feedback li, .review li li, .bq details li, .about li { margin: 3px 0; }
+.file { font-size: .9rem; margin: 4px 0 14px; }
+.selfgrade { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px; font-size: .9rem; color: var(--muted); }
+.selfgrade .btn kbd { font-size: .7rem; opacity: .6; }
+.selfgrade .btn.on-ok { border-color: var(--ok); background: var(--ok-bg); color: var(--ok); }
+.selfgrade .btn.on-bad { border-color: var(--bad); background: var(--bad-bg); color: var(--bad); }
+.about { font-size: .88rem; margin-top: 10px; max-width: 70ch; }
+.about p { margin: 0 0 6px; }
+.bq .qtext { display: flex; flex-direction: column; }
+.bq .qtext .qn { color: var(--muted); font-size: .85rem; }
 .opts { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
 .opt { width: 100%; text-align: left; display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 11px; background: var(--surface); cursor: pointer; line-height: 1.45; transition: border-color .12s, background .12s; }
 .opt:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-soft); }

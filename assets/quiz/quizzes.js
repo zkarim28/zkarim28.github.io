@@ -3,6 +3,569 @@ window.QUIZ_DATA = {
  "generated": "2026-09-26",
  "quizzes": [
   {
+   "id": "prelim-1-exam",
+   "official": true,
+   "kind": "exam",
+   "title": "Prelim 1: Sample Exam",
+   "subtitle": "Study guide Part 2 · exam format (T/F + multiple choice)",
+   "covers": "Topics 1 through 3.2 plus the six assigned papers: Horowitz, Leiserson, Web Search for a Planet, Transformer Inference, Roofline, The Tail at Scale.",
+   "about": [
+    "- **Coverage:** Topic 1 through Topic 3.2 (up to and including \"Reducing component variability\"), plus the six assigned papers:\n  1. M. Horowitz, \"Computing's Energy Problem (and what we can do about it),\" ISSCC 2014\n  2. C. E. Leiserson et al., \"There's Plenty of Room at the Top,\" *Science* 2020\n  3. L. A. Barroso, J. Dean, U. Hölzle, \"Web Search for a Planet,\" *IEEE Micro* 2003\n  4. J. Austin et al., \"All About Transformer Inference,\" *How To Scale Your Model*, Part 7\n  5. S. Williams, A. Waterman, D. Patterson, \"Roofline,\" *CACM* 2009\n  6. J. Dean, L. A. Barroso, \"The Tail at Scale,\" *CACM* 2013\n- **Open notes.** The questions are not about finding a sentence in your notes. Most of them ask you to connect two ideas: a lecture topic with a paper, or one topic with another. Some ask for a short calculation."
+   ],
+   "origin": "prelim/1/prelim1-study-guide.md + prelim1-study-guide-explanations.md",
+   "sections": [
+    {
+     "title": "True or false",
+     "note": [],
+     "image": null,
+     "questions": [
+      {
+       "label": "2.1",
+       "text": "A service sends every request to 100 servers and waits for all of them. Each server independently misses its deadline 1% of the time. If every server is improved so that it misses its deadline only 0.1% of the time, about 1% of requests will then be slow.",
+       "options": [
+        "TRUE",
+        "FALSE"
+       ],
+       "answer": 1,
+       "explanation": [
+        "With 0.1% per server, the chance that at least one of 100 servers is slow is 1 − 0.999^100 ≈ **9.5%**, not 1%. A tenfold improvement in every server only reduced slow requests from about 63% (1 − 0.99^100) to about 9.5%. For small per-server probability q, P(slow) ≈ 1 − e^(−Nq), so what matters is the product N × q. This is why \"The Tail at Scale\" argues for *tolerating* variability rather than trying to eliminate it. *(Topic 3.1, Paper 6)*"
+       ]
+      },
+      {
+       "label": "2.2",
+       "text": "The end of Dennard scaling pushed the industry toward multicore processors, and the slowdown of Moore's law is the main force behind the move to specialized accelerators.",
+       "options": [
+        "TRUE",
+        "FALSE"
+       ],
+       "answer": 0,
+       "explanation": [
+        "When Dennard scaling ended (power density rising as transistors shrank), clock frequencies stopped climbing. The industry used its still-growing transistor budget for more cores instead. When Moore's law slowed as well, more transistors stopped arriving cheaply, and specialization became the main remaining way to gain performance and efficiency. *(Topic 1)*"
+       ]
+      },
+      {
+       "label": "2.3",
+       "text": "If servers were perfectly energy-proportional (an idle server drew no power at all), there would be no economic reason to fill the overnight dip in user traffic with batch work.",
+       "options": [
+        "TRUE",
+        "FALSE"
+       ],
+       "answer": 1,
+       "explanation": [
+        "Perfect energy proportionality removes only the energy wasted by idle servers, which is part of the *operating* cost. It does nothing about *capital* cost: the servers and building depreciate whether they are busy or dark. Server capital is by far the larger share of monthly cost (roughly 71%, against about 11% for server operating cost), so filling the overnight dip is mainly about making use of capital already spent. Energy proportionality and filling idle capacity complement each other. *(Topic 1, Topic 2)*"
+       ]
+      },
+      {
+       "label": "2.4",
+       "text": "The decode phase of LLM inference is usually limited by memory bandwidth, so an accelerator with twice the peak FLOP/s but the same memory bandwidth would barely speed it up.",
+       "options": [
+        "TRUE",
+        "FALSE"
+       ],
+       "answer": 0,
+       "explanation": [
+        "A decode step reads all of the model's weights (plus the KV cache) to produce one token per request. That is very little arithmetic per byte, which places it far to the left of the ridge point on a roofline, where attainable performance is bandwidth × operational intensity. Doubling peak FLOP/s does not move that line. Only more bandwidth, or more batching to raise intensity, helps. *(Topic 2, Papers 4 and 5)*"
+       ]
+      },
+      {
+       "label": "2.5",
+       "text": "SSD garbage collection is especially harmful to services that fan out across many servers, partly because each drive decides on its own when to collect garbage, independently of the request load and of the other drives.",
+       "options": [
+        "TRUE",
+        "FALSE"
+       ],
+       "answer": 0,
+       "explanation": [
+        "Flash cannot be overwritten in place, and it is erased in large blocks, so the drive must periodically move valid data out of a block and erase it. A read that arrives during this work can be slowed by about two orders of magnitude. Because garbage collection depends on the drive's internal state and write history, not the current load, you cannot avoid it by reducing load. And because every drive has its own state, with a large fan-out some drive is almost always in the middle of garbage collection. *(Topic 3.2, Paper 6)*"
+       ]
+      },
+      {
+       "label": "2.6",
+       "text": "Splitting a monolithic application into microservices usually lowers its end-to-end latency, because each microservice is smaller and simpler than the monolith.",
+       "options": [
+        "TRUE",
+        "FALSE"
+       ],
+       "answer": 1,
+       "explanation": [
+        "Microservices buy flexibility in development, deployment, and scaling, and they pay for it in performance. A request now crosses many service boundaries, each adding RPC, serialization, and network latency. End-to-end latency also depends on many distributed components, each another chance to hit the tail. *(Topic 1, Topic 3.1)*"
+       ]
+      },
+      {
+       "label": "2.7",
+       "text": "In LLM serving, increasing the batch size generally raises throughput (tokens per second) but tends to increase tail latency.",
+       "options": [
+        "TRUE",
+        "FALSE"
+       ],
+       "answer": 0,
+       "explanation": [
+        "Batching lets one read of the weights serve every request in the batch. That raises operational intensity, and with it throughput. But requests wait for batches to form and then advance at the batch's pace, so queueing grows, and queueing delay has a heavy tail. Batch size is where throughput is traded against latency. *(Topic 2, Topic 3.1)*"
+       ]
+      },
+      {
+       "label": "2.8",
+       "text": "A brute-force similarity search over fp32 embedding vectors has high operational intensity (i.e., FLOPs performed per byte moved from memory), so it is compute-bound on modern processors.",
+       "options": [
+        "TRUE",
+        "FALSE"
+       ],
+       "answer": 1,
+       "explanation": [
+        "Comparing a query with one 768-dimensional fp32 vector reads 768 × 4 = 3,072 bytes and performs about 1,536 FLOPs (a multiply and an add per dimension). That is about **0.5 FLOP/byte**, far below any modern processor's ridge point, so the search is strongly **memory-bandwidth-bound**. *(Topic 2 RAG, Paper 5)*"
+       ]
+      },
+      {
+       "label": "2.9",
+       "text": "Memory disaggregation is harder to deploy than storage disaggregation, mainly because the latency a network adds is small compared with an SSD or HDD access but large compared with a DRAM access.",
+       "options": [
+        "TRUE",
+        "FALSE"
+       ],
+       "answer": 0,
+       "explanation": [
+        "A DRAM access takes on the order of 100 ns, so a network hop that adds even a few hundred nanoseconds is a large slowdown, and a CPU stalls on each cache-line miss. An SSD or HDD access already takes tens of microseconds to milliseconds, so the network's added latency is small by comparison. Memory disaggregation therefore needs a much lower-latency, high-bandwidth interconnect with enough reach. *(Topic 1)*"
+       ]
+      },
+      {
+       "label": "2.10",
+       "text": "In a service that fans out each request to many servers, the median latency of an individual server is a good predictor of the service's median end-to-end latency.\n\nChoose the single best answer.",
+       "options": [
+        "TRUE",
+        "FALSE"
+       ],
+       "answer": 1,
+       "explanation": [
+        "The service's response waits for the *slowest* of its many servers, so even a typical request is shaped by the servers' tails. With a fan-out of 100, a median request is already exposed to roughly the 99th percentile of a single server. Per-server medians can look excellent while the service's median and tail are poor. *(Topic 3.1, Paper 6)*"
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Multiple choice",
+     "note": [],
+     "image": null,
+     "questions": [
+      {
+       "label": "2.11",
+       "text": "A datacenter site is provisioned for 300 MW of total facility power and runs at a PUE of 1.15. An upgrade would lower the PUE to 1.08. If each server draws 500 W, about how many *additional* servers could the same 300 MW site host after the upgrade?",
+       "options": [
+        "about 8,500",
+        "about 16,900",
+        "about 33,800",
+        "about 42,000"
+       ],
+       "answer": 2,
+       "explanation": [
+        "- IT power at PUE 1.15: 300 / 1.15 = 260.9 MW\n- IT power at PUE 1.08: 300 / 1.08 = 277.8 MW\n- Power freed: about 16.9 MW\n- Additional servers: 16.9 MW / 500 W ≈ **33,800**",
+        "Choice (b) is the freed power in kilowatts, not a server count. Choice (d) multiplies 300 MW by the PUE difference (0.07), which is not how PUE works. The larger point: when a site is limited by its power supply, every watt saved becomes room for more compute. *(Topic 1)*"
+       ]
+      },
+      {
+       "label": "2.12",
+       "text": "You are choosing between two servers for a site where electricity costs 10 cents per kWh. Server A costs $5,000 and draws 400 W. Server B costs $6,000 and draws 200 W. Each runs at full power for its 4-year lifetime. Ignoring cooling and other facility overhead, which is cheaper over its lifetime?",
+       "options": [
+        "Server A, by about $300",
+        "Server B, by about $300",
+        "Server B, by about $700",
+        "They cost the same"
+       ],
+       "answer": 0,
+       "explanation": [
+        "- 4 years × 8,760 h = 35,040 hours\n- Server A: 0.4 kW × 35,040 h × $0.10 = $1,401.60 in energy, **$6,401.60** in total\n- Server B: 0.2 kW × 35,040 h × $0.10 = $700.80 in energy, **$6,700.80** in total",
+        "Server A is about $299 cheaper. Halving the power saved only about $700 of electricity, less than the extra $1,000 purchase price. Two follow-ups show how sensitive this is. With facility overhead included, B wins once the PUE rises above about 1.43. And if the site is power-limited, B lets you fit twice as many servers in the same power budget, which could matter far more than the electricity bill. *(Topic 1)*"
+       ]
+      },
+      {
+       "label": "2.13",
+       "text": "A service fans out each request to 100 servers and waits for all of them. To make only 1% of requests slow, each server must meet the deadline at roughly which percentile of its own latency distribution?",
+       "options": [
+        "99th",
+        "99.9th",
+        "99.99th",
+        "99.999th"
+       ],
+       "answer": 2,
+       "explanation": [
+        "You need 1 − (1 − q)^100 ≤ 0.01, which gives q ≈ 0.0001 per server, so each server must meet the deadline 99.99% of the time. As a rule of thumb, the per-server miss budget is the request's miss budget divided by the fan-out. *(Topic 3.1, Paper 6)*"
+       ]
+      },
+      {
+       "label": "2.14",
+       "text": "Machine A has 300 GB/s of memory bandwidth and 100 TFLOP/s of peak compute. Machine B has 1.5 TB/s and 200 TFLOP/s. An LLM decode step has an operational intensity of about 1 FLOP/byte. Using the roofline model, how much faster is Machine B on the decode step?",
+       "options": [
+        "No faster",
+        "About 2×",
+        "About 3.3×",
+        "About 5×"
+       ],
+       "answer": 3,
+       "explanation": [
+        "Attainable performance = min(peak FLOP/s, bandwidth × intensity).",
+        "- Machine A: min(100 TFLOP/s, 300 GB/s × 1 FLOP/byte) = **0.3 TFLOP/s**\n- Machine B: min(200 TFLOP/s, 1.5 TB/s × 1 FLOP/byte) = **1.5 TFLOP/s**",
+        "Both machines are bandwidth-bound: their ridge points are about 333 and 133 FLOP/byte, far to the right of 1. B is faster by exactly its bandwidth ratio, 5×, and peak FLOP/s never enters the calculation. Choice (b) is the FLOP/s ratio, the wrong roof. This is also part (b) of question 1.21. *(Topic 2, Paper 5)*"
+       ]
+      },
+      {
+       "label": "2.15",
+       "text": "A vector index holds one billion 768-dimensional fp32 embeddings, about 3 TB. Each vector is compressed to a 64-byte product-quantization code. What is the approximate size of the compressed vectors, and what do you give up?",
+       "options": [
+        "about 64 GB; some search accuracy (recall), since distances are estimated from compressed codes",
+        "about 64 GB; nothing, since the compression is lossless",
+        "about 6.4 GB; some search accuracy (recall)",
+        "about 300 GB; a large increase in FLOPs per query"
+       ],
+       "answer": 0,
+       "explanation": [
+        "10^9 × 64 bytes = 64 GB, a 48× reduction from about 3 TB, small enough to fit in one server's DRAM. Product quantization is lossy: distances are estimated from compressed codes, so some true nearest neighbors are missed. Measure the loss as recall@k against an exact search, across a range of settings. *(Topic 2 RAG)*"
+       ]
+      },
+      {
+       "label": "2.16",
+       "text": "The hottest binary in a datacenter fleet uses 9.9% of all CPU cycles. If you built an accelerator that made that binary *infinitely* fast, what is the largest speedup the fleet's total CPU work could see?",
+       "options": [
+        "about 1.1×",
+        "about 2×",
+        "about 9.9×",
+        "about 50×"
+       ],
+       "answer": 0,
+       "explanation": [
+        "This is Amdahl's law. If 9.9% of the work becomes free, the remaining 90.1% still has to run: speedup = 1 / (1 − 0.099) ≈ 1.11×. This is why the flat binary distribution (question 1.14) makes accelerating individual applications so unattractive outside AI. *(Topic 1, Topic 2)*"
+       ]
+      },
+      {
+       "label": "2.17",
+       "text": "A storage-heavy service shows p99 read latency spikes of about 100×. The spikes recur periodically and do not track the request rate. Which is the most likely cause?",
+       "options": [
+        "Queueing in the memory controller as load rises",
+        "Network incast when many responses converge on one server",
+        "Threads running on a different NUMA socket from their memory",
+        "Garbage collection inside the SSDs"
+       ],
+       "answer": 3,
+       "explanation": [
+        "The clues are the size (about 100×), the periodic pattern, and the lack of any link to request rate. Memory-controller queueing (a) and network incast (b) both *grow with load*. NUMA misplacement (c) causes a steady penalty, not periodic spikes. SSD garbage collection follows the drive's internal state and write history, so it produces exactly this signature. *(Topic 3.2, Paper 6)*"
+       ]
+      },
+      {
+       "label": "2.18",
+       "text": "At low load, an operator uses DVFS to lower the CPU's voltage and frequency. Why might the energy consumed *per request* fail to drop?",
+       "options": [
+        "DVFS increases the CPU's power draw at low frequencies.",
+        "Each request takes longer, and the rest of the server (memory, NIC, storage, power supply) keeps drawing power for that extra time.",
+        "Lowering the frequency increases the number of instructions each request executes.",
+        "DVFS turns off the caches, so every access goes to DRAM."
+       ],
+       "answer": 1,
+       "explanation": [
+        "Energy = power × time. Lowering voltage and frequency reduces the CPU's power, but each request takes longer, and every other component in the server keeps drawing power for that extra time. Depending on the workload, total energy per request can stay the same or even rise. *(Topic 1, Topic 2)*"
+       ]
+      },
+      {
+       "label": "2.19",
+       "text": "Capacity for a user-facing service is provisioned for peak traffic, and the operator wants to use the idle capacity overnight. What property must the overnight work have?",
+       "options": [
+        "It must be latency-critical, so it gets priority when daytime traffic returns.",
+        "It must be preemptible: able to be stopped at short notice and to checkpoint or restart cheaply.",
+        "It must use little memory, so it cannot interfere with other tenants.",
+        "It must run only on servers that would otherwise be powered off."
+       ],
+       "answer": 1,
+       "explanation": [
+        "The idle capacity belongs to the user-facing service the moment its traffic returns, so the overnight work must be ready to be stopped at short notice. That means it must checkpoint, or be cheap to restart. This is why best-effort and weak-SLO (service level objective) tiers exist and are priced lower. Choice (a) is backwards: the user-facing service is the latency-critical work. *(Topic 1, Topic 2)*"
+       ]
+      },
+      {
+       "label": "2.20",
+       "text": "Horowitz (\"Computing's Energy Problem\") and Leiserson et al. (\"There's Plenty of Room at the Top\") both argue that performance and efficiency no longer come for free from process scaling. Which remaining lever appears in *both* papers?",
+       "options": [
+        "New process nodes with faster transistors",
+        "Higher clock frequencies",
+        "Hardware specialization (streamlining)",
+        "More reliable components"
+       ],
+       "answer": 2,
+       "explanation": [
+        "Horowitz shows that arithmetic is cheap and moving data is expensive, and that general-purpose overhead dominates the energy of each operation. His remedy is specialized hardware that avoids that overhead and exploits locality. Leiserson et al. list hardware streamlining as one of their three sources of gains at the \"top,\" alongside software and algorithms. Choices (a) and (b) are exactly what both papers say has stopped delivering. *(Topic 1, Papers 1 and 2)*"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "prelim-1-concepts",
+   "official": true,
+   "kind": "exam",
+   "open": true,
+   "title": "Prelim 1: Concept Review",
+   "subtitle": "Study guide Part 1 · open-ended, self-graded",
+   "covers": "Topics 1 through 3.2 plus the six assigned papers: Horowitz, Leiserson, Web Search for a Planet, Transformer Inference, Roofline, The Tail at Scale.",
+   "about": [
+    "- **Coverage:** Topic 1 through Topic 3.2 (up to and including \"Reducing component variability\"), plus the six assigned papers:\n  1. M. Horowitz, \"Computing's Energy Problem (and what we can do about it),\" ISSCC 2014\n  2. C. E. Leiserson et al., \"There's Plenty of Room at the Top,\" *Science* 2020\n  3. L. A. Barroso, J. Dean, U. Hölzle, \"Web Search for a Planet,\" *IEEE Micro* 2003\n  4. J. Austin et al., \"All About Transformer Inference,\" *How To Scale Your Model*, Part 7\n  5. S. Williams, A. Waterman, D. Patterson, \"Roofline,\" *CACM* 2009\n  6. J. Dean, L. A. Barroso, \"The Tail at Scale,\" *CACM* 2013\n- **Open notes.** The questions are not about finding a sentence in your notes. Most of them ask you to connect two ideas: a lecture topic with a paper, or one topic with another. Some ask for a short calculation."
+   ],
+   "origin": "prelim/1/prelim1-study-guide.md + prelim1-study-guide-explanations.md",
+   "sections": [
+    {
+     "title": null,
+     "note": [],
+     "image": null,
+     "questions": [
+      {
+       "label": "1.1",
+       "text": "What are the benefits of keeping datacenter servers highly utilized at all times?",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**Benefits of high utilization.**",
+        "1. **Capital is amortized.** Buildings, power and cooling infrastructure, and servers are paid for whether or not they do useful work. Capital is the largest part of total cost of ownership (TCO), so an idle server mostly wastes money that is already spent.\n2. **Energy efficiency improves.** Real servers are not energy-proportional: an idle or lightly loaded server still draws a large fraction of its peak power. Work per joule is therefore best near high load."
+       ],
+       "open": true
+      },
+      {
+       "label": "1.2",
+       "text": "Is PUE (power usage effectiveness) a good metric for how energy efficient the *servers* inside a datacenter are? Why or why not?",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**Is PUE a good measure of server efficiency?** No. PUE is total facility power divided by IT equipment power. It measures overhead *outside* the IT equipment (cooling, power conversion, lighting). It says nothing about how much useful work the IT equipment does per watt. A datacenter with excellent cooling can report a PUE near 1.0 while being full of inefficient, underutilized servers."
+       ],
+       "open": true
+      },
+      {
+       "label": "1.3",
+       "text": "Are energy-proportional CPUs more important for datacenter computing or for client-side computing (laptops, phones)? Justify your answer.",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**Energy proportionality: datacenter or client?** A good case can be made for either, but the stronger case is the **client side**:",
+        "- Client devices are mostly idle and are not shared, so there is no way to raise their utilization by adding other users' work.\n- Many are battery-powered. Without energy proportionality, a phone or laptop would drain its battery while doing almost nothing.",
+        "It matters in the datacenter too, since fleets spend much of their time at partial load. But a datacenter has another option a client lacks: with many users sharing the machines, it can raise utilization by packing more work onto them."
+       ],
+       "open": true
+      },
+      {
+       "label": "1.4",
+       "text": "Electricity costs 11 cents per kWh, and a server draws about 1 kW. A hyperscaler does not want a server's purchase price to exceed the cost of the electricity it consumes over its lifetime. If a server's lifetime is 5 years, what is the most the hyperscaler should pay for the server?",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**Electricity cost over a lifetime.**",
+        "- Energy: 1 kW × 24 h/day × 365 days/year × 5 years = 43,800 kWh\n- Cost: 43,800 kWh × $0.11/kWh ≈ **$4,818**",
+        "So the hyperscaler would pay at most about $4,800 for the server. If you also count facility overhead, multiply by the PUE. At a PUE of 1.1 the limit is about $5,300."
+       ],
+       "open": true
+      },
+      {
+       "label": "1.5",
+       "text": "You have just become the manager of a datacenter whose servers are highly **non**-energy-proportional (an idle server draws nearly as much power as a busy one). Your first decision is whether users should run their programs in a conventional *serverful* model (users rent whole servers or VMs) or a *serverless* model (users submit functions and pay only while they run). Which do you choose, and why?",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**Serverful or serverless with non-energy-proportional servers?** Choose **serverful**. A big advantage of serverless is that a user's resources drop to zero when they are not in use. But if the servers are not energy-proportional, a server that is only lightly used draws nearly as much power as a busy one. Releasing resources saves little energy unless the freed servers are filled with other work or switched off entirely. A serverful model, in which servers stay steadily occupied and are less sensitive to swings in user load, fits this hardware better.",
+        "(A good follow-up answer: serverless could still win if the provider aggressively consolidates functions onto fewer machines and powers off the rest. That is a scheduling capability, not a property of the servers.)"
+       ],
+       "open": true
+      },
+      {
+       "label": "1.6",
+       "text": "Imagine you have a time machine. You can travel back to 2005, around the time Dennard scaling ended, live there for three months, and return to the present. A friend who is a Ph.D. student hands you a paper titled \"The End of Dennard Scaling and the Beginning of the Accelerator Era.\" They suggest you take it back to 2005, submit it to ISCA (a top computer architecture conference), wait for the acceptance, and come home famous.\n\nWould you follow your friend's plan? Why or why not?",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**The time-machine paper.** No. In 2005, Moore's law was still delivering more transistors per chip every generation, and the simplest way to turn them into performance was to put more general-purpose cores on the chip. The end of Dennard scaling (power density no longer staying constant as transistors shrink) is what began the **multicore** era. The accelerator era came later, driven by the **slowdown of Moore's law**: once transistor counts stopped growing cheaply, specialization became the main way to get more performance and efficiency. The paper would have been premature, and reviewers in 2005 would not have been convinced."
+       ],
+       "open": true
+      },
+      {
+       "label": "1.7",
+       "text": "Would chiplets make sense if Moore's law had not slowed down?",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**Chiplets without the Moore's-law slowdown?** Probably not. Chiplets address the cost and yield of very large dies. A large monolithic die has low yield, because one defect can ruin the whole die, and it becomes very expensive at the leading edge. If Moore's law had continued, the needed transistors would have fit in smaller, cheaper, higher-yield dies, and there would be much less reason to split a design into chiplets."
+       ],
+       "open": true
+      },
+      {
+       "label": "1.8",
+       "text": "How would you explain the recent success of DeepSeek using what you have learned in this course? Think about Leiserson et al., \"There's Plenty of Room at the Top.\"",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**DeepSeek and \"Room at the Top.\"** Leiserson et al. argue that once device scaling (the \"bottom\") slows, performance gains must come from the \"top\": **software, algorithms, and hardware streamlining**. DeepSeek illustrates this. It trained and served competitive models with much less hardware by optimizing at the top of the stack rather than waiting for better chips. Examples: algorithmic and model-architecture changes such as mixture-of-experts and more memory-efficient attention, low-precision arithmetic, and heavily tuned software for communication and scheduling."
+       ],
+       "open": true
+      },
+      {
+       "label": "1.9",
+       "text": "What is the *data-delivery wall* in computer systems?",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**The data-delivery wall.** The data-delivery wall is the growing gap between how many operations a chip can perform per second and how many bytes per second can be delivered to it. Compute throughput has grown faster than memory and interconnect bandwidth. Many workloads therefore sit idle waiting for data, which is the bandwidth-bound region of a roofline plot."
+       ],
+       "open": true
+      },
+      {
+       "label": "1.10",
+       "text": "A friend argues that the arrival of SSDs is what led to storage disaggregation (moving storage out of compute servers and accessing it over the network). Do you agree?",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**Did SSDs lead to storage disaggregation?** You can argue either side:",
+        "- **Agree:** An SSD costs much more per GB than an HDD. Stranded or underused SSD capacity inside individual servers therefore wastes more money, which strengthens the economic case for pooling storage and sharing it over the network.\n- **Disagree:** Latency argues the other way. An HDD access takes milliseconds, which dwarfs the network's added latency, so disaggregating HDDs costs almost nothing in performance. An SSD access is much faster, so the network hop is a larger fraction of it. Storage disaggregation was practical before SSDs because disks were slow and datacenter networks became fast.",
+        "The stronger position is to disagree on causation: the enabler was fast networks. SSDs changed the economics, but they made the latency argument harder, not easier."
+       ],
+       "open": true
+      },
+      {
+       "label": "1.11",
+       "text": "What makes memory disaggregation challenging? Is it easier to disaggregate memory or storage?",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**Challenges of memory disaggregation.** Memory disaggregation needs an interconnect with **very low latency, high bandwidth, and enough reach** to connect many servers to a shared pool. DRAM is accessed in about 100 ns, so even a few hundred nanoseconds of added latency is a large slowdown. The processor also stalls on memory accesses at cache-line granularity, so it cannot hide much of that latency. **Storage is easier to disaggregate**, because a storage access already takes tens of microseconds (SSD) to milliseconds (HDD), so the network's latency and bandwidth are unlikely to be the bottleneck."
+       ],
+       "open": true
+      },
+      {
+       "label": "1.12",
+       "text": "A friend works at a startup building a DIMM (dual in-line memory module) with a built-in compression/decompression accelerator, so that these operations happen near the memory. You show them the figure below, which reports the fraction of \"cold\" memory (memory that has not been accessed recently) across Google clusters. They get very excited. Why?",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**Cold memory and a compression DIMM.** The figure shows that a large share of memory in Google's clusters is cold, often around 30% and sometimes much more. Cold memory takes up expensive DRAM capacity without being used. Compressing it frees capacity, so the server can hold more data in the same DRAM. That is effectively a memory-capacity increase, and memory is one of the largest costs in a server. The startup's DIMM could compress and decompress cold pages *near the memory*, without spending CPU cycles or moving the data across the memory bus to the CPU. They have found a large, real application for their hardware."
+       ],
+       "open": true,
+       "image": {
+        "alt": "Percentage of cold memory across ten Google clusters",
+        "src": "assets/quiz/prelim1-cold-memory.png",
+        "md": "prelim/1/cold-memory.png"
+       }
+      },
+      {
+       "label": "1.13",
+       "text": "What are *datacenter taxes*?",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**Datacenter taxes.** Datacenter taxes are common, low-level functions that nearly every datacenter application runs, no matter what the application does. Examples: RPC handling, serialization and deserialization (e.g., protocol buffers), memory allocation, data copying (`memcpy`), compression, hashing, and encryption. Each one is small, but together they consume a substantial fraction (roughly a quarter or more) of all fleet cycles. They are also stable and shared across applications, which makes them good targets for acceleration."
+       ],
+       "open": true
+      },
+      {
+       "label": "1.14",
+       "text": "The graph below is the cumulative distribution (CDF) of CPU cycles across the unique binaries running in Google's datacenters: the hottest binary accounts for 9.9% of cycles, and the curve reaches only a little over 50% by the 50th binary. A friend says this graph shows one of the main reasons it is hard to build accelerators for datacenters (excluding AI workloads). Do you agree?",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**The binary CDF.** Agree. The hottest binary uses only about 10% of cycles, and the top 50 binaries together barely pass half. The rest is a long tail of many binaries, each too small to justify its own accelerator. An accelerator has a large fixed design cost that must be paid back by the volume of work it speeds up, and here no single application is big enough. The datacenter is a **general-purpose** platform: there is no single \"killer application\" to specialize for (AI aside). This is also why the datacenter taxes (1.13) are attractive targets: they cut across the whole long tail."
+       ],
+       "open": true,
+       "image": {
+        "alt": "CDF of datacenter CPU cycles across unique binaries",
+        "src": "assets/quiz/prelim1-binary-cycles-cdf.png",
+        "md": "prelim/1/binary-cycles-cdf.png"
+       }
+      },
+      {
+       "label": "1.15",
+       "text": "A friend who claims to have taken this course is starting a company to revolutionize web search. They plan to run search on microcontrollers. Their reasoning: microcontrollers have scalar, in-order cores and run no operating system, so the system will not suffer from the tail-latency problems Google has struggled with for decades. They ask you to sell your car and invest by buying 30,000 ATmega328P microcontrollers at $3 each to build a datacenter of them.\n\nWould you invest? Why or why not?",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**The microcontroller startup.** No, for several reasons:",
+        "1. **Memory capacity.** An ATmega328P has 2 KB of SRAM. Even 30,000 of them together hold about 60 MB, while a web index needs terabytes of fast memory.\n2. **Performance and the SLO.** The ATmega328P is an 8-bit core running at up to 20 MHz, roughly 20 million simple 8-bit instructions per second. Search has a response deadline (its service level objective, or SLO), and a single query would take far too long to finish on such a slow core.\n3. **Tail latency does not come only from the OS.** It comes from queueing, the network, shared resources, and above all **fan-out**. Spreading one query across thousands of tiny devices makes the fan-out problem much *worse*, not better."
+       ],
+       "open": true
+      },
+      {
+       "label": "1.16",
+       "text": "You join a startup that runs a large service built from many microservices. Load on the service swings strongly over the day (a diurnal pattern). You must decide which server features to prioritize. For each feature below, say whether it would help, and why.\n\n- (a) DVFS (dynamic voltage and frequency scaling) for the CPU cores\n- (b) Many simple cores\n- (c) A few complex cores\n- (d) An RPC (remote procedure call) accelerator\n- (e) Large instruction caches on the CPU\n- (f) A general-purpose network stack in the Linux kernel",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**Server features for a microservice deployment with diurnal load.**",
+        "- **(a) DVFS: it can help, but check the energy.** Lowering voltage and frequency at low load reduces power. But energy is power × time: slowing the CPU makes each request take longer, and the rest of the server (memory, NIC, storage, interconnect, power supply) keeps drawing power for that longer time. Whether energy per request actually drops depends on the application.\n- **(b) Many simple cores: helpful.** Microservices offer abundant request-level parallelism. Each request can run on its own core without synchronizing with the others. Many cores also give finer control over how much CPU is allocated as load rises and falls.\n- **(c) A few complex cores: less useful.** Each microservice does relatively simple work, with less instruction-level parallelism to exploit, so much of a big out-of-order core's hardware would sit idle.\n- **(d) An RPC accelerator: helpful**, especially for communication-heavy services. Microservices talk to each other constantly, and RPC processing is a datacenter tax (1.13).\n- **(e) Large instruction caches: probably not a priority.** Each microservice has a smaller code footprint than a monolithic application, so it puts less pressure on the instruction cache.\n- **(f) A general-purpose Linux kernel network stack: no.** Heavy RPC traffic makes kernel networking overhead (system calls, interrupts, context switches, copies) a major cost. A specialized user-space network stack would perform much better."
+       ],
+       "open": true
+      },
+      {
+       "label": "1.17",
+       "text": "How does semantic search (i.e., retrieval by meaning rather than exact keyword match) enable retrieval-augmented generation (RAG)?",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**Semantic search and RAG.** RAG first *retrieves* the items in a database most relevant to the user's query, then passes them to the LLM with the query, so the generated answer is accurate and grounded in facts. That only works if retrieval finds passages that are relevant in *meaning*, not just ones that share keywords. Semantic search embeds the query and the documents as vectors and finds the nearest neighbors. Without it, the retrieved text may not be relevant and would not help the LLM."
+       ],
+       "open": true
+      },
+      {
+       "label": "1.18",
+       "text": "A user-facing service has a strong diurnal cycle: peak traffic is about 5× the traffic at the 2 a.m. trough, and capacity is provisioned for the peak. Two proposals compete for the idle off-peak capacity:\n\n- (A) Power the surplus machines down until traffic returns.\n- (B) Fill the trough with other work.\n\nChoose between them using the TCO (total cost of ownership) decomposition from the course. Which workload tier must the trough-filling work belong to, and why? Name one condition under which proposal (A) becomes the better choice.",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**Power down, or fill the trough?** Choose **(B), fill the trough**.",
+        "TCO = datacenter depreciation + datacenter operating cost + server depreciation + server operating cost. Powering a machine down saves only its energy, which is part of the operating cost. The two depreciation (capital) terms are already paid: the building and the servers cost the same whether a machine is busy or dark. Capital is also by far the larger share. The \"Web Search for a Planet\" figures are about $1,500 per month of operating cost against $7,700 per month of amortized capital, and modern figures put server capital at roughly 71% of monthly cost against about 11% for server operating cost. Powering down recovers a slice of the small term and leaves the large one wasted. Filling the trough turns capital that is already spent into useful work at close to the cost of the extra electricity.",
+        "The trough work must belong to a **preemptible tier** (best-effort or weak SLO). The capacity belongs to the latency-critical service the moment its traffic returns, so the filler must tolerate being stopped at short notice. That means it must checkpoint, or be cheap to restart. This is why such tiers exist and are priced lower, and it is where batch pipelines and training jobs typically run.",
+        "(A) becomes the better choice when the energy saved is large compared with the capital that sits idle. Examples: very high or time-varying electricity prices; a power-limited site that can use the freed power elsewhere; hardware that is already fully depreciated; or a demand-response contract that pays the operator to cut consumption. (A) saves anything at all only because servers are not energy-proportional: an idle server still draws a large fraction of its peak power."
+       ],
+       "open": true
+      },
+      {
+       "label": "1.19",
+       "text": "The file `p99-samples.csv` contains 100 response-time samples, in milliseconds. What is the 99th-percentile (p99) latency? Would the p99 change if the slowest sample were 1,000 ms instead of 10 ms? Would the mean?",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**p99 of the samples.** Sort the 100 samples. 98 of them are below 1 ms, one is exactly 1 ms, and one is 10 ms.",
+        "- The p99 is the value at or below which 99% of samples fall. That is the 99th value in sorted order: **p99 = 1 ms**. Spreadsheet functions such as Excel's `PERCENTILE.INC` interpolate between the 99th and 100th values and report about 1.09 ms. That is also acceptable, provided you know which definition you used.\n- If the slowest sample were 1,000 ms instead of 10 ms, the nearest-rank p99 **would not change**: it would still be 1 ms. (The interpolated value would move, because it blends in the maximum.) The **mean** would change a lot, from about 0.63 ms to about 10.5 ms.",
+        "Two lessons. First, a percentile tells you nothing about samples beyond it. The p99 here is blind to the single worst request, however bad it is. Second, with only 100 samples the p99 is set by the top one or two values, so estimating a tail percentile reliably takes far more samples than estimating a median."
+       ],
+       "open": true,
+       "files": [
+        {
+         "name": "p99-samples.csv",
+         "src": "assets/quiz/prelim1-p99-samples.csv",
+         "md": "prelim/1/p99-samples.csv"
+        }
+       ]
+      },
+      {
+       "label": "1.20",
+       "text": "Horowitz's central measurement is that moving operands costs far more energy than operating on them. Explain where this shows up in a single LLM decode step. Then explain why batching is the systems response to exactly this problem, framing that part of your answer in roofline terms.",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**Horowitz's data movement in an LLM decode step.** A decode step generates one token per request. To do it, the accelerator must read **every weight in the model**, plus the request's KV cache, and then performs very little arithmetic: a matrix-vector product rather than a matrix-matrix product. For a 70B-parameter model in bf16, that is about 140 GB read to produce a single token. Nearly all of the time and energy goes into moving weights out of memory, not into multiplying them. This is Horowitz's point at datacenter scale: the joules are in the fetch, not the arithmetic.",
+        "In roofline terms, decode at batch size one has a very low operational intensity (FLOPs per byte), far to the left of any machine's ridge point. There, attainable performance is bandwidth × intensity, and peak FLOP/s does not matter.",
+        "Batching fixes this by raising the intensity directly. One read of the weights now serves every request in the batch, so the bytes moved stay roughly the same while the FLOPs grow with the batch size. The workload slides right along the roofline toward the ridge point, and both performance and work per joule improve. The limit is memory capacity: every request in the batch needs its own KV cache resident in memory, so the memory left over after the weights caps the batch size, and with it the achievable intensity."
+       ],
+       "open": true
+      },
+      {
+       "label": "1.21",
+       "text": "Consider two accelerators and two workloads:\n\n- Machine A: 300 GB/s memory bandwidth, 100 TFLOP/s peak compute\n- Machine B: 1.5 TB/s memory bandwidth, 200 TFLOP/s peak compute\n- Decode step: operational intensity of about 1 FLOP/byte\n- Prefill: operational intensity of about 200 FLOP/byte\n\n(a) Compute each machine's ridge point.\n\n(b) Compute the attainable performance of each workload on each machine, and state which machine wins for each workload.\n\n(c) Both workloads have an operational intensity below or near both ridge points. What does that tell you about these accelerators and this class of workload?",
+       "options": [],
+       "answer": null,
+       "explanation": [
+        "**Two accelerators, two phases.**",
+        "(a) Ridge point = peak FLOP/s ÷ peak bandwidth.",
+        "- Machine A: 100 × 10^12 / 300 × 10^9 ≈ **333 FLOP/byte**\n- Machine B: 200 × 10^12 / 1.5 × 10^12 ≈ **133 FLOP/byte**",
+        "(b) Attainable performance = min(peak FLOP/s, bandwidth × intensity).",
+        "- Decode (1 FLOP/byte):\n  - A: min(100, 0.3 × 1) = **0.3 TFLOP/s**\n  - B: min(200, 1.5 × 1) = **1.5 TFLOP/s**\n  - B wins by 5×, exactly its bandwidth ratio. Both machines are bandwidth-bound, and peak FLOP/s never enters the calculation.\n- Prefill (200 FLOP/byte):\n  - A: 200 is below A's ridge point of 333, so A is still bandwidth-bound: 0.3 TB/s × 200 = **60 TFLOP/s**, well short of its 100 TFLOP/s peak.\n  - B: 200 is above B's ridge point of 133, so B is compute-bound at **200 TFLOP/s**.\n  - B wins by about 3.3×.",
+        "(c) Decode sits more than two orders of magnitude left of both ridge points, and even prefill does not reach Machine A's. Both machines are starved for bandwidth on this workload: their arithmetic units are sized for intensities LLM inference does not reach. This is the data-delivery wall in concrete form. Two consequences follow. First, peak FLOP/s is a poor basis for buying inference hardware; memory bandwidth and capacity matter more. Second, the most valuable software work is whatever raises intensity: batching above all, plus operator fusion, quantization (fewer bytes per weight), and KV-cache techniques that let the batch grow."
+       ],
+       "open": true
+      }
+     ]
+    }
+   ]
+  },
+  {
    "id": "combo-1",
    "official": true,
    "kind": "combo",

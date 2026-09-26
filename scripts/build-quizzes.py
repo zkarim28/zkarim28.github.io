@@ -41,6 +41,30 @@ def paragraphs(lines):
     return out
 
 
+LIST_ITEM = re.compile(r'^(\s*)(?:-|\d+\.)\s+')
+
+
+def blocks(lines):
+    """Like paragraphs(), but keeps bulleted/numbered lists as one block of '- item' lines (two levels deep)."""
+    out, cur, is_list = [], [], False
+    for line in lines + ['']:
+        m = LIST_ITEM.match(line)
+        if not line.strip() or (m and cur and not is_list):
+            if cur:
+                out.append('\n'.join(cur) if is_list else clean(' '.join(cur)))
+            cur, is_list = [], False
+            if not line.strip():
+                continue
+        if m:
+            is_list = True
+            cur.append(('  ' if len(m.group(1)) >= 2 else '') + clean(line))
+        elif is_list:
+            cur[-1] += ' ' + clean(line)
+        else:
+            cur.append(line)
+    return out
+
+
 # ---------------------------------------------------------------- parsing
 
 def parse_quiz_file(path):
@@ -261,11 +285,129 @@ PAPER_QUIZ_2 = {
 }
 
 
+# ---------------------------------------------------------------- Prelim study guide
+
+PRELIM_QID = re.compile(r'^\*\*(\d+\.\d+)\*\*\s*(.*)')
+PRELIM_EID = re.compile(r'^\*\*(\d+\.\d+)(.*?)\*\*\s*(.*)')
+PRELIM_OPT = re.compile(r'^-\s+\(([a-d])\)\s+(.*)')
+
+
+def copy_asset(src, prefix):
+    name = f'{prefix}-{src.name}'
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(src, OUT_DIR / name)
+    return {'src': f'assets/quiz/{name}', 'md': str(src.relative_to(SRC))}
+
+
+def parse_prelim(folder, prefix):
+    """Split a prelim study guide into its parts: {'1': [sections], '2': [sections]}, plus the 'About' blocks."""
+    parts, about, part, sec, q = {}, [], None, None, None
+    for line in (folder / f'{prefix}-study-guide.md').read_text().splitlines():
+        if line.startswith('## '):
+            m = re.match(r'## Part (\d)', line)
+            part, q = (m.group(1) if m else None), None
+            sec = None
+            if line.startswith('## About'):
+                part = 'about'
+            continue
+        if part == 'about':
+            about.append(line)
+            continue
+        if part is None:
+            continue
+        if line.startswith('### ') or sec is None:
+            sec = {'title': line[4:].strip() if line.startswith('### ') else None, 'note': [], 'qs': []}
+            parts.setdefault(part, []).append(sec)
+            if line.startswith('### '):
+                continue
+        if line.strip() == '---':
+            q = None
+        elif PRELIM_QID.match(line):
+            m = PRELIM_QID.match(line)
+            q = {'id': m.group(1), 'lines': [m.group(2)]}
+            sec['qs'].append(q)
+        else:
+            (q['lines'] if q else sec['note']).append(line)
+
+    explained, key = {}, None
+    for line in (folder / f'{prefix}-study-guide-explanations.md').read_text().splitlines():
+        m = PRELIM_EID.match(line)
+        if m:
+            key = m.group(1)
+            explained[key] = {'head': m.group(2).strip(), 'lines': [m.group(3)]}
+        elif line.startswith('#') or line.strip() == '---':
+            key = None
+        elif key:
+            explained[key]['lines'].append(line)
+    return parts, blocks(about), explained
+
+
+def prelim_question(q, exp, folder, prefix, graded):
+    text, opts, image, files = [], [], None, []
+    for line in q['lines']:
+        mi = re.match(r'!\[(.*?)\]\((.*?)\)', line.strip())
+        mo = PRELIM_OPT.match(line) if graded else None
+        if mi:
+            image = {'alt': mi.group(1), **copy_asset(folder / mi.group(2), prefix)}
+        elif mo:
+            opts.append(clean(mo.group(2)))
+        else:
+            text.append(line)
+    text = '\n\n'.join(blocks(text))
+    for name in re.findall(r'`([\w.-]+\.(?:csv|txt|json))`', text):
+        if (folder / name).exists():
+            files.append({'name': name, **copy_asset(folder / name, prefix)})
+    head = exp['head'].lstrip(' —').strip()
+    if graded:
+        letter = re.search(r'\(([a-d])\)', head)
+        if not opts:
+            opts = ['TRUE', 'FALSE']
+            answer = 0 if head.lower().startswith('true') else 1
+        else:
+            answer = 'abcd'.index(letter.group(1))
+        explanation = blocks(exp['lines'])
+    else:
+        answer = None
+        explanation = blocks([f'**{head}** {exp["lines"][0]}'] + exp['lines'][1:])
+    out = {'label': q['id'], 'text': text, 'options': opts, 'answer': answer, 'explanation': explanation}
+    if not graded:
+        out['open'] = True
+    if image:
+        out['image'] = image
+    if files:
+        out['files'] = files
+    return out
+
+
+def prelim(num):
+    folder, prefix = SRC / 'prelim' / str(num), f'prelim{num}'
+    parts, about, explained = parse_prelim(folder, prefix)
+    origin = f'prelim/{num}/{prefix}-study-guide.md + {prefix}-study-guide-explanations.md'
+
+    def sections(part, graded):
+        return [{'title': s['title'], 'note': paragraphs(s['note']), 'image': None,
+                 'questions': [prelim_question(q, explained[q['id']], folder, prefix, graded) for q in s['qs']]}
+                for s in parts[part] if s['qs']]
+
+    covers = ('Topics 1 through 3.2 plus the six assigned papers: Horowitz, Leiserson, Web Search for a Planet, '
+              'Transformer Inference, Roofline, The Tail at Scale.')
+    return [
+        {'id': f'prelim-{num}-exam', 'official': True, 'kind': 'exam', 'title': f'Prelim {num}: Sample Exam',
+         'subtitle': 'Study guide Part 2 · exam format (T/F + multiple choice)', 'covers': covers,
+         'about': about, 'origin': origin, 'sections': sections('2', True)},
+        {'id': f'prelim-{num}-concepts', 'official': True, 'kind': 'exam', 'open': True,
+         'title': f'Prelim {num}: Concept Review',
+         'subtitle': 'Study guide Part 1 · open-ended, self-graded', 'covers': covers,
+         'about': about, 'origin': origin, 'sections': sections('1', False)},
+    ]
+
+
 # ---------------------------------------------------------------- catalogue
 
 def quizzes():
     return [
         # Official: released by course staff (Mohammad Alian) into the zk67 repo.
+        *prelim(1),
         load({'id': 'combo-1', 'official': True, 'kind': 'combo', 'title': 'Combo Quiz 1',
               'subtitle': 'Topic Quiz 2 + Paper Quiz 3',
               'covers': 'Datacenter case study, chiplets and the data-delivery gap, the WSC software stack; '
@@ -318,6 +460,7 @@ def quizzes():
 # ---------------------------------------------------------------- Markdown
 
 GROUPS = [
+    ('exam', True, 'Prelim 1 exam prep (released study guide)'),
     ('combo', True, 'Combo quizzes (topic quiz + paper quiz, same sitting)'),
     ('topic', True, 'Topic quizzes'),
     ('paper', True, 'Paper quizzes'),
@@ -365,6 +508,10 @@ def markdown(qs):
                     'None of them came from class.', '']
         elif heading:
             out += [f'### {heading}', '']
+        if group and group[0].get('about'):
+            out += ['**About the prelim** (from the study guide):', '']
+            for b in group[0]['about']:
+                out += [b, '']
         for z in group:
             out += quiz_markdown(z)
     return '\n'.join(out).rstrip() + '\n'
@@ -383,10 +530,17 @@ def quiz_markdown(z):
             out += [f"![{s['image']['alt']}]({s['image']['md']})", '']
         for q in s['questions']:
             n += 1
-            out += [f"**{n}.** {q['text']}", '']
-            out += [f"- **{'ABCD'[i]}.** {o}" for i, o in enumerate(q['options'])]
-            out += ['', '<details><summary>Answer</summary>', '',
-                    f"**{'ABCD'[q['answer']]}. {q['options'][q['answer']]}**", '']
+            out += [f"**{q.get('label', n)}{'' if 'label' in q else '.'}** {q['text']}", '']
+            if q.get('image'):
+                out += [f"![{q['image']['alt']}]({q['image']['md']})", '']
+            for f in q.get('files', []):
+                out += [f"📎 Data file: [{f['name']}]({f['md']})", '']
+            if q.get('open'):
+                out += ['<details><summary>Explanation</summary>', '']
+            else:
+                out += [f"- **{'ABCD'[i]}.** {o}" for i, o in enumerate(q['options'])]
+                out += ['', '<details><summary>Answer</summary>', '',
+                        f"**{'ABCD'[q['answer']]}. {q['options'][q['answer']]}**", '']
             for p in q['explanation']:
                 out += [p, '']
             out += ['</details>', '']
