@@ -1,0 +1,1355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Read Aloud</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f3ec; --paper:#fffdf8; --ink:#1e2126; --muted:#6a6f77; --rule:#e4ded2;
+  --accent:#2d63d8; --accent-ink:#fff; --word:#ffd23f; --word-ink:#17181a;
+  --sent:rgba(255,210,63,.20); --bar:rgba(255,253,248,.94); --chip:#efeae0; --danger:#b3261e;
+  --fs:20px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131518; --paper:#1a1d21; --ink:#e6e4df; --muted:#9aa0a8; --rule:#2b2f35;
+    --accent:#7ea6ff; --accent-ink:#0d1117; --word:#ffcf33; --word-ink:#111;
+    --sent:rgba(255,207,51,.13); --bar:rgba(26,29,33,.94); --chip:#24282e; --danger:#ff8a80;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131518; --paper:#1a1d21; --ink:#e6e4df; --muted:#9aa0a8; --rule:#2b2f35;
+  --accent:#7ea6ff; --accent-ink:#0d1117; --word:#ffcf33; --word-ink:#111;
+  --sent:rgba(255,207,51,.13); --bar:rgba(26,29,33,.94); --chip:#24282e; --danger:#ff8a80;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Source Serif 4",Georgia,"Times New Roman",serif;-webkit-font-smoothing:antialiased}
+.ui,button,select,textarea,input{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:12;display:flex;align-items:center;gap:12px;padding:10px 16px;
+  background:var(--bar);backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);
+  border-bottom:1px solid var(--rule)}
+.brand{all:unset;cursor:pointer;font:600 15px Inter,system-ui,sans-serif;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.brand svg{width:20px;height:20px;fill:var(--accent)}
+.doc-title{flex:1;min-width:0;font:13px Inter,system-ui,sans-serif;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+button.tb{appearance:none;border:1px solid var(--rule);background:var(--paper);color:var(--ink);height:34px;
+  padding:0 12px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+button.tb:hover{border-color:var(--muted)}
+button.primary{appearance:none;border:none;background:var(--accent);color:var(--accent-ink);height:40px;padding:0 18px;
+  border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}
+button.primary:disabled{opacity:.45;cursor:default}
+
+.page{max-width:780px;margin:0 auto;padding:28px 16px 230px}
+.sheet{overflow-wrap:anywhere;background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:40px 52px}
+@media (max-width:640px){.sheet{padding:24px 18px}.page{padding-top:14px}.top .tb.opt{display:none}}
+
+/* home */
+.hero{font-size:34px;line-height:1.15;margin:0 0 8px;letter-spacing:-.01em}
+.sub{font-size:15px;color:var(--muted);margin:0 0 22px;line-height:1.5}
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;
+  border:2px dashed var(--rule);border-radius:14px;padding:34px 16px;cursor:pointer;transition:.15s;font-size:15px}
+.drop:hover{border-color:var(--accent);background:var(--sent)}
+.drop svg{width:34px;height:34px;fill:var(--accent)}
+.drop small{color:var(--muted);font-size:12.5px}
+.or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin:22px 0 12px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--rule)}
+textarea{width:100%;min-height:150px;resize:vertical;border:1px solid var(--rule);border-radius:12px;background:var(--bg);
+  color:var(--ink);padding:12px 14px;font-size:14px;line-height:1.55}
+textarea:focus,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+textarea.big{min-height:60vh;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+.row{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.recent h2{font:600 12px Inter,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:30px 0 8px}
+.recent ul{list-style:none;margin:0;padding:0}
+.recent li{display:flex;align-items:center;gap:10px;border-top:1px solid var(--rule)}
+.recent li:first-child{border-top:none}
+.recent a{flex:1;min-width:0;padding:11px 2px;cursor:pointer;color:var(--ink);text-decoration:none}
+.recent a:hover .rt{color:var(--accent)}
+.rt{font-size:16px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rm{font:12px Inter,system-ui,sans-serif;color:var(--muted)}
+.recent button{all:unset;cursor:pointer;color:var(--muted);font:18px Inter,sans-serif;padding:4px 8px;border-radius:6px}
+.recent button:hover{color:var(--danger)}
+.fine{font:12.5px Inter,system-ui,sans-serif;color:var(--muted);margin:26px 0 0;line-height:1.5}
+
+/* reader */
+.hint{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted);
+  border-bottom:1px solid var(--rule);padding-bottom:14px;margin-bottom:24px}
+.hint kbd{font-family:inherit;font-size:11.5px;background:var(--chip);border:1px solid var(--rule);
+  border-bottom-width:2px;border-radius:5px;padding:1px 6px;color:var(--ink)}
+#doc h1{font-size:calc(var(--fs)*1.75);line-height:1.18;margin:0 0 .7em;font-weight:700;letter-spacing:-.01em}
+#doc h2{font-size:calc(var(--fs)*1.2);line-height:1.3;margin:1.8em 0 .6em;font-weight:700}
+#doc h3,#doc h4{font-size:calc(var(--fs)*1.02);line-height:1.35;margin:1.5em 0 .5em;font-weight:600}
+#doc p{font-size:var(--fs);line-height:1.72;margin:0 0 1em}
+#doc p.li{padding-left:1.1em;text-indent:-1.1em;margin-bottom:.5em}
+#doc p.li::before{content:"•";display:inline-block;width:1.1em;text-indent:0;color:var(--muted)}
+#doc p.cap{font-family:Inter,system-ui,sans-serif;font-size:calc(var(--fs)*.74);line-height:1.55;color:var(--muted);
+  border-left:3px solid var(--rule);padding-left:12px}
+body.skip-caps #doc .cap .w, body.skip-refs #doc .ref .w{opacity:.5}
+#doc .ref{font-size:calc(var(--fs)*.8)}
+#doc h2.ref,#doc h3.ref{font-size:calc(var(--fs)*1.05)}
+
+.sent{border-radius:4px;transition:background-color .15s}
+.sent.cur-sent{background:var(--sent);box-shadow:0 0 0 2px var(--sent)}
+.w{cursor:pointer;border-radius:3px}
+.w:hover{text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px}
+.w.cur-word{background:var(--word);color:var(--word-ink);box-shadow:0 0 0 2px var(--word);opacity:1 !important}
+
+/* control bar */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--bar);
+  backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);
+  border-top:1px solid var(--rule);padding:10px 16px 14px}
+.bar-inner{max-width:1000px;margin:0 auto}
+.prog-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:12px;color:var(--muted)}
+.prog{flex:1;height:6px;border-radius:99px;background:var(--chip);cursor:pointer;position:relative}
+.prog::before{content:"";position:absolute;inset:-8px 0}
+.fill{height:100%;width:0;border-radius:99px;background:var(--accent)}
+.tabnum{font-variant-numeric:tabular-nums;white-space:nowrap}
+.ctrls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.grp{display:flex;align-items:center;gap:4px}
+.sep{width:1px;height:26px;background:var(--rule);margin:0 2px}
+button.ic{appearance:none;border:1px solid var(--rule);background:var(--paper);color:var(--ink);
+  height:36px;min-width:36px;border-radius:10px;display:inline-grid;place-items:center;cursor:pointer;
+  font-size:13px;font-weight:500;padding:0 8px}
+button.ic:hover{border-color:var(--muted)}
+button.ic svg{width:18px;height:18px;fill:currentColor}
+button.play{height:46px;width:46px;border-radius:50%;background:var(--accent);color:var(--accent-ink);border:none}
+button.play svg{width:22px;height:22px}
+.rate{min-width:48px;text-align:center;font-size:13px;font-weight:600}
+select{appearance:none;height:36px;border-radius:10px;border:1px solid var(--rule);background:var(--paper);
+  color:var(--ink);font-size:13px;padding:0 28px 0 10px;max-width:250px;
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 15px) 16px,calc(100% - 10px) 16px;background-size:5px 5px;background-repeat:no-repeat}
+label.tg{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;user-select:none;white-space:nowrap}
+label.tg input{accent-color:var(--accent);width:15px;height:15px;margin:0}
+.sync{font-size:12px;color:var(--muted);margin-left:auto;display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
+.dot.ok{background:#2fa66a}.dot.est{background:#e0a100}
+@media (max-width:760px){.sync{margin-left:0;width:100%}select{max-width:100%;flex:1}.sep{display:none}}
+
+/* overlays */
+.overlay{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:rgba(0,0,0,.35)}
+.ov-card{background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:22px 26px;display:flex;
+  align-items:center;gap:14px;font:14px Inter,system-ui,sans-serif;max-width:calc(100% - 32px)}
+.spinner{width:22px;height:22px;border-radius:50%;border:3px solid var(--chip);border-top-color:var(--accent);animation:spin .8s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.dropveil{position:fixed;inset:10px;z-index:40;border:3px dashed var(--accent);border-radius:18px;background:var(--sent);
+  display:grid;place-items:center;font:600 22px Inter,system-ui,sans-serif;color:var(--ink);pointer-events:none;opacity:0;transition:.12s}
+.dropveil.on{opacity:1}
+.toast{position:fixed;left:50%;bottom:150px;transform:translateX(-50%) translateY(10px);opacity:0;
+  background:var(--ink);color:var(--paper);padding:9px 14px;border-radius:10px;font-size:13px;
+  transition:.25s;pointer-events:none;z-index:50;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.lightbox{position:fixed;inset:0;z-index:45;background:rgba(0,0,0,.82);display:grid;place-items:center;cursor:zoom-out;padding:16px}
+.lightbox img{max-width:100%;max-height:100%;background:#fff;border-radius:8px}
+#doc figure{margin:1.6em 0 .6em;text-align:center}
+#doc figure img{max-width:100%;height:auto;border-radius:8px;border:1px solid var(--rule);background:#fff;cursor:zoom-in}
+.warn{background:#ffe9e6;color:#8a1c0f;border:1px solid #f3b9b0;border-radius:10px;padding:12px 14px;margin-bottom:18px;font-size:14px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <button class="brand" id="brand" title="Home">
+    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>
+    Read Aloud
+  </button>
+  <span class="doc-title" id="docTitle"></span>
+  <div class="top-actions">
+    <button class="tb opt" id="editBtn" hidden>Edit text</button>
+    <button class="tb" id="openBtn">Open file</button>
+    <button class="tb opt" id="newBtn" hidden>Paste text</button>
+    <button class="ic" id="theme" title="Toggle dark mode"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
+  </div>
+  <input type="file" id="file" hidden
+    accept=".pdf,.txt,.md,.markdown,.text,.html,.htm,application/pdf,text/plain,text/markdown,text/html">
+</header>
+
+<section id="homeView" class="page">
+  <div class="sheet">
+    <div id="nosupport"></div>
+    <h1 class="hero">Read anything aloud</h1>
+    <p class="sub ui">Open a PDF or text file, or paste text. Each word is highlighted as it is spoken; click any word to jump there.</p>
+    <label class="drop ui" for="file">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 13h8v2H8v-2zm0 4h5v2H8v-2z"/></svg>
+      <span><b>Drop a file here</b> or click to choose</span>
+      <small>PDF, .txt, .md or .html · stays on your device</small>
+    </label>
+    <div class="or ui">or paste text</div>
+    <textarea id="pasteBox" placeholder="Paste text here…&#10;&#10;Tip: blank lines separate paragraphs, and lines starting with # become headings."></textarea>
+    <div class="row"><button class="primary" id="readPaste" disabled>Read this text</button></div>
+    <div class="recent ui" id="recentWrap" hidden>
+      <h2>Recent</h2>
+      <ul id="recent"></ul>
+    </div>
+    <p class="fine">Nothing is uploaded: files are processed in this browser and recent documents are kept in its local storage. Scanned PDFs without a text layer can’t be read. Speech uses your system’s voices, so macOS/Windows voices give exact word timing, while online voices are timed by estimate.</p>
+  </div>
+</section>
+
+<section id="readerView" class="page" hidden>
+  <div class="sheet">
+    <div class="hint ui">
+      <span>Click any word to read from there</span>
+      <span><kbd>Space</kbd> play / pause</span>
+      <span><kbd>←</kbd><kbd>→</kbd> sentence</span>
+      <span><kbd>−</kbd><kbd>+</kbd> speed</span>
+    </div>
+    <main id="doc"></main>
+  </div>
+</section>
+
+<section id="editView" class="page" hidden>
+  <div class="sheet">
+    <h1 class="hero" style="font-size:26px">Edit text</h1>
+    <p class="sub ui">Fix anything the extraction got wrong. Blank lines separate paragraphs, <code>#</code>/<code>##</code>/<code>###</code> start headings, <code>- </code> starts a list item, and paragraphs beginning “Figure 3.” or “Table 2:” are treated as captions, and <code>![Figure](#fig-N)</code> lines place the extracted figures. Everything after a “References” heading counts as references.</p>
+    <textarea id="editBox" class="big" spellcheck="false"></textarea>
+    <div class="row"><button class="primary" id="applyEdit">Apply</button><button class="tb" id="cancelEdit">Cancel</button></div>
+  </div>
+</section>
+
+<div class="bar ui" id="bar" hidden>
+  <div class="bar-inner">
+    <div class="prog-row">
+      <span class="tabnum" id="pct">0%</span>
+      <div class="prog" id="prog" title="Click to jump"><div class="fill" id="fill"></div></div>
+      <span class="tabnum" id="left">–</span>
+    </div>
+    <div class="ctrls">
+      <div class="grp">
+        <button class="ic" id="prev" title="Previous sentence (←)"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+        <button class="ic play" id="play" title="Play / pause (Space)"><svg viewBox="0 0 24 24" id="playIcon"><path d="M7 4.5v15l13-7.5z"/></svg></button>
+        <button class="ic" id="next" title="Next sentence (→)"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
+      </div>
+      <span class="sep"></span>
+      <div class="grp" title="Speed (− / +)">
+        <button class="ic" id="slower">−</button>
+        <span class="rate tabnum" id="rate">1.0×</span>
+        <button class="ic" id="faster">+</button>
+      </div>
+      <span class="sep"></span>
+      <select id="voice" title="Voice"></select>
+      <label class="tg"><input type="checkbox" id="follow"> Follow</label>
+      <label class="tg"><input type="checkbox" id="caps"> Captions</label>
+      <label class="tg"><input type="checkbox" id="refs"> References</label>
+      <div class="grp">
+        <button class="ic" id="smaller" title="Smaller text">A−</button>
+        <button class="ic" id="bigger" title="Larger text">A+</button>
+      </div>
+      <span class="sync" id="sync"><span class="dot" id="dot"></span><span id="syncText">Word sync: detecting…</span></span>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" hidden><div class="ov-card"><div class="spinner"></div><div id="ovText">Working…</div></div></div>
+<div class="dropveil" id="dropveil">Drop to read aloud</div>
+<div class="lightbox" id="lightbox" hidden><img id="lbImg" alt="Enlarged figure"></div>
+<div class="toast ui" id="toast"></div>
+
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const store = {
+  get(k, d){ try { const v = localStorage.getItem('tts-' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v){ try { localStorage.setItem('tts-' + k, JSON.stringify(v)); return true; } catch { return false; } },
+  del(k){ try { localStorage.removeItem('tts-' + k); } catch {} }
+};
+function toast(msg, ms = 2800){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), ms);
+}
+const busy = msg => { $('#ovText').textContent = msg; $('#overlay').hidden = false; };
+const idle = () => { $('#overlay').hidden = true; };
+const wordCount = s => (s.match(/\S+/g) || []).length;
+
+/* =====================================================================
+   Text → blocks  ({t:'h'|'p'|'li'|'cap', lvl?, text})
+   ===================================================================== */
+const CAPTION_RE = /^(fig(?:ure)?s?\.?|table|tab\.)\s*(?:[\dIVX]+[a-z]?)?\s*(?:[.:|—–-]|$)/i;
+const REF_HEAD_RE = /^(?:[\dIVX]+\.?\s*)?(references|bibliography|works cited|literature cited|reference list)\s*:?$/i;
+const ENDS_SENT = /[.!?:]["”’)\]]?$/;
+const SOFT = '­';
+
+function joinLines(lines){
+  let out = '';
+  for (let l of lines){
+    l = l.trim(); if (!l) continue;
+    if (!out){ out = l; continue; }
+    if (/\p{L}-$/u.test(out) && /^\p{Ll}/u.test(l)) out = out.slice(0, -1) + SOFT + l;
+    else if (/(\p{L}[-/]|[—–])$/u.test(out)) out += l;
+    else out += ' ' + l;
+  }
+  return out.replace(/\s+/g, ' ').trim();
+}
+// Decide whether a line-break hyphen was a real hyphen ("energy-efficient") or a syllable break ("infra-structure").
+function fixHyphens(blocks){
+  const vocab = new Set(), prefixes = new Set();
+  for (const b of blocks) for (const tok of (b.text || '').split(/\s+/)){
+    if (tok.includes(SOFT)) continue;
+    const w = tok.toLowerCase().replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
+    if (w){ vocab.add(w); if (w.includes('-')){ const parts = w.split('-'); parts.forEach(p => vocab.add(p)); prefixes.add(parts[0]); } }
+  }
+  const re = new RegExp('([\\p{L}]+)' + SOFT + '([\\p{L}]+)', 'gu');
+  for (const b of blocks) if (b.text) b.text = b.text.replace(re, (m, a, c) => {
+    const j = (a + c).toLowerCase(), h = (a + '-' + c).toLowerCase();
+    if (vocab.has(h) && !vocab.has(j)) return a + '-' + c;
+    if (vocab.has(j)) return a + c;
+    if (prefixes.has(a.toLowerCase()) && vocab.has(c.toLowerCase())) return a + '-' + c;   // e.g. energy- + efficient
+    return a + c;
+  }).split(SOFT).join('');
+  return blocks;
+}
+function classify(text){
+  if (REF_HEAD_RE.test(text)) return {t:'h', lvl:2, text};
+  return {t: CAPTION_RE.test(text) ? 'cap' : 'p', text};
+}
+function stripMd(s){
+  return s.replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+    .replace(/\[([^\]]+)\]\((?:[^)]+)\)/g, '$1')
+    .replace(/(\*\*|__)(.+?)\1/g, '$2')
+    .replace(/(^|[\s(])[*_](\S(?:.*?\S)?)[*_](?=[\s).,;:!?]|$)/g, '$1$2')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/^>\s?/, '');
+}
+function parseText(src){
+  src = src.normalize('NFKC').replace(/\r\n?/g, '\n').replace(/\t/g, ' ');
+  const blocks = [];
+  for (const chunk of src.split(/\n[ \t]*\n/)){
+    const lines = chunk.split('\n').map(l => l.trim()).filter(Boolean);
+    let para = [], kind = 'p';
+    const flush = () => {
+      if (para.length){ const text = joinLines(para); if (text){ const b = classify(text); if (kind === 'li' && b.t === 'p') b.t = 'li'; blocks.push(b); } }
+      para = []; kind = 'p';
+    };
+    for (const l of lines){
+      if (/^(```|---+|\*\*\*+|___+)$/.test(l)) { flush(); continue; }
+      const fig = l.match(/^!\[[^\]]*\]\(#fig-(\d+)\)$/);
+      if (fig){ flush(); blocks.push({t:'fig', fig:+fig[1], text:''}); continue; }
+      const h = l.match(/^(#{1,6})\s+(.*)$/);
+      if (h){ flush(); blocks.push({t:'h', lvl:Math.min(h[1].length, 3), text:stripMd(h[2]).replace(/\s*#+$/, '')}); continue; }
+      const li = l.match(/^[-*+•▪◦]\s+(.*)$/);
+      if (li){ flush(); para = [stripMd(li[1])]; kind = 'li'; continue; }
+      if (/^\d+[.)]\s+/.test(l)){ flush(); para = [stripMd(l)]; continue; }
+      para.push(stripMd(l));
+    }
+    flush();
+  }
+  return fixHyphens(blocks);
+}
+function serialize(blocks){
+  return blocks.map(b => b.t === 'fig' ? `![Figure](#fig-${b.fig})` : b.t === 'h' ? '#'.repeat(b.lvl || 2) + ' ' + b.text
+    : b.t === 'li' ? '- ' + b.text : b.text).join('\n\n');
+}
+function htmlToBlocks(html){
+  const d = new DOMParser().parseFromString(html, 'text/html');
+  d.querySelectorAll('script,style,noscript,nav,svg,template,iframe,form,button').forEach(e => e.remove());
+  const root = d.querySelector('article') || d.querySelector('main') || d.body;
+  const SEL = 'h1,h2,h3,h4,h5,h6,p,li,figcaption,blockquote,pre,dd,dt,td,th';
+  const out = [];
+  for (const el of root.querySelectorAll(SEL)){
+    if (el.querySelector(SEL)) continue;                 // leaf-most only
+    const text = el.textContent.normalize('NFKC').replace(/\s+/g, ' ').trim();
+    if (!text) continue;
+    const tag = el.tagName.toLowerCase();
+    if (/^h\d$/.test(tag)) out.push({t:'h', lvl:Math.min(3, +tag[1]), text});
+    else if (tag === 'li') out.push({t:'li', text});
+    else if (tag === 'figcaption') out.push({t:'cap', text});
+    else out.push(classify(text));
+  }
+  if (!out.length) return parseText(root.textContent || '');
+  return fixHyphens(out);
+}
+
+/* =====================================================================
+   PDF → blocks  (pdf.js text layer + layout heuristics)
+   ===================================================================== */
+const PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+function loadScript(src){
+  return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res;
+    s.onerror = () => rej(new Error('Could not load ' + src + ' (are you offline?)')); document.head.append(s); });
+}
+async function ensurePdfJs(){
+  if (window.pdfjsLib) return;
+  await loadScript(PDFJS + 'pdf.min.js');
+  pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS + 'pdf.worker.min.js';
+}
+
+function pageSegments(items, vp){
+  const its = [];
+  for (const it of items){
+    if (!it.str || !it.str.trim()) continue;
+    const t = pdfjsLib.Util.transform(vp.transform, it.transform);
+    const size = Math.hypot(t[2], t[3]);
+    if (size < 2) continue;
+    if (Math.abs(t[1]) > 0.1 * size || Math.abs(t[2]) > 0.1 * size) continue;   // rotated text (axis labels etc.)
+    its.push({s: it.str.normalize('NFKC'), x: t[4], y: t[5], w: Math.max(0, it.width), size});
+  }
+  its.sort((a, b) => a.y - b.y || a.x - b.x);
+  const rows = [];
+  for (const it of its){
+    // same row if baselines match; superscripts may sit higher, but drop caps / huge text never merge
+    const r = rows[rows.length - 1];
+    if (r){
+      const small = Math.min(it.size, r.size), big = Math.max(it.size, r.size), ratio = small / big;
+      const tol = ratio >= 0.8 ? 0.35 * big : ratio >= 0.45 ? 0.55 * big : -1;
+      if (Math.abs(it.y - r.y) <= tol){ r.items.push(it); if (it.size > r.size){ r.size = it.size; r.y = it.y; } continue; }
+    }
+    rows.push({y: it.y, size: it.size, items: [it]});
+  }
+  const segs = [];
+  for (const r of rows){
+    r.items.sort((a, b) => a.x - b.x);
+    let seg = null;
+    for (const it of r.items){
+      if (seg && it.x - seg.x1 < 0.9 * Math.max(r.size, 6) && it.x > seg.x1 - 0.5 * it.size){ seg.items.push(it); seg.x1 = Math.max(seg.x1, it.x + it.w); }
+      else { seg = {items: [it], x0: it.x, x1: it.x + it.w, y: r.y}; segs.push(seg); }
+    }
+  }
+  for (const seg of segs){
+    const cnt = new Map();
+    for (const it of seg.items){ const k = Math.round(it.size * 2) / 2; cnt.set(k, (cnt.get(k) || 0) + it.s.length); }
+    seg.size = [...cnt].sort((a, b) => b[1] - a[1])[0][0];
+    let text = '', prev = null;
+    for (const it of seg.items){
+      // drop raised, small, numeric superscripts (citation markers like "ownership.³")
+      if (it.size < 0.8 * seg.size && it.y < seg.y - 0.15 * seg.size && /^[\s\d,\-–*†‡§¶]+$/.test(it.s)) continue;
+      if (prev){ const gap = it.x - (prev.x + prev.w); if (gap > 0.12 * seg.size && !/\s$/.test(text) && !/^\s/.test(it.s)) text += ' '; }
+      text += it.s; prev = it;
+    }
+    seg.text = text.replace(/\s+/g, ' ').trim().replace(/^F igure\b/, 'Figure').replace(/^T able\b/, 'Table');   // styled first letters
+  }
+  return segs.filter(s => s.text);
+}
+
+// Drop caps: a huge single letter beside the first lines of a paragraph.
+function mergeDropCaps(segs, body){
+  for (const dc of segs.filter(s => /^\p{Lu}$/u.test(s.text) && s.size > 1.6 * body)){
+    let best = null;
+    for (const s of segs){
+      if (s === dc || s.size > 1.3 * body) continue;
+      const dx = s.x0 - dc.x1;
+      if (dx < -2 || dx > 2.5 * body) continue;
+      if (s.y < dc.y - dc.size * 1.3 || s.y > dc.y + body) continue;
+      if (!best || s.y < best.y) best = s;
+    }
+    if (best){ best.text = dc.text + best.text; dc.text = ''; }
+  }
+  return segs.filter(s => s.text);
+}
+
+// Group lines into text blocks: a line joins the block whose last line sits directly above it
+// with a similar font size and overlapping horizontal extent.
+function buildBlocks(segs){
+  const blocks = [];
+  for (const s of segs.slice().sort((a, b) => a.y - b.y || a.x0 - b.x0)){
+    let best = null;
+    for (const b of blocks){
+      const l = b.last, dy = s.y - l.y;
+      if (dy <= 0.3 * s.size || dy > 1.9 * Math.max(l.size, s.size)) continue;
+      if (Math.abs(s.size - l.size) > 0.15 * Math.max(s.size, l.size)) continue;
+      const ov = Math.min(s.x1, l.x1) - Math.max(s.x0, l.x0);
+      if (ov < 0.5 * Math.min(s.x1 - s.x0, l.x1 - l.x0)) continue;
+      if (!best || dy < best.dy) best = {b, dy};
+    }
+    if (best){ const b = best.b; b.lines.push(s); b.last = s; b.x0 = Math.min(b.x0, s.x0); b.x1 = Math.max(b.x1, s.x1); }
+    else blocks.push({lines: [s], last: s, x0: s.x0, x1: s.x1, y0: s.y});
+  }
+  return blocks;
+}
+
+// Column gutters: vertical strips inside the text area that (almost) no line crosses.
+// Returns the gutter x positions, left to right ([] for single-column pages).
+function findGutters(segs, W){
+  const all = segs.filter(s => s.text.length > 3);
+  if (all.length < 8) return [];
+  const span = Math.max(...all.map(s => s.x1)) - Math.min(...all.map(s => s.x0));
+  // only column-width lines count; titles and full-width text would hide the gutters
+  const body = all.filter(s => s.x1 - s.x0 > W * 0.06 && s.x1 - s.x0 < span * 0.6);
+  if (body.length < 8) return [];
+  const step = 2, n = Math.ceil(W / step), cov = new Array(n).fill(0);
+  // weight by width so short centred lines (author blocks, labels) can't hide a gutter
+  for (const s of body){ const w = (s.x1 - s.x0) / span; for (let i = Math.max(0, Math.floor(s.x0 / step)); i < Math.min(n, Math.ceil(s.x1 / step)); i++) cov[i] += w; }
+  const lEdge = Math.min(...body.map(s => s.x0)), rEdge = Math.max(...body.map(s => s.x1));
+  const peak = Math.max(...cov), low = peak * 0.12;
+  const gutters = [];
+  let run = null;
+  for (let i = Math.ceil((lEdge + W * 0.08) / step); i <= Math.floor((rEdge - W * 0.08) / step); i++){
+    if (cov[i] <= low){ if (!run) run = {a: i}; run.b = i; }
+    else if (run){ gutters.push(run); run = null; }
+  }
+  if (run) gutters.push(run);
+  const xs = gutters.filter(r => (r.b - r.a + 1) * step >= 4 && (r.b - r.a + 1) * step <= W * 0.2)
+                    .map(r => (r.a + r.b + 1) / 2 * step);
+  // keep a gutter only if real columns of text sit on both sides of it
+  return xs.filter((g, i) => {
+    const lo = i ? xs[i - 1] : -Infinity, hi = i + 1 < xs.length ? xs[i + 1] : Infinity;
+    const left = body.filter(s => s.x0 >= lo - 1 && s.x1 <= g + 1).length;
+    const right = body.filter(s => s.x0 >= g - 1 && s.x1 <= hi + 1).length;
+    return left >= 4 && right >= 4;
+  });
+}
+const colOf = (x, gs) => gs.filter(g => g < x).length;
+
+// Justified lines squeezed beside a figure get split at their wide word gaps; re-join pieces of the
+// same row that sit in the same column.
+function mergeRowSegs(segs, gs){
+  const out = [];
+  for (const s of segs.slice().sort((a, b) => a.y - b.y || a.x0 - b.x0)){
+    const l = out[out.length - 1];
+    if (l && !gs.some(g => l.x1 <= g + 1 && s.x0 >= g - 1) && Math.abs(l.y - s.y) < 0.2 * s.size
+        && Math.abs(l.size - s.size) < 0.6 && s.x0 > l.x1 - 1 && s.x0 - l.x1 < 4 * s.size){ l.text += ' ' + s.text; l.x1 = s.x1; }
+    else out.push(s);
+  }
+  return out;
+}
+
+// Reading order: blocks spanning all columns split the page into bands; within a band the
+// columns are read left to right, each top to bottom.
+function orderBlocks(blocks, gs, bodySize){
+  let sorted = blocks.slice().sort((a, b) => a.y0 - b.y0 || a.x0 - b.x0);
+  if (!gs.length) return sorted;
+  const body = blocks.flatMap(b => b.lines).filter(s => s.text.length > 3);
+  const lEdge = Math.min(...body.map(s => s.x0)), rEdge = Math.max(...body.map(s => s.x1));
+  const g0 = gs[0], gN = gs[gs.length - 1];
+  const out = []; let cols = gs.map(() => []).concat([[]]);
+  // title / author area above where the column text starts is read straight down
+  const colText = sorted.filter(b => b.lines.length >= 3 && Math.abs(b.lines[0].size - bodySize) < 0.6 && b.x1 - b.x0 < (rEdge - lEdge) * 0.6);
+  if (colText.length){
+    const top = Math.min(...colText.map(b => b.y0)) - 1.5 * bodySize;
+    out.push(...sorted.filter(b => b.y0 < top));
+    sorted = sorted.filter(b => b.y0 >= top);
+  }
+  const flush = () => { cols.forEach(c => out.push(...c)); cols = cols.map(() => []); };
+  for (const b of sorted){
+    if (b.x0 < lEdge + 0.4 * (g0 - lEdge) && b.x1 > gN + 0.6 * (rEdge - gN)){ flush(); out.push(b); }
+    else cols[colOf((b.x0 + b.x1) / 2, gs)].push(b);
+  }
+  flush();
+  return out;
+}
+
+async function pdfToBlocks(buf){
+  await ensurePdfJs();
+  const pdf = await pdfjsLib.getDocument({data: buf}).promise;
+  const pages = [];
+  for (let p = 1; p <= pdf.numPages; p++){
+    busy(`Extracting text · page ${p} of ${pdf.numPages}`);
+    const page = await pdf.getPage(p);
+    const vp = page.getViewport({scale: 1});
+    const tc = await page.getTextContent();
+    pages.push({page, w: vp.width, h: vp.height, segs: pageSegments(tc.items, vp)});
+  }
+  const chars = pages.reduce((n, p) => n + p.segs.reduce((m, s) => m + s.text.length, 0), 0);
+  if (chars < 40 * pages.length) throw new Error('This PDF has little or no selectable text (it is probably scanned). Try a PDF with a text layer, or paste the text instead.');
+  const figs = [];
+  const blocks = await segmentsToBlocks(pages, figs);
+  pdf.destroy();
+  return {blocks, figs};
+}
+
+// Figures: render each page, mask out the text we are going to read, and take connected regions
+// of the remaining ink (charts, photos, diagrams with their small labels). Ink that repeats in the
+// same place on most pages (page frames, header bars) and column rules beside text are ignored.
+// Each region is matched to the nearest "Figure N" / "Table N" caption; large uncaptioned regions
+// are kept on their own.
+const FIG_S = 2, FIG_C = 4;
+let imgType = null;
+async function renderPage(p){
+  const vp = p.page.getViewport({scale: FIG_S});
+  const cv = document.createElement('canvas');
+  cv.width = Math.ceil(vp.width); cv.height = Math.ceil(vp.height);
+  const ctx = cv.getContext('2d', {willReadFrequently: true});
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
+  await p.page.render({canvasContext: ctx, viewport: vp}).promise;
+  return cv;
+}
+async function pageInk(p){
+  const C = FIG_C, S = FIG_S, cv = await renderPage(p);
+  const px = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
+  const gw = Math.ceil(p.w / C), gh = Math.ceil(p.h / C);
+  const text = new Uint8Array(gw * gh), ink = new Uint8Array(gw * gh);
+  for (const s of p.blocks.flatMap(b => b.lines).concat(p.dropped || [])){
+    for (let gy = Math.max(0, Math.floor((s.y - s.size) / C)); gy < Math.min(gh, Math.ceil((s.y + s.size * 0.35) / C)); gy++)
+      for (let gx = Math.max(0, Math.floor((s.x0 - s.size * 0.3) / C)); gx < Math.min(gw, Math.ceil((s.x1 + s.size * 0.3) / C)); gx++) text[gy * gw + gx] = 1;
+  }
+  for (let gy = 0; gy < gh; gy++) for (let gx = 0; gx < gw; gx++){
+    const yEnd = Math.min(cv.height, (gy + 1) * C * S), xEnd = Math.min(cv.width, (gx + 1) * C * S);
+    scan: for (let y = gy * C * S; y < yEnd; y += 2) for (let x = gx * C * S; x < xEnd; x += 2){
+      const i = (y * cv.width + x) * 4;
+      if (px[i] < 232 || px[i + 1] < 232 || px[i + 2] < 232){ ink[gy * gw + gx] = 1; break scan; }
+    }
+  }
+  if (!imgType) imgType = cv.toDataURL('image/webp', 0.9).startsWith('data:image/webp') ? 'image/webp' : 'image/jpeg';
+  cv.width = cv.height = 0;
+  p.grid = {gw, gh, text, ink};
+}
+function inkRegions(p){
+  const C = FIG_C, {gw, gh, text} = p.grid, ink = p.grid.ink.slice();
+  for (let i = 0; i < ink.length; i++) if (text[i]) ink[i] = 0;
+  // column rules: ink in a gutter with text close by on the same row
+  for (const g of p.gutters || []){
+    for (let gx = Math.max(0, Math.floor((g - 6) / C)); gx <= Math.min(gw - 1, Math.ceil((g + 6) / C)); gx++)
+      for (let gy = 0; gy < gh; gy++){
+        let near = false;
+        for (let k = -5; k <= 5 && !near; k++){ const x = gx + k; if (x >= 0 && x < gw && text[gy * gw + x]) near = true; }
+        if (near) ink[gy * gw + gx] = 0;
+      }
+  }
+  const seen = new Uint8Array(gw * gh), regions = [], R = 2;   // ink within 8pt joins a region
+  for (let i0 = 0; i0 < gw * gh; i0++){
+    if (!ink[i0] || seen[i0]) continue;
+    const q = [i0]; seen[i0] = 1;
+    let x0 = gw, y0 = gh, x1 = 0, y1 = 0, n = 0;
+    while (q.length){
+      const i = q.pop(), gx = i % gw, gy = (i / gw) | 0; n++;
+      if (gx < x0) x0 = gx; if (gx > x1) x1 = gx; if (gy < y0) y0 = gy; if (gy > y1) y1 = gy;
+      for (let dy = -R; dy <= R; dy++) for (let dx = -R; dx <= R; dx++){
+        const nx = gx + dx, ny = gy + dy;
+        if (nx < 0 || ny < 0 || nx >= gw || ny >= gh) continue;
+        const j = ny * gw + nx;
+        if (ink[j] && !seen[j]){ seen[j] = 1; q.push(j); }
+      }
+    }
+    let tc = 0; for (let gy = y0; gy <= y1; gy++) for (let gx = x0; gx <= x1; gx++) tc += text[gy * gw + gx];
+    const r = {x0: x0 * C, y0: y0 * C, x1: (x1 + 1) * C, y1: (y1 + 1) * C, n};
+    r.w = r.x1 - r.x0; r.h = r.y1 - r.y0; r.textFrac = tc / ((x1 - x0 + 1) * (y1 - y0 + 1));
+    if (r.w >= 50 && r.h >= 40 && n >= 30 && !(r.w > p.w * 0.9 && r.h > p.h * 0.85) && r.textFrac < 0.5) regions.push(r);
+  }
+  return regions;
+}
+async function pageFigures(p, figs){
+  const regions = inkRegions(p);
+  if (!regions.length){ p.loose = []; return; }
+  const picks = [];   // [region, top, bottom, block|null]
+  const used = new Set();
+  for (const b of p.blocks){
+    if (!CAPTION_RE.test(b.lines[0].text)) continue;
+    const top = b.lines[0].y - b.lines[0].size, bottom = b.last.y + b.last.size * 0.3;
+    const table = /^tab/i.test(b.lines[0].text);
+    let best = null;
+    for (const r of regions){
+      if (used.has(r)) continue;
+      const ov = Math.min(b.x1, r.x1) - Math.max(b.x0, r.x0);
+      if (ov < 0.3 * Math.min(b.x1 - b.x0, r.w)) continue;
+      if (top >= r.y0 - 8 && bottom <= r.y1 + 8){ best = {r, d: -1, inside: true}; break; }     // caption bar inside a figure panel
+      for (const [d, pen, above] of [[top - r.y1, table ? 15 : 0, true], [r.y0 - bottom, table ? 0 : 15, false]])
+        if (d > -8 && d < 60 && (!best || d + pen < best.d)) best = {r, d: d + pen, above};
+    }
+    if (best){ used.add(best.r); picks.push(best.inside ? [best.r, 0, p.h, b] : best.above ? [best.r, 0, top, b] : [best.r, bottom, p.h, b]); }
+  }
+  // uncaptioned: only big regions, and not decorative title banners
+  const bigText = p.blocks.flatMap(b => b.lines).filter(s => s.size >= p.bodySize * 1.4);
+  const loose = regions.filter(r => !used.has(r) && r.w >= p.w * 0.3 && r.h >= p.h * 0.12 && r.textFrac < 0.3
+                               && !bigText.some(s => s.x1 > r.x0 && s.x0 < r.x1 && s.y > r.y0 && s.y - s.size < r.y1))
+                   .sort((a, b) => a.y0 - b.y0);
+  loose.forEach(r => picks.push([r, 0, p.h, null]));
+  p.loose = [];
+  if (!picks.length) return;
+  const cv = await renderPage(p), S = FIG_S;
+  for (const [r, top, bottom, b] of picks){
+    const pad = 4, x = Math.max(0, r.x0 - pad), y = Math.max(top, r.y0 - pad);
+    const w = Math.min(p.w, r.x1 + pad) - x, h = Math.min(bottom, r.y1 + pad) - y;
+    if (w < 20 || h < 20) continue;
+    const c = document.createElement('canvas'); c.width = Math.round(w * S); c.height = Math.round(h * S);
+    c.getContext('2d').drawImage(cv, x * S, y * S, w * S, h * S, 0, 0, c.width, c.height);
+    const idx = figs.push({src: c.toDataURL(imgType, 0.9), w: Math.round(w), h: Math.round(h)}) - 1;
+    if (b) b.fig = idx; else p.loose.push(idx);
+  }
+  cv.width = cv.height = 0;
+}
+
+async function segmentsToBlocks(pages, figs = []){
+  const N = pages.length;
+  const cnt = new Map();
+  pages.forEach(p => p.segs.forEach(s => cnt.set(s.size, (cnt.get(s.size) || 0) + s.text.length)));
+  const body = [...cnt].sort((a, b) => b[1] - a[1])[0][0];
+
+  // running headers / footers / page numbers
+  const edge = (s, p) => s.y < p.h * 0.1 || s.y > p.h * 0.9;
+  const key = s => s.text.toLowerCase().replace(/\d+/g, '#').replace(/\s+/g, ' ');
+  const seen = new Map();
+  pages.forEach((p, pi) => p.segs.forEach(s => { if (edge(s, p)){ const k = key(s); if (!seen.has(k)) seen.set(k, new Set()); seen.get(k).add(pi); } }));
+  const junk = (s, p) => {
+    if (/^[\s\d.,%\-–−+()×/:|$€£#*]+$/.test(s.text)) return true;                  // page numbers, axis ticks
+    const toks = s.text.split(' ');
+    if (toks.length >= 6 && toks.filter(x => x.length === 1).length >= toks.length * 0.7) return true;   // l e t t e r-spaced decoration
+    if (edge(s, p) && N >= 3 && seen.get(key(s)).size >= Math.max(2, N * 0.3)) return true;
+    return false;
+  };
+
+  // small-print text inside charts/diagrams: short, unpunctuated, smaller than body text
+  const figureLabels = b => {
+    const text = b.lines.map(s => s.text).join(' ');
+    return b.lines.every(s => s.size < body * 0.9) && !CAPTION_RE.test(text) && (wordCount(text) < 8 || (wordCount(text) < 15 && !/[.!?]/.test(text)));
+  };
+  for (const p of pages){
+    p.segs = mergeDropCaps(p.segs, body);
+    p.dropped = p.segs.filter(s => junk(s, p));
+    p.segs = p.segs.filter(s => !junk(s, p));
+    const g = findGutters(p.segs, p.w);
+    p.gutters = g;
+    p.segs = mergeRowSegs(p.segs, g);
+    p.blocks = orderBlocks(buildBlocks(p.segs).filter(b => !figureLabels(b)), g, body);
+    const gaps = [];
+    for (const b of p.blocks) for (let i = 1; i < b.lines.length; i++){
+      const d = b.lines[i].y - b.lines[i-1].y;
+      if (Math.abs(b.lines[i].size - body) < 0.6 && d > body * 0.8 && d < body * 2.2) gaps.push(d);
+    }
+    gaps.sort((a, b) => a - b);
+    p.step = gaps.length ? gaps[gaps.length >> 1] : body * 1.25;
+  }
+
+  // figures (rendering is the slow part, so long documents only render pages that have captions)
+  const figPages = pages.filter(p => p.page && typeof document !== 'undefined'
+    && (N <= 60 || p.blocks.some(b => CAPTION_RE.test(b.lines[0].text))));
+  for (const [k, p] of figPages.entries()){
+    busy(`Looking for figures · page ${k + 1} of ${figPages.length}`);
+    p.bodySize = body;
+    try { await pageInk(p); } catch (err){ console.warn('page render failed', err); }
+    p.page.cleanup();
+  }
+  // decoration that repeats in the same place on most pages (frames, header bars)
+  const grids = figPages.filter(p => p.grid && p.grid.gw === figPages[0].grid?.gw && p.grid.gh === figPages[0].grid?.gh);
+  if (grids.length >= 4){
+    const cnt = new Uint16Array(grids[0].grid.ink.length);
+    for (const p of grids) p.grid.ink.forEach((v, i) => { cnt[i] += v; });
+    const need = Math.max(4, grids.length * 0.8);
+    for (const p of grids) for (let i = 0; i < cnt.length; i++) if (cnt[i] >= need) p.grid.ink[i] = 0;
+  }
+  for (const [k, p] of figPages.entries()){
+    if (!p.grid) continue;
+    busy(`Cropping figures · page ${k + 1} of ${figPages.length}`);
+    try { await pageFigures(p, figs); } catch (err){ console.warn('figure extraction failed', err); }
+    p.grid = null; p.page.cleanup();
+  }
+
+  const paras = [], stash = []; let cur = null, prev = null, prev2 = null, prevBlk = null;
+  const push = () => { if (cur) paras.push(cur); cur = null; paras.push(...stash.splice(0)); };
+  const unfinished = () => cur && cur.t === 'p' && !ENDS_SENT.test(cur.lines[cur.lines.length - 1]);
+  pages.forEach((p, pi) => {
+    for (const blk of p.blocks){
+      // a caption or footnote that interrupts a sentence is held back until that paragraph ends
+      const isCap = CAPTION_RE.test(blk.lines[0].text);
+      if ((isCap || blk.lines.every(s => s.size < body * 0.85)) && unfinished()){
+        stash.push({t: isCap ? 'cap' : 'p', fig: blk.fig, size: blk.lines[0].size, pi, lines: blk.lines.map(s => s.text)});
+        continue;
+      }
+      blk.lines.forEach((s, li) => {
+        const newBlock = li === 0;
+        const wc = wordCount(s.text);
+        const caps = s.text.length >= 4 && s.text === s.text.toUpperCase() && /\p{Lu}{3}/u.test(s.text) && wc <= 10 && s.size >= body * 0.9;
+        const sub = s.size >= body * 1.06 && s.size < body * 1.18 && wc <= 12 && !/[.,;:!?]$/.test(s.text);
+        const isHead = (s.size >= body * 1.18 && wc <= 16) || caps || sub || REF_HEAD_RE.test(s.text);
+        if (isHead){
+          if (cur && cur.t === 'h' && prev && prev.pi === pi && Math.abs(s.size - cur.size) < 0.6 && s.y > prev.y && s.y - prev.y < 2.2 * s.size) cur.lines.push(s.text);
+          else { push(); cur = {t:'h', lvl: caps || s.size >= body * 1.18 ? 2 : 3, size:s.size, pi, lines:[s.text]}; }
+          prev2 = null; prev = {...s, pi}; prevBlk = blk; return;
+        }
+        const cap = CAPTION_RE.test(s.text) && (newBlock || !prev || ENDS_SENT.test(prev.text));
+        let brk = !cur || cur.t === 'h' || cap;
+        if (!brk){
+          const ended = ENDS_SENT.test(prev.text);
+          const prevShort = prev.x1 < (newBlock ? prevBlk.x1 : Math.max(s.x1, prev2 ? prev2.x1 : 0)) - 1.5 * body;
+          const indent = newBlock ? s.x0 > blk.x0 + 0.6 * body : s.x0 > prev.x0 + 0.6 * body;
+          if (Math.abs(s.size - cur.size) > 0.12 * body) brk = true;
+          else if (cur.t === 'p' && cur.lines.length === 1 && wordCount(prev.text) <= 10 && !/[.,;:!?)]$/.test(prev.text)
+                   && Math.abs(prev.size - body) < 0.6 && (newBlock ? prevBlk.lines.length === 1 : s.x1 - prev.x1 > 3 * body)){
+            cur.t = 'h'; cur.lvl = 3; brk = true;                                  // short unpunctuated line → sub-heading
+          }
+          else if (!newBlock && s.y - prev.y > p.step * 1.5) brk = true;
+          else if (ended && (prevShort || indent || /^(\[\d{1,3}\]|\d{1,3}\.|[•▪◦])\s/.test(s.text))) brk = true;
+        }
+        if (brk){ push(); cur = {t: cap ? 'cap' : 'p', fig: cap && newBlock ? blk.fig : undefined, size: s.size, pi, lines: [s.text]}; }
+        else cur.lines.push(s.text);
+        prev2 = newBlock ? null : prev; prev = {...s, pi}; prevBlk = blk;
+      });
+    }
+  });
+  push();
+
+  // acronyms seen in body text, used to fix ALL-CAPS headings
+  const acr = new Set();
+  let blocks = [];
+  for (const p of paras){
+    const text = joinLines(p.lines);
+    if (!text) continue;
+    if (p.t === 'h' && wordCount(text) <= 25){ blocks.push({t:'h', lvl: p.lvl || 2, size: p.size, pi: p.pi, text}); continue; }
+    const letters = (text.match(/\p{L}/gu) || []).length;
+    if (letters < text.length * 0.4) continue;
+    if (p.t !== 'cap' && ((p.size < body * 0.9 && wordCount(text) < 8) || (wordCount(text) <= 3 && !/[.!?:]$/.test(text)))) continue;
+    (text.match(/\b\p{Lu}[\p{Lu}\d]+s?\b/gu) || []).forEach(a => acr.add(a));
+    if (p.t === 'cap' && p.fig != null) blocks.push({t:'fig', fig: p.fig, pi: p.pi, text: ''});
+    blocks.push({t: p.t === 'h' ? 'p' : p.t, size: p.size, pi: p.pi, text: text});
+  }
+  // uncaptioned figures go after the last paragraph of their page
+  pages.forEach((p, pi) => {
+    if (!p.loose || !p.loose.length) return;
+    let at = blocks.findIndex(b => b.pi > pi); if (at < 0) at = blocks.length;
+    blocks.splice(at, 0, ...p.loose.map(fig => ({t:'fig', fig, pi, text:''})));
+  });
+  // multi-level headings: biggest heading font on page 1 becomes the title
+  const heads = blocks.filter(b => b.t === 'h');
+  const first = heads.filter(b => b.pi === 0 && !/^(\d+(\.\d+)*\.?\s|(abstract|introduction|contents|references)$)/i.test(b.text));
+  if (first.length){
+    const t = first.reduce((a, b) => b.size > a.size ? b : a);
+    if (t.size >= body * 1.25){ blocks.splice(blocks.indexOf(t), 1); t.lvl = 1; blocks.unshift(t); }
+  }
+  const SMALL = new Set(['a','an','the','at','of','for','and','or','to','in','on','by','with','versus','vs','via','from','as']);
+  for (const b of heads){
+    if (b.lvl !== 1 && b.size >= body * 1.18 && b.lvl !== 3) b.lvl = 2;
+    if (b.text === b.text.toUpperCase() && /\p{Lu}{3}/u.test(b.text)){
+      b.text = b.text.split(' ').map((w, i) => {
+        const core = w.replace(/[^\p{L}\d]/gu, '');
+        if (acr.has(core) || /\d/.test(core) && core.length <= 5) return w;
+        const lw = w.toLowerCase();
+        return i > 0 && SMALL.has(lw) ? lw : lw.replace(/\p{L}/u, c => c.toUpperCase());
+      }).join(' ');
+    }
+  }
+  return fixHyphens(blocks.map(b => b.t === 'h' ? {t:'h', lvl:b.lvl, text:b.text} : b.t === 'fig' ? {t:'fig', fig:b.fig, text:''} : {t:b.t, text:b.text}));
+}
+
+/* =====================================================================
+   Rendering: blocks → sentences → word spans
+   ===================================================================== */
+const SPLIT = /(?<=[.!?][”"’)\]]?)\s+(?=[\p{Lu}\d“"‘(\[])/u;
+const ABBR = /(?:\b(?:e\.g|i\.e|et al|Fig|Figs|Eq|Eqs|Ref|Refs|Sec|Secs|Ch|Dr|Mr|Mrs|Ms|Prof|vs|cf|approx|No|Nos|Vol|pp|Jr|Sr|St|Inc|Ltd|Co|Corp|U\.S|U\.K|Ph\.D|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)|(?:^|\s)\p{Lu})\.$/u;
+function splitSentences(t){
+  const out = [];
+  for (const p of t.split(SPLIT)){
+    if (out.length && ABBR.test(out[out.length - 1])) out[out.length - 1] += ' ' + p; else out.push(p);
+  }
+  return out;
+}
+const SAY_RULES = [
+  [/^\[[\d,;\s–-]+\]([.,;:]?)$/, '$1'],                                    // [12], [3, 4] citations → silent
+  [/^(\(?)(?:https?:\/\/|www\.)\S*?([).,;:]*)$/i, '$1link$2'],
+  [/^(\(?)e\.g\.(,?)$/i, '$1for example$2'], [/^(\(?)i\.e\.(,?)$/i, '$1that is$2'],
+  [/^(\(?)Figs\.$/, '$1Figures'], [/^(\(?)Fig\.$/, '$1Figure'],
+  [/^(\(?)Eqs\.$/, '$1Equations'], [/^(\(?)Eq\.$/, '$1Equation'],
+  [/^vs\.?$/, 'versus'], [/^&$/, 'and'], [/^w\/o$/i, 'without'], [/^w\/$/i, 'with'],
+  [/^(\(?)approx\.$/i, '$1approximately'], [/^(\(?)Sec\.$/, '$1Section'],
+];
+function sayToken(tok){
+  for (const [re, rep] of SAY_RULES) if (re.test(tok)) return tok.replace(re, rep);
+  return tok;
+}
+
+let sentences = [], before = [], GRAND = 0;
+function renderText(host, text, kind){
+  for (const sText of splitSentences(text)){
+    const sEl = document.createElement('span'); sEl.className = 'sent';
+    const S = {el: sEl, words: [], spoken: '', kind, idx: sentences.length};
+    const re = /\[[^\]\s]*(?:\s[^\]\s]*){0,6}\][^\s—]*|—|[^\s—]+/g;
+    let m, sepNext = ' ';
+    while ((m = re.exec(sText))){
+      const tok = m[0];
+      if (m.index > 0 && /\s/.test(sText[m.index - 1])) sEl.append(' ');
+      if (tok === '—'){ sEl.append('—'); sepNext = ', '; continue; }
+      const w = document.createElement('span');
+      w.className = 'w'; w.textContent = tok; w.dataset.s = S.idx; w.dataset.w = S.words.length;
+      const sp = sayToken(tok);
+      let start;
+      if (!/[\p{L}\p{N}]/u.test(sp)){ start = S.spoken.length; S.spoken += sp; }   // silent / punctuation-only
+      else { if (S.spoken) S.spoken += sepNext; start = S.spoken.length; S.spoken += sp; }
+      sepNext = ' ';
+      S.words.push({el: w, start, end: S.spoken.length, text: sp});
+      sEl.append(w);
+    }
+    host.append(sEl, ' ');
+    if (S.words.length){
+      S.wt = S.words.map(w => !/[\p{L}\p{N}]/u.test(w.text) ? 0.5 : w.text.length + 1
+        + (/[.!?]["”’)]?$/.test(w.text) ? 6 : /[,;:)]$/.test(w.text) || S.spoken[w.end] === ',' ? 3 : 0));
+      S.total = S.wt.reduce((a, b) => a + b, 0);
+      sentences.push(S);
+    }
+  }
+}
+function renderDoc(blocks, figs){
+  const host = $('#doc'); host.innerHTML = ''; sentences = [];
+  let inRefs = false;
+  for (const b of blocks){
+    let el;
+    if (b.t === 'fig'){
+      const f = figs && figs[b.fig]; if (!f) continue;
+      el = document.createElement('figure');
+      const img = document.createElement('img');
+      img.src = f.src; img.alt = 'Figure from the document'; img.style.width = `min(100%, ${Math.round(f.w * 1.5)}px)`;
+      el.append(img); host.append(el); continue;
+    }
+    if (b.t === 'h'){
+      inRefs = REF_HEAD_RE.test(b.text);
+      el = document.createElement('h' + Math.min(3, b.lvl || 2));
+    } else {
+      el = document.createElement('p');
+      if (b.t === 'cap') el.className = 'cap';
+      if (b.t === 'li') el.className = 'li';
+    }
+    if (inRefs) el.classList.add('ref');
+    renderText(el, b.text, inRefs ? 'ref' : b.t === 'cap' ? 'cap' : 'body');
+    host.append(el);
+  }
+  before = []; GRAND = 0;
+  for (const S of sentences){ before.push(GRAND); GRAND += S.total; }
+}
+
+/* =====================================================================
+   Speech engine
+   Sentences are spoken as short utterances (long ones split at commas so online voices
+   don't cut out). The highlighted word comes from `boundary` events when the voice sends
+   them; otherwise it is estimated from elapsed time, and that estimate self-calibrates.
+   ===================================================================== */
+const synth = window.speechSynthesis;
+let voices = [], voice = null;
+let rate = store.get('rate', 1.0);
+let cps = store.get('cps', {});
+let voiceSync = store.get('vsync', {});
+let readCaps = store.get('caps', true), readRefs = store.get('refs', false), follow = store.get('follow', true);
+let playing = false, ended = false, gen = 0, cur = {s: 0, w: 0};
+let gotBoundary = false, uttStart = 0, estTimer = null;
+let DOC = null;   // {id, title, kind, blocks}
+
+const baseCps = () => (voice && cps[voice.name]) || 14;
+const readable = S => (S.kind !== 'cap' || readCaps) && (S.kind !== 'ref' || readRefs);
+
+let curWordEl = null, curSentEl = null, lastSave = 0, lastUserScroll = 0;
+function mark(si, wi, scroll = true){
+  cur = {s: si, w: wi};
+  const S = sentences[si], W = S.words[wi];
+  if (curSentEl !== S.el){ curSentEl?.classList.remove('cur-sent'); S.el.classList.add('cur-sent'); curSentEl = S.el; }
+  if (curWordEl !== W.el){ curWordEl?.classList.remove('cur-word'); W.el.classList.add('cur-word'); curWordEl = W.el; }
+  if (scroll) keepInView(W.el);
+  progress();
+  const now = Date.now();
+  if (now - lastSave > 1000){ savePos(); lastSave = now; }
+}
+function keepInView(el, force){
+  if (!el || (!follow && !force)) return;
+  if (!force && Date.now() - lastUserScroll < 3500) return;
+  const r = el.getBoundingClientRect();
+  const topH = $('.top').offsetHeight, vh = window.innerHeight - $('#bar').offsetHeight;
+  if (force || r.top < topH + (vh - topH) * 0.12 || r.bottom > vh * 0.75)
+    window.scrollTo({top: window.scrollY + r.top - topH - (vh - topH) * 0.35, behavior: 'smooth'});
+}
+['wheel', 'touchmove'].forEach(ev => addEventListener(ev, () => lastUserScroll = Date.now(), {passive: true}));
+
+function doneFraction(){
+  const S = sentences[cur.s];
+  let done = before[cur.s]; for (let k = 0; k < cur.w; k++) done += S.wt[k];
+  return GRAND ? done / GRAND : 0;
+}
+function progress(){
+  if (!sentences.length) return;
+  const f = doneFraction();
+  $('#fill').style.width = (f * 100).toFixed(2) + '%';
+  $('#pct').textContent = Math.round(f * 100) + '%';
+  const secs = (GRAND * (1 - f)) / (baseCps() * rate);
+  $('#left').textContent = secs < 60 ? '<1 min left' : secs < 5400 ? Math.round(secs / 60) + ' min left' : (secs / 3600).toFixed(1) + ' h left';
+}
+
+function chunkEnd(S, wi){
+  const MAX = 220; let chars = 0, brk = -1;
+  for (let k = wi; k < S.words.length; k++){
+    chars += S.words[k].text.length + 1;
+    if (chars > MAX && brk > wi) return brk;
+    if (/[,;:]$/.test(S.words[k].text) || S.spoken[S.words[k].end] === ',') brk = k + 1;
+    if (chars > MAX * 1.4) return k + 1;
+  }
+  return S.words.length;
+}
+function nextReadable(si){ while (si < sentences.length && !readable(sentences[si])) si++; return si; }
+function stopEst(){ clearInterval(estTimer); estTimer = null; }
+function startEst(si, wi, we, g){
+  stopEst();
+  const S = sentences[si], cum = [0];
+  for (let k = wi; k < we; k++) cum.push(cum[cum.length - 1] + S.wt[k]);
+  const t0 = performance.now();
+  estTimer = setInterval(() => {
+    if (g !== gen || gotBoundary) return stopEst();
+    const chars = (performance.now() - t0) / 1000 * baseCps() * rate;
+    let k = 0; while (k + 1 < cum.length - 1 && cum[k + 1] <= chars) k++;
+    const idx = Math.min(wi + k, we - 1);
+    if (idx !== cur.w || si !== cur.s) mark(si, idx);
+  }, 40);
+}
+function advance(si, we){
+  if (!playing) return;
+  if (we < sentences[si].words.length) return speakFrom(si, we);
+  const n = nextReadable(si + 1);
+  if (n >= sentences.length) finish(); else speakFrom(n, 0);
+}
+function speakFrom(si, wi){
+  if (si >= sentences.length) return finish();
+  const S = sentences[si], we = chunkEnd(S, wi);
+  const base = S.words[wi].start;
+  const text = S.spoken.slice(base, S.words[we - 1].end);
+  const g = ++gen;
+  gotBoundary = false;
+  mark(si, wi);
+  if (!/[\p{L}\p{N}]/u.test(text)){ synth.cancel(); setTimeout(() => { if (g === gen) advance(si, we); }, 0); return; }
+
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = rate; if (voice){ u.voice = voice; u.lang = voice.lang; } else u.lang = 'en-US';
+  let chunkWeight = 0; for (let k = wi; k < we; k++) chunkWeight += S.wt[k];
+
+  u.onstart = () => { if (g !== gen) return; uttStart = performance.now(); startEst(si, wi, we, g); };
+  u.onboundary = e => {
+    if (g !== gen || (e.name && e.name !== 'word')) return;
+    if (!gotBoundary){ gotBoundary = true; stopEst(); setSync(true); }
+    const abs = base + e.charIndex;
+    let k = wi; while (k + 1 < we && S.words[k + 1].start <= abs) k++;
+    mark(si, k);
+  };
+  u.onend = () => {
+    if (g !== gen) return;
+    stopEst();
+    const el = performance.now() - uttStart;
+    if (!gotBoundary && el > 700 && voice){
+      const measured = chunkWeight / (el / 1000) / rate;
+      cps[voice.name] = Math.min(30, Math.max(6, baseCps() * 0.5 + measured * 0.5));
+      store.set('cps', cps); setSync(false);
+    }
+    advance(si, we);
+  };
+  u.onerror = e => {
+    if (g !== gen || e.error === 'interrupted' || e.error === 'canceled') return;
+    console.warn('speech error', e.error);
+    stopEst(); playing = false; ui();
+    toast(e.error === 'not-allowed' ? 'Click Play to allow speech' : 'Speech error: ' + e.error + '. Try another voice.');
+  };
+  window.__utt = u; // keep a reference so Chrome doesn't garbage-collect it mid-speech
+
+  if (synth.speaking || synth.pending){
+    synth.cancel();
+    setTimeout(() => { if (g === gen){ synth.resume(); synth.speak(u); } }, 60);
+  } else { synth.resume(); synth.speak(u); }
+}
+function play(){
+  if (!synth || !sentences.length) return;
+  if (ended){ ended = false; cur = {s: nextReadable(0), w: 0}; }
+  playing = true; ui();
+  speakFrom(cur.s, cur.w);
+}
+function pause(){
+  playing = false; gen++; stopEst(); synth && synth.cancel(); ui(); savePos();
+}
+function toggle(){ playing ? pause() : play(); }
+function finish(){
+  playing = false; ended = true; gen++; stopEst(); ui(); savePos(true);
+  toast('Finished reading');
+}
+function jump(si, wi){
+  ended = false;
+  si = Math.max(0, Math.min(sentences.length - 1, si));
+  if (playing) speakFrom(si, wi); else { mark(si, wi, false); keepInView(sentences[si].words[wi].el, true); }
+}
+function nextSent(){ const n = nextReadable(cur.s + 1); if (n < sentences.length) jump(n, 0); }
+function prevSent(){
+  if (cur.w > 2) return jump(cur.s, 0);
+  let p = cur.s - 1; while (p > 0 && !readable(sentences[p])) p--;
+  jump(Math.max(0, p), 0);
+}
+function setRate(r){
+  rate = Math.round(Math.min(3, Math.max(0.5, r)) * 10) / 10;
+  $('#rate').textContent = rate.toFixed(1) + '×'; store.set('rate', rate); progress();
+  if (playing) speakFrom(cur.s, cur.w);
+}
+function setSync(ok){ if (!voice) return; voiceSync[voice.name] = ok; store.set('vsync', voiceSync); showSync(); }
+function showSync(){
+  const v = voice && voiceSync[voice.name];
+  $('#dot').className = 'dot' + (v === true ? ' ok' : v === false ? ' est' : '');
+  $('#syncText').textContent = v === true ? 'Word sync: exact'
+    : v === false ? 'Word sync: estimated (voice sends no word timing)' : 'Word sync: detecting…';
+}
+
+/* voices */
+const PREFERRED = ['Ava (Premium)','Zoe (Premium)','Ava (Enhanced)','Samantha (Enhanced)','Evan (Enhanced)',
+  'Samantha','Alex','Ava','Allison','Susan','Tom','Microsoft Aria','Microsoft Jenny','Microsoft Guy','Google US English'];
+const NOVELTY = /^(Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Good News|Jester|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Junior|Ralph|Fred|Kathy|Grandma|Grandpa|Rocko|Shelley|Flo|Eddy|Reed|Sandy)\b/;
+function loadVoices(){
+  const all = synth.getVoices(); if (!all.length) return;
+  const en = v => /^en/i.test(v.lang);
+  voices = all.slice().sort((a, b) => (en(b) - en(a)) || (NOVELTY.test(a.name) - NOVELTY.test(b.name)) ||
+    (b.localService - a.localService) || a.name.localeCompare(b.name));
+  const sel = $('#voice'); sel.innerHTML = '';
+  for (const [label, fn] of [['English', v => en(v) && !NOVELTY.test(v.name)], ['English (novelty)', v => en(v) && NOVELTY.test(v.name)], ['Other languages', v => !en(v)]]){
+    const vs = voices.filter(fn); if (!vs.length) continue;
+    const og = document.createElement('optgroup'); og.label = label;
+    for (const v of vs){ const o = document.createElement('option'); o.value = v.name; o.textContent = `${v.name} · ${v.lang}${v.localService ? '' : ' · online'}`; og.append(o); }
+    sel.append(og);
+  }
+  const saved = store.get('voice', null);
+  voice = voices.find(v => v.name === saved)
+    || PREFERRED.map(p => voices.find(v => en(v) && v.name.startsWith(p))).find(Boolean)
+    || voices.find(v => en(v) && v.localService) || voices[0];
+  sel.value = voice.name; showSync();
+}
+
+/* =====================================================================
+   Documents: open / save / recent
+   ===================================================================== */
+function hash(str){ let h = 0x811c9dc5; for (let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193); } return (h >>> 0).toString(36); }
+function titleFor(blocks, name){
+  const h1 = blocks.find(b => b.t === 'h' && b.lvl === 1);
+  if (h1) return h1.text;
+  if (name) return name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ');
+  const first = (blocks.find(b => b.t === 'p' || b.t === 'li') || blocks.find(b => b.text)).text.split(/\s+/).slice(0, 9).join(' ');
+  return first + '…';
+}
+function recentList(){ return store.get('recent', []); }
+// Document bodies (with figure images) live in IndexedDB; the recent list and positions in localStorage.
+const idb = (() => {
+  let dbp = null;
+  const open = () => dbp || (dbp = new Promise((res, rej) => {
+    const r = indexedDB.open('tts', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('docs');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  }));
+  const run = async (mode, fn) => {
+    const db = await open();
+    return new Promise((res, rej) => {
+      const tx = db.transaction('docs', mode), req = fn(tx.objectStore('docs'));
+      tx.oncomplete = () => res(req.result); tx.onerror = tx.onabort = () => rej(tx.error);
+    });
+  };
+  return {get: k => run('readonly', s => s.get(k)), set: (k, v) => run('readwrite', s => s.put(v, k)), del: k => run('readwrite', s => s.delete(k))};
+})();
+const forgetDoc = id => { idb.del('doc-' + id).catch(() => {}); store.del('doc-' + id); store.del('pos-' + id); };
+async function saveDoc(){
+  if (!DOC) return;
+  const d = DOC;
+  let list = recentList().filter(r => r.id !== d.id);
+  list.unshift({id: d.id, title: d.title, kind: d.kind, words: d.words, figs: d.figs.length, updated: Date.now(), pct: d.pct || 0});
+  while (list.length > 25) forgetDoc(list.pop().id);
+  store.set('recent', list);
+  try { await idb.set('doc-' + d.id, {title: d.title, kind: d.kind, blocks: d.blocks, figs: d.figs}); }
+  catch (err){
+    console.warn('IndexedDB unavailable, saving text only', err);
+    if (!store.set('doc-' + d.id, {title: d.title, kind: d.kind, blocks: d.blocks.filter(b => b.t !== 'fig')})){
+      store.set('recent', recentList().filter(r => r.id !== d.id));
+      toast('Too large to keep in Recent, but you can still read it now');
+    }
+  }
+}
+function savePos(finished){
+  if (!DOC) return;
+  const pos = finished ? {s: 0, w: 0} : cur;
+  store.set('pos-' + DOC.id, pos);
+  const pct = finished ? 100 : Math.round(doneFraction() * 100);
+  const list = recentList(); const r = list.find(r => r.id === DOC.id);
+  if (r && r.pct !== pct){ r.pct = pct; store.set('recent', list); }
+}
+function openDoc(blocks, {name, kind, id, title, figs = []} = {}){
+  blocks = blocks.filter(b => b.t === 'fig' ? figs[b.fig] : b.text && b.text.trim());
+  if (!blocks.some(b => b.t !== 'fig')){ toast('No readable text found'); return; }
+  pause();
+  const words = blocks.reduce((n, b) => n + wordCount(b.text), 0);
+  DOC = {id: id || hash(serialize(blocks)), title: title || titleFor(blocks, name), kind: kind || 'Text', blocks, words, figs};
+  renderDoc(blocks, figs);
+  showView('reader');
+  saveDoc();
+  $('#docTitle').textContent = DOC.title;
+  document.title = DOC.title + ' · Read Aloud';
+  const pos = store.get('pos-' + DOC.id, null);
+  ended = false; curWordEl = curSentEl = null;
+  if (pos && sentences[pos.s] && sentences[pos.s].words[pos.w] && (pos.s || pos.w)){
+    mark(pos.s, pos.w, false);
+    setTimeout(() => keepInView(curWordEl, true), 50);
+    toast('Picked up where you left off. Press Space to continue');
+  } else { mark(nextReadable(0) < sentences.length ? nextReadable(0) : 0, 0, false); window.scrollTo(0, 0); }
+}
+async function openFile(file){
+  const name = file.name || 'document';
+  const ext = (name.match(/\.([^.]+)$/) || [])[1]?.toLowerCase() || '';
+  try {
+    if (ext === 'pdf' || file.type === 'application/pdf'){
+      busy('Loading PDF…');
+      const {blocks, figs} = await pdfToBlocks(await file.arrayBuffer());
+      openDoc(blocks, {name, kind: 'PDF', figs});
+    } else if (/^(html?|xhtml)$/.test(ext) || file.type === 'text/html'){
+      openDoc(htmlToBlocks(await file.text()), {name, kind: 'HTML'});
+    } else if (/^(txt|md|markdown|text|rst|tex|csv|log|json)?$/.test(ext) || file.type.startsWith('text/')){
+      openDoc(parseText(await file.text()), {name, kind: ext === 'md' || ext === 'markdown' ? 'Markdown' : 'Text'});
+    } else {
+      toast('Unsupported file type: .' + ext + '. Use PDF, .txt, .md or .html.');
+    }
+  } catch (err){
+    console.error(err);
+    toast(err.name === 'PasswordException' ? 'This PDF is password-protected.' : (err.message || 'Could not read that file'), 6000);
+  } finally { idle(); }
+}
+async function openUrl(url){
+  try {
+    busy('Fetching ' + url + '…');
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Could not fetch ' + url + ' (' + res.status + ')');
+    const type = res.headers.get('content-type') || '';
+    const name = decodeURIComponent(new URL(url, location.href).pathname.split('/').pop() || 'document');
+    if (/pdf/.test(type) || /\.pdf$/i.test(name)){ const {blocks, figs} = await pdfToBlocks(await res.arrayBuffer()); openDoc(blocks, {name, kind: 'PDF', figs}); }
+    else if (/html/.test(type)) openDoc(htmlToBlocks(await res.text()), {name, kind: 'HTML'});
+    else openDoc(parseText(await res.text()), {name, kind: 'Text'});
+  } catch (err){ console.error(err); toast(err.message || 'Could not load that URL (the server may block cross-site requests)', 6000); }
+  finally { idle(); }
+}
+async function openRecent(id){
+  let d = null;
+  try { d = await idb.get('doc-' + id); } catch {}
+  d = d || store.get('doc-' + id, null);
+  if (!d){ toast('That document is no longer stored'); store.set('recent', recentList().filter(r => r.id !== id)); renderRecent(); return; }
+  openDoc(d.blocks, {id, kind: d.kind, title: d.title, figs: d.figs || []});
+}
+function renderRecent(){
+  const list = recentList(), ul = $('#recent'); ul.innerHTML = '';
+  $('#recentWrap').hidden = !list.length;
+  for (const r of list){
+    const li = document.createElement('li');
+    const a = document.createElement('a'); a.onclick = () => openRecent(r.id);
+    const t = document.createElement('span'); t.className = 'rt'; t.textContent = r.title;
+    const m = document.createElement('span'); m.className = 'rm';
+    const mins = Math.max(1, Math.round((r.words || 0) / 165));
+    m.textContent = `${r.kind || 'Text'} · ~${mins} min${r.figs ? ` · ${r.figs} figure${r.figs > 1 ? 's' : ''}` : ''} · ${r.pct >= 100 ? 'finished' : (r.pct || 0) + '% read'} · ${new Date(r.updated).toLocaleDateString()}`;
+    a.append(t, m);
+    const x = document.createElement('button'); x.textContent = '×'; x.title = 'Remove';
+    x.onclick = () => { forgetDoc(r.id); store.set('recent', recentList().filter(q => q.id !== r.id)); renderRecent(); };
+    li.append(a, x); ul.append(li);
+  }
+}
+
+/* =====================================================================
+   Views & wiring
+   ===================================================================== */
+let view = 'home';
+function showView(v){
+  view = v;
+  $('#homeView').hidden = v !== 'home';
+  $('#readerView').hidden = v !== 'reader';
+  $('#editView').hidden = v !== 'edit';
+  $('#bar').hidden = v !== 'reader';
+  $('#editBtn').hidden = !(DOC && v === 'reader');
+  $('#newBtn').hidden = v === 'home';
+  if (v === 'home'){ pause(); renderRecent(); $('#docTitle').textContent = ''; document.title = 'Read Aloud'; }
+}
+const PLAY = '<path d="M7 4.5v15l13-7.5z"/>', PAUSE = '<path d="M6 4h4.5v16H6zM13.5 4H18v16h-4.5z"/>';
+function ui(){ $('#playIcon').innerHTML = playing ? PAUSE : PLAY; }
+
+if (!synth) $('#nosupport').innerHTML = '<div class="warn">This browser has no speech synthesis. Use Chrome, Safari or Edge.</div>';
+else { loadVoices(); synth.onvoiceschanged = loadVoices; }
+
+$('#brand').onclick = () => showView('home');
+$('#newBtn').onclick = () => { showView('home'); setTimeout(() => $('#pasteBox').focus(), 50); };
+$('#openBtn').onclick = () => $('#file').click();
+$('#file').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) openFile(f); };
+$('#pasteBox').oninput = e => { $('#readPaste').disabled = !e.target.value.trim(); };
+$('#readPaste').onclick = () => { const t = $('#pasteBox').value; if (t.trim()){ openDoc(parseText(t), {kind: 'Pasted text'}); $('#pasteBox').value = ''; $('#readPaste').disabled = true; } };
+$('#editBtn').onclick = () => { pause(); $('#editBox').value = serialize(DOC.blocks); showView('edit'); window.scrollTo(0, 0); };
+$('#cancelEdit').onclick = () => showView('reader');
+$('#applyEdit').onclick = () => {
+  const blocks = parseText($('#editBox').value);
+  if (!blocks.length) return toast('Nothing to read');
+  const keep = {...cur}, id = DOC.id, kind = DOC.kind, title = DOC.title, figs = DOC.figs;
+  openDoc(blocks, {id, kind, title, figs});
+  if (sentences[keep.s]) mark(keep.s, Math.min(keep.w, sentences[keep.s].words.length - 1), false);
+  toast('Text updated');
+};
+
+$('#play').onclick = toggle;
+$('#next').onclick = nextSent;
+$('#prev').onclick = prevSent;
+$('#slower').onclick = () => setRate(rate - 0.1);
+$('#faster').onclick = () => setRate(rate + 0.1);
+$('#voice').onchange = e => {
+  voice = voices.find(v => v.name === e.target.value) || voice;
+  store.set('voice', voice.name); showSync(); e.target.blur(); progress();
+  if (playing) speakFrom(cur.s, cur.w);
+};
+function bindToggle(id, get, set){
+  const el = $(id); el.checked = get();
+  el.onchange = () => { set(el.checked); el.blur(); applySkips(); };
+}
+function applySkips(){ document.body.classList.toggle('skip-caps', !readCaps); document.body.classList.toggle('skip-refs', !readRefs); }
+bindToggle('#follow', () => follow, v => { follow = v; store.set('follow', v); if (v){ lastUserScroll = 0; keepInView(curWordEl, true); } });
+bindToggle('#caps', () => readCaps, v => { readCaps = v; store.set('caps', v); });
+bindToggle('#refs', () => readRefs, v => { readRefs = v; store.set('refs', v); });
+applySkips();
+
+let fs = store.get('fs', 20);
+const applyFs = () => document.documentElement.style.setProperty('--fs', fs + 'px');
+applyFs();
+$('#smaller').onclick = () => { fs = Math.max(14, fs - 1); applyFs(); store.set('fs', fs); };
+$('#bigger').onclick = () => { fs = Math.min(32, fs + 1); applyFs(); store.set('fs', fs); };
+
+const savedTheme = store.get('theme', null);
+if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+$('#theme').onclick = () => {
+  const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme = dark ? 'light' : 'dark';
+  store.set('theme', document.documentElement.dataset.theme);
+};
+
+document.addEventListener('click', e => { const b = e.target.closest('button'); if (b) b.blur(); });
+$('#doc').addEventListener('click', e => {
+  const w = e.target.closest('.w'); if (!w) return;
+  const sel = getSelection(); if (sel && !sel.isCollapsed) return;
+  const si = +w.dataset.s, wi = +w.dataset.w;
+  ended = false;
+  if (playing) speakFrom(si, wi); else { mark(si, wi, false); play(); }
+});
+$('#doc').addEventListener('click', e => {
+  const img = e.target.closest('figure img'); if (!img) return;
+  $('#lbImg').src = img.src; $('#lightbox').hidden = false;
+});
+$('#lightbox').onclick = () => { $('#lightbox').hidden = true; };
+$('#prog').addEventListener('click', e => {
+  const r = e.currentTarget.getBoundingClientRect();
+  const target = (e.clientX - r.left) / r.width * GRAND;
+  let si = 0; while (si + 1 < sentences.length && before[si + 1] <= target) si++;
+  jump(si, 0);
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !$('#lightbox').hidden){ $('#lightbox').hidden = true; return; }
+  if (view !== 'reader') return;
+  if (e.target.closest && e.target.closest('select,input,textarea')) return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  switch (e.key){
+    case ' ': e.preventDefault(); toggle(); break;
+    case 'ArrowRight': e.preventDefault(); nextSent(); break;
+    case 'ArrowLeft': e.preventDefault(); prevSent(); break;
+    case '-': case '_': setRate(rate - 0.1); break;
+    case '=': case '+': setRate(rate + 0.1); break;
+    case 'Escape': pause(); break;
+  }
+});
+// paste anywhere on the home screen
+document.addEventListener('paste', e => {
+  if (view !== 'home' || (e.target.closest && e.target.closest('textarea,input'))) return;
+  const f = [...(e.clipboardData?.files || [])][0];
+  if (f){ e.preventDefault(); return openFile(f); }
+  const t = e.clipboardData?.getData('text/plain');
+  if (t && t.trim()){ e.preventDefault(); openDoc(parseText(t), {kind: 'Pasted text'}); }
+});
+// drag & drop anywhere
+let dragDepth = 0;
+addEventListener('dragenter', e => { if ([...e.dataTransfer.types].includes('Files')){ dragDepth++; $('#dropveil').classList.add('on'); } });
+addEventListener('dragleave', () => { if (--dragDepth <= 0){ dragDepth = 0; $('#dropveil').classList.remove('on'); } });
+addEventListener('dragover', e => e.preventDefault());
+addEventListener('drop', e => {
+  e.preventDefault(); dragDepth = 0; $('#dropveil').classList.remove('on');
+  const f = e.dataTransfer.files[0]; if (f) openFile(f);
+});
+addEventListener('beforeunload', () => { savePos(); synth && synth.cancel(); });
+
+$('#rate').textContent = rate.toFixed(1) + '×';
+ui();
+showView('home');
+const src = new URLSearchParams(location.search).get('src');
+if (src) openUrl(src);
+</script>
+</body>
+</html>
