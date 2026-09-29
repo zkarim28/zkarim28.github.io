@@ -98,9 +98,12 @@ def parse_quiz_file(path):
 def parse_question(block):
     m = re.match(r'(\d+)\.\s+(.*)', block['head'])
     key, text = (m.group(1), [m.group(2)]) if m else (block['head'], [])
-    opts, ans, expl, state = [], None, [], 'text'
+    opts, ans, expl, state, image = [], None, [], 'text', None
     for line in block['lines']:
-        if state == 'expl':
+        mi = re.match(r'!\[(.*?)\]\((.*?)\)\s*$', line.strip()) if state == 'text' else None
+        if mi:
+            image = (mi.group(1), mi.group(2))
+        elif state == 'expl':
             expl.append(line)
         elif line.startswith('**Answer:**'):
             ans, state = line[len('**Answer:**'):].strip(), 'expl'
@@ -111,7 +114,7 @@ def parse_question(block):
             opts[-1] += ' ' + line.strip()
         elif state == 'text':
             text.append(line)
-    return key, clean(' '.join(text)), [clean(o) for o in opts], ans, paragraphs(expl)
+    return key, clean(' '.join(text)), [clean(o) for o in opts], ans, paragraphs(expl), image
 
 
 def parse_answer_list(lines):
@@ -161,21 +164,25 @@ def load(meta, path, key_file=None):
     listed = parse_answer_list(answer_lines)
     keyed = parse_answer_key(SRC / key_file) if key_file else {}
     sections = []
+
+    def site_image(alt, rel):
+        src = path.parent / rel
+        site_name = f"{meta['id']}-{src.name}"
+        OUT_DIR.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(src, OUT_DIR / site_name)
+        return {'alt': alt, 'src': f'assets/quiz/{site_name}', 'md': str(src.relative_to(SRC))}
+
     for s in raw_sections:
         note, image = [], None
         for line in s['note']:
             mi = re.match(r'!\[(.*?)\]\((.*?)\)', line.strip())
             if mi:
-                src = path.parent / mi.group(2)
-                site_name = f"{meta['id']}-{src.name}"
-                OUT_DIR.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(src, OUT_DIR / site_name)
-                image = {'alt': mi.group(1), 'src': f'assets/quiz/{site_name}', 'md': str(src.relative_to(SRC))}
+                image = site_image(mi.group(1), mi.group(2))
             else:
                 note.append(line)
         questions = []
         for block in s['qs']:
-            key, text, opts, ans, expl = parse_question(block)
+            key, text, opts, ans, expl, qimg = parse_question(block)
             if ans is None:
                 ans = listed.get(key) or keyed[key][0]
             if not expl and key in keyed:
@@ -183,7 +190,10 @@ def load(meta, path, key_file=None):
             idx, extra = resolve(ans, opts, f'{path.name} Q{key}')
             if extra and not expl:
                 expl = [extra]
-            questions.append({'text': text, 'options': opts, 'answer': idx, 'explanation': expl})
+            q = {'text': text, 'options': opts, 'answer': idx, 'explanation': expl}
+            if qimg:
+                q['image'] = site_image(*qimg)
+            questions.append(q)
         sections.append({'title': s['title'], 'note': paragraphs(note), 'image': image, 'questions': questions})
     return {**meta, 'origin': str(path.relative_to(SRC)) + (f' + {key_file}' if key_file else ''), 'sections': sections}
 

@@ -2209,7 +2209,12 @@ window.QUIZ_DATA = {
        "answer": 2,
        "explanation": [
         "This is the paper's central observation. The shape of the distribution varies by service, but two things generalize: servers are rarely completely idle and seldom operate near their maximum utilization. The authors stress that this is not an accident. It follows from sound provisioning (you keep slack for load spikes and faults) and from distributed-systems design (the data is spread over every machine). The consequence is that neither of the mobile world's two sweet spots, peak performance and near-zero-power sleep, is where servers actually live."
-       ]
+       ],
+       "image": {
+        "alt": "Figure 1: CPU utilization histogram",
+        "src": "assets/quiz/practice-energy-fig1-cpu-utilization.png",
+        "md": "paper-quiz/5/fig1-cpu-utilization.png"
+       }
       },
       {
        "text": "According to the paper, even an energy-efficient server still consumes about half of its full power when doing virtually no work.",
@@ -2246,7 +2251,12 @@ window.QUIZ_DATA = {
        "answer": 0,
        "explanation": [
         "Dividing utilization by power (the red curve in Figure 2) gives an efficiency that peaks at full utilization and falls quickly as load decreases. In the 20 to 30 percent range, efficiency is less than half of what it is at peak. The authors call the result \"both enlightening and discouraging\": the machine is least efficient exactly where it spends most of its time. Question 13 derives the same number from a simple linear power model."
-       ]
+       ],
+       "image": {
+        "alt": "Figure 2: power and efficiency of a typical server",
+        "src": "assets/quiz/practice-energy-fig2-typical-server.png",
+        "md": "paper-quiz/5/fig2-typical-server.png"
+       }
       },
       {
        "text": "The paper describes consuming no power at all when idle as the hardest property of an energy-proportional machine to achieve.",
@@ -2270,7 +2280,12 @@ window.QUIZ_DATA = {
        "answer": 1,
        "explanation": [
         "In the same 2007 platform, the CPU is an even smaller share of total power when the system is idle. That can only happen if the CPU's power falls further than everyone else's when load drops. The paper reads this as evidence that processors are already the closest component to energy-proportional. The comparison between the 2005 and 2007 servers makes a second point: the CPU no longer dominates platform power even at peak, and the authors expect its share to keep shrinking. Both observations point attention away from the CPU and toward memory, disk and networking."
-       ]
+       ],
+       "image": {
+        "alt": "Figure 3: CPU share of server power",
+        "src": "assets/quiz/practice-energy-fig3-cpu-share.png",
+        "md": "paper-quiz/5/fig3-cpu-share.png"
+       }
       },
       {
        "text": "Which ordering of dynamic power range, from widest to narrowest, matches what the authors report?",
@@ -2333,7 +2348,12 @@ window.QUIZ_DATA = {
        "answer": 1,
        "explanation": [
         "Compared with the servers of the day, a 90% dynamic range could cut data center energy by half and lower facility-level peak power by more than 30%. The authors stress that these gains come from optimizations that leave peak server power unchanged: nothing is traded away at the top end. The efficiency curve in Figure 4 explains the gain: more than 80% of peak efficiency at 30% utilization and above, and still above 50% at 10% utilization. One caveat for your review: the Figure 4 server is hypothetical, and the savings figures come from the authors' earlier power-provisioning study (Fan, Weber and Barroso), not from a prototype in this paper."
-       ]
+       ],
+       "image": {
+        "alt": "Figure 4: power and efficiency of a more energy-proportional server",
+        "src": "assets/quiz/practice-energy-fig4-proportional-server.png",
+        "md": "paper-quiz/5/fig4-proportional-server.png"
+       }
       },
       {
        "text": "The authors put the main responsibility for fixing the mismatch between server efficiency and server workloads on application developers, who should restructure their software to create long idle intervals.",
