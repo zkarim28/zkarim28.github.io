@@ -454,6 +454,13 @@ def quizzes():
               'covers': 'Spanner/BigTable/BigQuery time breakdowns, datacenter and system taxes, IPC/MPKI, '
                         'accelerator limit studies, chained acceleration.'},
              'paper-quiz/4/quiz-paper7.md', 'paper-quiz/4/answer-key.md'),
+        load({'id': 'practice-energy', 'official': False, 'kind': 'practice',
+              'title': 'Practice: The Case for Energy-Proportional Computing',
+              'subtitle': 'Paper 8, Barroso & Hölzle, IEEE Computer 2007',
+              'covers': 'Server utilization and idle power, efficiency vs utilization, dynamic range by component, '
+                        'active vs inactive low-power modes; links to PUE, over-provisioning, Tail at Scale and '
+                        'Web Search for a Planet, plus efficiency calculations. 15 multiple choice + 19 true/false.'},
+             'paper-quiz/5/quiz-paper8.md', 'paper-quiz/5/answer-key.md'),
     ]
 
 
