@@ -469,8 +469,8 @@ def quizzes():
               'title': 'Practice: The Case for Energy-Proportional Computing',
               'subtitle': 'Paper 8, Barroso & Hölzle, IEEE Computer 2007',
               'covers': 'Server utilization and idle power, efficiency vs utilization, dynamic range by component, '
-                        'active vs inactive low-power modes; links to PUE, over-provisioning, Tail at Scale and '
-                        'Web Search for a Planet, plus efficiency calculations. 15 multiple choice + 19 true/false.'},
+                        'active vs inactive low-power modes, the 90%-dynamic-range payoff. '
+                        '6 multiple choice + 6 true/false, with the paper\'s figures.'},
              'paper-quiz/5/quiz-paper8.md', 'paper-quiz/5/answer-key.md'),
     ]
 
