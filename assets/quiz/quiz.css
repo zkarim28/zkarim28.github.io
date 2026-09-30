@@ -89,14 +89,17 @@ select { font: inherit; font-size: .9rem; color: var(--text); background: var(--
 .card-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; padding-top: 12px; border-top: 1px dashed var(--line); }
 .card-foot .meta { font-size: .78rem; color: var(--muted); }
 .card-foot .meta b { color: var(--text); font-weight: 600; }
-.card-foot .actions { display: flex; gap: 6px; }
-.card-foot .btn { padding: 6px 12px; font-size: .84rem; }
+.card-foot .actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+.card-foot .btn { padding: 6px 10px; font-size: .84rem; white-space: nowrap; }
 
 /* runner */
 .run-head { margin-bottom: 16px; }
 .run-title { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .run-title h1 { font-size: 1.3rem; margin: 0; }
 .run-meta { display: flex; justify-content: space-between; font-size: .85rem; color: var(--muted); margin: 12px 0 6px; }
+.run-meta .shuf { all: unset; cursor: pointer; color: var(--accent); font-weight: 600; font-size: .85rem; padding: 0 6px; border-radius: 6px; }
+.run-meta .shuf:hover { text-decoration: underline; }
+.run-meta .shuf:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .bar { height: 6px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
 .bar i { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width .25s; }
 .qcard { padding: 22px 22px 18px; }

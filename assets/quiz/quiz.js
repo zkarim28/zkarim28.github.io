@@ -81,7 +81,9 @@
   function route() {
     const [, name, id] = location.hash.replace(/^#\/?/, '#/').split('/');
     if (name === 'quiz' && byId[id]) {
-      if (!run || run.key !== 'quiz:' + id) startQuiz(byId[id]); else renderRun();
+      if (!run || run.key !== 'quiz:' + id || run.shuffled !== settings.shuffleQ) startQuiz(byId[id]); else renderRun();
+    } else if (name === 'shuffle' && byId[id]) {
+      if (!run || run.key !== 'quiz:' + id || !run.shuffled) startQuiz(byId[id], byId[id].all, true); else renderRun();
     } else if (name === 'mix' && run && run.key === 'mix') {
       renderRun();
     } else if (name === 'browse' && byId[id]) {
@@ -132,7 +134,7 @@
           <button class="btn" data-action="mix">Start mixed practice →</button>
         </div>
         <div class="toggles">
-          <label><input type="checkbox" id="shuffle-q" ${settings.shuffleQ ? 'checked' : ''}> Shuffle question order (single quizzes)</label>
+          <label><input type="checkbox" id="shuffle-q" ${settings.shuffleQ ? 'checked' : ''}> Always shuffle question order when starting a quiz</label>
           <label><input type="checkbox" id="shuffle-o" ${settings.shuffleO ? 'checked' : ''}> Shuffle answer choices</label>
         </div>
       </section>
@@ -157,7 +159,7 @@
       <p class="covers">${md(z.covers)}</p>
       <div class="card-foot">
         <span class="meta">${z.all.length} ${z.open ? 'prompts' : 'questions'}${best}</span>
-        <span class="actions"><a class="btn ghost" href="#/browse/${z.id}">Browse</a><a class="btn" href="#/quiz/${z.id}">Start</a></span>
+        <span class="actions"><a class="btn ghost" href="#/browse/${z.id}">Browse</a><a class="btn ghost" href="#/shuffle/${z.id}" title="Start with the questions in a random order">🔀 Shuffle</a><a class="btn" href="#/quiz/${z.id}">Start</a></span>
       </div>
     </article>`;
   }
@@ -176,9 +178,20 @@
     };
   }
 
-  function startQuiz(z, questions = z.all) {
-    makeRun('quiz:' + z.id, z.title, z.official, questions, { shuffleQ: settings.shuffleQ, quizId: z.id });
+  function startQuiz(z, questions = z.all, shuffled = settings.shuffleQ) {
+    makeRun('quiz:' + z.id, z.title, z.official, questions, { shuffleQ: shuffled, quizId: z.id });
+    run.shuffled = shuffled;
     renderRun();
+  }
+
+  // Restart the current quiz with its questions in a fresh random order.
+  function reshuffle() {
+    const z = byId[run.quizId];
+    const answered = run.items.filter(it => it.pick != null).length;
+    if (answered && !run.done && !confirm('Restart this quiz in a new random order? Your answers so far will be cleared.')) return;
+    startQuiz(z, z.all, true);
+    if (location.hash !== '#/shuffle/' + z.id) location.hash = '#/shuffle/' + z.id;
+    window.scrollTo(0, 0);
   }
 
   function startMix() {
@@ -255,7 +268,9 @@
   }
 
   function runMeta(right, done) {
-    return `<div class="run-meta"><span>Question ${run.i + 1} of ${run.items.length}</span><span>Score ${right} / ${done}</span></div>
+    const shuf = run.quizId != null && run.full
+      ? `<button class="shuf" data-action="reshuffle" title="Restart with the questions in a new random order">🔀 ${run.shuffled ? 'Reshuffle' : 'Shuffle'}</button>` : '';
+    return `<div class="run-meta"><span>Question ${run.i + 1} of ${run.items.length}${run.shuffled ? ' · shuffled' : ''}</span>${shuf}<span>Score ${right} / ${done}</span></div>
       <div class="bar"><i style="width:${pct(done, run.items.length)}%"></i></div>`;
   }
 
@@ -353,6 +368,7 @@
         <div class="actions">
           ${missed ? `<button class="btn" data-action="retry-missed">Retry the ${missed} missed</button>` : ''}
           <button class="btn ${missed ? 'ghost' : ''}" data-action="retake">${run.key === 'mix' ? 'New mixed set' : 'Retake quiz'}</button>
+          ${run.key === 'mix' ? '' : '<button class="btn ghost" data-action="reshuffle">🔀 Retake shuffled</button>'}
           <a class="btn ghost" href="#/">All quizzes</a>
         </div>
       </section>
@@ -401,8 +417,9 @@
     else if (a === 'prev') { run.i--; renderRun(); }
     else if (a === 'filter') { settings.filter = el.dataset.f; saveSettings(); renderHome(); }
     else if (a === 'mix') startMix();
+    else if (a === 'reshuffle') reshuffle();
     else if (a === 'retake') {
-      if (run.key === 'mix') startMix(); else startQuiz(byId[run.quizId]);
+      if (run.key === 'mix') startMix(); else startQuiz(byId[run.quizId], byId[run.quizId].all, !!run.shuffled);
     } else if (a === 'retry-missed') {
       const missed = run.items.filter(it => !isRight(it)).map(it => it.q);
       if (run.key === 'mix') { makeRun('mix', run.title + ' · missed', run.official, missed); renderRun(); }
