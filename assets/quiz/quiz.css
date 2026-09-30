@@ -96,10 +96,9 @@ select { font: inherit; font-size: .9rem; color: var(--text); background: var(--
 .run-head { margin-bottom: 16px; }
 .run-title { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .run-title h1 { font-size: 1.3rem; margin: 0; }
+.run-tools { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 2px; }
+.run-tools .chip { font-size: .82rem; padding: 5px 12px; }
 .run-meta { display: flex; justify-content: space-between; font-size: .85rem; color: var(--muted); margin: 12px 0 6px; }
-.run-meta .shuf { all: unset; cursor: pointer; color: var(--accent); font-weight: 600; font-size: .85rem; padding: 0 6px; border-radius: 6px; }
-.run-meta .shuf:hover { text-decoration: underline; }
-.run-meta .shuf:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .bar { height: 6px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
 .bar i { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width .25s; }
 .qcard { padding: 22px 22px 18px; }

@@ -81,9 +81,10 @@
   function route() {
     const [, name, id] = location.hash.replace(/^#\/?/, '#/').split('/');
     if (name === 'quiz' && byId[id]) {
-      if (!run || run.key !== 'quiz:' + id || run.shuffled !== settings.shuffleQ) startQuiz(byId[id]); else renderRun();
+      // resume an unfinished attempt; a finished one starts over
+      if (!run || run.key !== 'quiz:' + id || run.done) startQuiz(byId[id]); else renderRun();
     } else if (name === 'shuffle' && byId[id]) {
-      if (!run || run.key !== 'quiz:' + id || !run.shuffled) startQuiz(byId[id], byId[id].all, true); else renderRun();
+      if (!run || run.key !== 'quiz:' + id || run.done || !run.shuffled) startQuiz(byId[id], byId[id].all, true); else renderRun();
     } else if (name === 'mix' && run && run.key === 'mix') {
       renderRun();
     } else if (name === 'browse' && byId[id]) {
@@ -166,13 +167,14 @@
 
   // ---------------------------------------------------------------- runs
   function makeRun(key, title, official, questions, { shuffleQ, quizId = null } = {}) {
-    const qs = shuffleQ ? shuffle(questions.slice()) : questions.slice();
+    const qs = questions.map((q, idx) => ({ q, idx }));
+    if (shuffleQ) shuffle(qs);
     run = {
       key, title, official, quizId, full: quizId != null && questions.length === byId[quizId].all.length,
-      items: qs.map(q => {
+      items: qs.map(({ q, idx }) => {
         const order = q.options.map((_, i) => i);
         if (settings.shuffleO && !isTF(q)) shuffle(order);
-        return { q, order, pick: null };
+        return { q, idx, order, pick: null };
       }),
       i: 0, done: false,
     };
@@ -184,14 +186,33 @@
     renderRun();
   }
 
-  // Restart the current quiz with its questions in a fresh random order.
+  // Restart the current quiz (from the results screen) with its questions in a fresh random order.
   function reshuffle() {
     const z = byId[run.quizId];
-    const answered = run.items.filter(it => it.pick != null).length;
-    if (answered && !run.done && !confirm('Restart this quiz in a new random order? Your answers so far will be cleared.')) return;
     startQuiz(z, z.all, true);
     if (location.hash !== '#/shuffle/' + z.id) location.hash = '#/shuffle/' + z.id;
     window.scrollTo(0, 0);
+  }
+
+  // In-quiz toggles. Answered questions keep their place; only the unanswered ones from the
+  // current question onward are reordered (shuffled, or put back in the quiz's original order).
+  function toggleShuffleQ() {
+    run.shuffled = !run.shuffled;
+    const slots = [];
+    for (let k = run.i; k < run.items.length; k++) if (run.items[k].pick == null) slots.push(k);
+    const rest = slots.map(k => run.items[k]);
+    if (run.shuffled) shuffle(rest); else rest.sort((a, b) => a.idx - b.idx);
+    slots.forEach((k, j) => { run.items[k] = rest[j]; });
+    renderRun();
+  }
+  function toggleShuffleO() {
+    settings.shuffleO = !settings.shuffleO; saveSettings();
+    for (const it of run.items) {
+      if (it.pick != null || isTF(it.q)) continue;
+      it.order = it.q.options.map((_, i) => i);
+      if (settings.shuffleO) shuffle(it.order);
+    }
+    renderRun();
   }
 
   function startMix() {
@@ -245,6 +266,7 @@
         <div class="run-head">
           <a class="back" href="#/">← All quizzes</a>
           <div class="run-title">${run.official == null ? '' : badge(run.official)}<h1>${esc(run.title)}</h1></div>
+          ${runTools()}
           ${runMeta(right, done)}
         </div>
         <article class="panel qcard">
@@ -267,10 +289,16 @@
     if (answered) app.querySelector('[data-action="next"]').focus({ preventScroll: true });
   }
 
+  function runTools() {
+    if (run.quizId == null) return '';
+    return `<div class="run-tools" role="group" aria-label="Question order">
+      <button class="chip" data-action="toggle-shuffle-q" aria-pressed="${!!run.shuffled}" title="Reorder the questions you haven't answered yet">🔀 Shuffle questions</button>
+      <button class="chip" data-action="toggle-shuffle-o" aria-pressed="${!!settings.shuffleO}" title="Reorder the multiple-choice options on unanswered questions">🔤 Shuffle answers</button>
+    </div>`;
+  }
+
   function runMeta(right, done) {
-    const shuf = run.quizId != null && run.full
-      ? `<button class="shuf" data-action="reshuffle" title="Restart with the questions in a new random order">🔀 ${run.shuffled ? 'Reshuffle' : 'Shuffle'}</button>` : '';
-    return `<div class="run-meta"><span>Question ${run.i + 1} of ${run.items.length}${run.shuffled ? ' · shuffled' : ''}</span>${shuf}<span>Score ${right} / ${done}</span></div>
+    return `<div class="run-meta"><span>Question ${run.i + 1} of ${run.items.length}</span><span>Score ${right} / ${done}</span></div>
       <div class="bar"><i style="width:${pct(done, run.items.length)}%"></i></div>`;
   }
 
@@ -297,6 +325,7 @@
         <div class="run-head">
           <a class="back" href="#/">← All quizzes</a>
           <div class="run-title">${run.official == null ? '' : badge(run.official)}<h1>${esc(run.title)}</h1></div>
+          ${runTools()}
           ${runMeta(right, done)}
         </div>
         <article class="panel qcard">
@@ -418,6 +447,8 @@
     else if (a === 'filter') { settings.filter = el.dataset.f; saveSettings(); renderHome(); }
     else if (a === 'mix') startMix();
     else if (a === 'reshuffle') reshuffle();
+    else if (a === 'toggle-shuffle-q') toggleShuffleQ();
+    else if (a === 'toggle-shuffle-o') toggleShuffleO();
     else if (a === 'retake') {
       if (run.key === 'mix') startMix(); else startQuiz(byId[run.quizId], byId[run.quizId].all, !!run.shuffled);
     } else if (a === 'retry-missed') {
