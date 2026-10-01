@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="theme-color" content="#1d2147">
+  <title>Happy Birthday, Abu!</title>
+  <style>
+    :root { --night:#1d2147; --night2:#2b3068; --gold:#ffc83d; --coral:#ff6b57; --mint:#5fd4b1; --sky:#6ab7ff; --cream:#fff8ea; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; color:var(--cream); background:var(--night); font-family:'Trebuchet MS',Verdana,sans-serif; overflow-x:hidden; }
+    button { font:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    button:focus-visible { outline:3px solid var(--gold); outline-offset:5px; }
+    h1,h2,.script { font-family:'Brush Script MT','Segoe Script',cursive; font-weight:normal; }
+    canvas#confetti { position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:50; }
+
+    /* hero */
+    .hero { min-height:100svh; display:grid; place-items:center; text-align:center; padding:60px 20px; position:relative; overflow:hidden; background:radial-gradient(circle at 50% 30%,var(--night2),var(--night) 70%); }
+    .bunting { position:absolute; top:0; left:0; right:0; height:70px; display:flex; justify-content:space-around; }
+    .bunting i { width:0; height:0; border-left:28px solid transparent; border-right:28px solid transparent; border-top:50px solid var(--c); transform-origin:top; animation:sway 3s ease-in-out infinite alternate; animation-delay:var(--d); }
+    @keyframes sway { from { transform:rotate(-6deg); } to { transform:rotate(6deg); } }
+    .eyebrow { letter-spacing:.3em; text-transform:uppercase; font-size:12px; color:var(--gold); }
+    h1 { font-size:clamp(64px,13vw,150px); line-height:1; margin:14px 0; color:var(--gold); text-shadow:4px 4px 0 var(--coral); }
+    .sub { max-width:420px; margin:0 auto 34px; line-height:1.7; opacity:.85; }
+    .btn { border:0; border-radius:50px; padding:16px 32px; background:var(--coral); color:#fff; font-weight:bold; letter-spacing:.05em; box-shadow:0 6px 0 #c24432; transition:transform .15s,box-shadow .15s; }
+    .btn:hover { transform:translateY(-2px); }
+    .btn:active { transform:translateY(4px); box-shadow:0 2px 0 #c24432; }
+    .scroll-hint { position:absolute; bottom:22px; font-size:11px; letter-spacing:.25em; text-transform:uppercase; opacity:.6; }
+
+    /* sections */
+    section { padding:90px 22px; }
+    .wrap { max-width:1000px; margin:auto; }
+    h2 { font-size:clamp(44px,8vw,80px); color:var(--gold); margin:0 0 10px; text-align:center; }
+    .lead { text-align:center; opacity:.8; margin:0 auto 50px; max-width:480px; line-height:1.7; }
+
+    /* photo wall */
+    .wall { columns:3 230px; column-gap:28px; }
+    .polaroid { break-inside:avoid; margin:0 0 34px; background:var(--cream); color:var(--night); padding:12px 12px 16px; border-radius:3px; box-shadow:0 12px 30px #0006; transform:rotate(var(--r,0deg)); transition:transform .25s; }
+    .polaroid:nth-child(4n+1) { --r:-2.5deg; } .polaroid:nth-child(4n+2) { --r:2deg; } .polaroid:nth-child(4n+3) { --r:-1deg; } .polaroid:nth-child(4n) { --r:3deg; }
+    .polaroid:hover { transform:rotate(0) scale(1.04); position:relative; z-index:2; }
+    .polaroid img,.polaroid video { width:100%; height:auto; display:block; background:#ddd; }
+    .polaroid figcaption { font:22px 'Brush Script MT','Segoe Script',cursive; text-align:center; margin-top:12px; }
+
+    /* reasons */
+    .reasons { background:var(--night2); }
+    .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:20px; }
+    .card { background:var(--night); border:2px dashed var(--gold); border-radius:18px; padding:26px; transition:transform .2s; }
+    .card:hover { transform:translateY(-6px) rotate(-1deg); }
+    .card b { display:block; font:40px 'Brush Script MT',cursive; color:var(--coral); margin-bottom:6px; }
+    .card p { margin:0; line-height:1.7; opacity:.9; }
+
+    /* letter */
+    .letter { max-width:620px; margin:auto; background:var(--cream); color:var(--night); padding:50px 40px; border-radius:6px; transform:rotate(-1deg); box-shadow:0 14px 40px #0007; }
+    .letter p { line-height:1.9; font-size:17px; }
+    .letter .sign { font:34px 'Brush Script MT',cursive; color:var(--coral); margin-top:24px; }
+
+    /* cake */
+    .cake-sec { text-align:center; }
+    .cake { position:relative; width:220px; height:200px; margin:60px auto 30px; }
+    .layer { position:absolute; left:50%; transform:translateX(-50%); border-radius:12px 12px 6px 6px; }
+    .l1 { bottom:0; width:220px; height:70px; background:var(--coral); }
+    .l2 { bottom:70px; width:160px; height:60px; background:var(--gold); }
+    .l3 { bottom:130px; width:100px; height:45px; background:var(--mint); }
+    .drip { position:absolute; left:50%; transform:translateX(-50%); bottom:166px; width:100px; height:10px; background:var(--cream); border-radius:10px 10px 0 0; }
+    .candle { position:absolute; left:50%; bottom:175px; width:10px; height:34px; margin-left:-5px; background:repeating-linear-gradient(45deg,var(--sky) 0 6px,var(--cream) 6px 12px); border-radius:2px; }
+    .flame { position:absolute; left:50%; bottom:208px; width:16px; height:26px; margin-left:-8px; background:radial-gradient(circle at 50% 70%,#fff 0,var(--gold) 40%,var(--coral) 100%); border-radius:50% 50% 50% 50%/60% 60% 40% 40%; animation:flick .25s infinite alternate; box-shadow:0 0 25px 8px #ffc83d88; transition:opacity .4s; }
+    @keyframes flick { from { transform:scale(1,1) rotate(-3deg); } to { transform:scale(.9,1.1) rotate(3deg); } }
+    .cake.out .flame { opacity:0; }
+    .wish { min-height:40px; font:32px 'Brush Script MT',cursive; color:var(--gold); margin-top:24px; }
+    footer { text-align:center; padding:40px 20px 60px; font-size:12px; letter-spacing:.2em; text-transform:uppercase; opacity:.5; }
+
+    .reveal { opacity:0; transform:translateY(30px); transition:opacity .7s,transform .7s; }
+    .reveal.in { opacity:1; transform:none; }
+    @media (prefers-reduced-motion:reduce) { *,*::before { animation:none !important; transition:none !important; } .reveal { opacity:1; transform:none; } }
+  </style>
+</head>
+<body>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+
+  <header class="hero">
+    <div class="bunting" aria-hidden="true">
+      <i style="--c:#ff6b57;--d:0s"></i><i style="--c:#ffc83d;--d:-.5s"></i><i style="--c:#5fd4b1;--d:-1s"></i><i style="--c:#6ab7ff;--d:-1.5s"></i>
+      <i style="--c:#ff6b57;--d:-2s"></i><i style="--c:#ffc83d;--d:-.3s"></i><i style="--c:#5fd4b1;--d:-.8s"></i><i style="--c:#6ab7ff;--d:-1.3s"></i>
+    </div>
+    <div>
+      <p class="eyebrow">Today is all about you</p>
+      <h1>Happy Birthday, Abu!</h1>
+      <p class="sub">I made you a little something. Press the button, then scroll down.</p>
+      <button class="btn" id="party">Let's party 🎉</button>
+    </div>
+    <div class="scroll-hint">scroll ↓</div>
+  </header>
+
+  <section>
+    <div class="wrap reveal">
+      <h2>Good times</h2>
+      <p class="lead">A few of my favorite moments with you.</p>
+      <div class="wall">
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/image0.jpg" alt="Where it all started"><figcaption>Where it all started</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/img_0716.jpg" alt="Dressed up and ready"><figcaption>Dressed up and ready</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/img_0718.jpg" alt="Balloon hat energy"><figcaption>Balloon hat energy</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/img_0717.jpg" alt="The look"><figcaption>The look</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/img_0086.jpg" alt="Grinding master"><figcaption>Grinding master</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/img_0014.jpg" alt="Goodbye 2016"><figcaption>Goodbye 2016</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/img_0010.jpg" alt="Posing for the camera"><figcaption>Posing for the camera</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/img_4643.jpg" alt="Hacked"><figcaption>Hacked</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/color_pop.jpg" alt="Mystery tube"><figcaption>Mystery tube</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/img_0368.jpg" alt="Selfie crimes"><figcaption>Selfie crimes</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/img_1206.jpg" alt="Squad of two"><figcaption>Squad of two</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/img_5195.jpg" alt="Wolf hat era"><figcaption>Wolf hat era</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/img_1222.jpg" alt="Looking sharp"><figcaption>Looking sharp</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/img_1342.jpg" alt="Fall vibes"><figcaption>Fall vibes</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/img_1560.jpg" alt="Group chat classics"><figcaption>Group chat classics</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/img_1805.jpg" alt="Too edgy"><figcaption>Too edgy</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/img_4991.jpg" alt="Late night ride"><figcaption>Late night ride</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/img_1114.jpg" alt="Dinner is served"><figcaption>Dinner is served</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/img_5577.jpg" alt="Sunset stroll"><figcaption>Sunset stroll</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/lp_image.jpg" alt="Flexing on a video call"><figcaption>Flexing on a video call</figcaption></figure>
+        <figure class="polaroid"><img loading="lazy" src="assets/img/abu/web/screen-recording-poster.jpg" alt="Caught in the act"><figcaption>Caught in the act</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap reveal">
+      <h2>In motion</h2>
+      <p class="lead">Because a photo can't capture all of it.</p>
+      <div class="wall videos">
+        <figure class="polaroid"><video controls playsinline preload="metadata" poster="assets/img/abu/web/img-1114-poster.jpg" aria-label="Dinner time, in motion"><source src="assets/img/abu/web/img-1114.mp4" type="video/mp4"></video><figcaption>Dinner time, in motion</figcaption></figure>
+        <figure class="polaroid"><video controls playsinline preload="metadata" poster="assets/img/abu/web/img-4991-poster.jpg" aria-label="Late night ride, live"><source src="assets/img/abu/web/img-4991.mp4" type="video/mp4"></video><figcaption>Late night ride, live</figcaption></figure>
+        <figure class="polaroid"><video controls playsinline preload="metadata" poster="assets/img/abu/web/lp-image-poster.jpg" aria-label="Flex check"><source src="assets/img/abu/web/lp-image.mp4" type="video/mp4"></video><figcaption>Flex check</figcaption></figure>
+        <figure class="polaroid"><video controls playsinline preload="metadata" poster="assets/img/abu/web/screen-recording-poster.jpg" aria-label="Screen recording"><source src="assets/img/abu/web/screen-recording.mp4" type="video/mp4"></video><figcaption>Screen recording</figcaption></figure>
+        <figure class="polaroid"><video controls playsinline preload="metadata" poster="assets/img/abu/web/chat-video-poster.jpg" aria-label="Couch hangout"><source src="assets/img/abu/web/chat-video.mp4" type="video/mp4"></video><figcaption>Couch hangout</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="reasons">
+    <div class="wrap reveal">
+      <h2>Why you're the best</h2>
+      <p class="lead">A very official, very accurate list.</p>
+      <div class="cards">
+        <div class="card"><b>01</b><p>Replace with something you love about Abu.</p></div>
+        <div class="card"><b>02</b><p>An inside joke or a favorite memory goes here.</p></div>
+        <div class="card"><b>03</b><p>Something he does that always makes you laugh.</p></div>
+        <div class="card"><b>04</b><p>A time he came through for you.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap reveal">
+      <div class="letter">
+        <p class="script" style="font-size:36px;margin:0;color:var(--coral)">Dear Abu,</p>
+        <p>Write your message here. Say what the friendship means to you, what you hope the next year brings, and maybe roast him a little.</p>
+        <p>Happy birthday!</p>
+        <div class="sign">Zarif</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cake-sec">
+    <div class="wrap reveal">
+      <h2>Make a wish</h2>
+      <p class="lead">Tap the candle to blow it out.</p>
+      <button class="cake" id="cake" aria-label="Blow out the candle" style="background:none;border:0;padding:0;display:block;">
+        <span class="flame"></span><span class="candle"></span><span class="drip"></span>
+        <span class="layer l3"></span><span class="layer l2"></span><span class="layer l1"></span>
+      </button>
+      <div class="wish" id="wish" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <footer>Made with love for Abu</footer>
+
+  <script>
+    (function () {
+      var cv = document.getElementById('confetti'), cx = cv.getContext('2d'), bits = [], running = false;
+      var colors = ['#ff6b57', '#ffc83d', '#5fd4b1', '#6ab7ff', '#fff8ea'];
+      function size() { cv.width = innerWidth; cv.height = innerHeight; }
+      size(); addEventListener('resize', size);
+      function burst(n) {
+        for (var i = 0; i < n; i++) bits.push({
+          x: innerWidth / 2, y: innerHeight * .55, vx: (Math.random() - .5) * 18, vy: -Math.random() * 16 - 4,
+          s: Math.random() * 8 + 4, r: Math.random() * 6, vr: (Math.random() - .5) * .4, c: colors[i % colors.length]
+        });
+        if (!running) { running = true; requestAnimationFrame(tick); }
+      }
+      function tick() {
+        cx.clearRect(0, 0, cv.width, cv.height);
+        bits = bits.filter(function (b) { return b.y < cv.height + 20; });
+        bits.forEach(function (b) {
+          b.vy += .35; b.vx *= .99; b.x += b.vx; b.y += b.vy; b.r += b.vr;
+          cx.save(); cx.translate(b.x, b.y); cx.rotate(b.r); cx.fillStyle = b.c; cx.fillRect(-b.s / 2, -b.s / 4, b.s, b.s / 2); cx.restore();
+        });
+        if (bits.length) requestAnimationFrame(tick); else running = false;
+      }
+      var reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+      document.getElementById('party').onclick = function () { if (!reduce) burst(160); document.querySelector('section').scrollIntoView(); };
+      document.getElementById('cake').onclick = function () {
+        this.classList.add('out');
+        document.getElementById('wish').textContent = 'Wish granted. Happy birthday, Abu! 🎂';
+        if (!reduce) { burst(220); setTimeout(function () { burst(120); }, 400); }
+      };
+      var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) e.target.classList.add('in'); }); }, { threshold: .15 });
+      document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+    })();
+  </script>
+</body>
+</html>
