@@ -1,0 +1,760 @@
+<!doctype html><html lang="en"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Altra-03 Optimization Results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one report column, charts at full column width, each finding paired with its explanation. */
+:root {
+  --bg: #f3f5f6;
+  --panel: #fcfdfd;
+  --ink: #0e1417;
+  --ink-2: #47535a;
+  --muted: #6f7b81;
+  --rule: #dde3e6;
+  --axis: #bcc6ca;
+  --accent: #155e75;
+
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+
+  --fast-1: #d6e6fb; --fast-2: #86b6ef; --fast-3: #2a78d6;
+  --slow-1: #f8d9d8; --slow-2: #ee9a99; --slow-3: #d64544;
+  --cell-ink-strong: #ffffff;
+  --noise: #eceff1;
+
+  --good: #0ca30c; --critical: #d03b3b; --neutral-pill: #6f7b81;
+
+  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --sans: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1214; --panel: #161b1e; --ink: #eef3f5; --ink-2: #b6c1c6; --muted: #8b979d;
+    --rule: #263035; --axis: #3a454b; --accent: #67c2d9;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+    --fast-1: #1b324f; --fast-2: #23599e; --fast-3: #4a92ea;
+    --slow-1: #45201f; --slow-2: #9c3634; --slow-3: #e66767;
+    --cell-ink-strong: #0e1214; --noise: #1d2327;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1214; --panel: #161b1e; --ink: #eef3f5; --ink-2: #b6c1c6; --muted: #8b979d;
+  --rule: #263035; --axis: #3a454b; --accent: #67c2d9;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+  --fast-1: #1b324f; --fast-2: #23599e; --fast-3: #4a92ea;
+  --slow-1: #45201f; --slow-2: #9c3634; --slow-3: #e66767;
+  --cell-ink-strong: #0e1214; --noise: #1d2327;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 980px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 56px; }
+p { margin: 0; max-width: 68ch; }
+h1, h2, h3, h4 { font-family: var(--display); font-stretch: 85%; text-wrap: balance; margin: 0; color: var(--ink); }
+h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight: 800; line-height: 1.02; letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.45rem, 3vw, 1.9rem); font-weight: 750; line-height: 1.12; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+h4 { font-size: 0.95rem; font-weight: 650; font-stretch: 90%; }
+.eyebrow { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+code, .mono { font-family: var(--mono); font-size: 0.88em; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.hero { display: grid; gap: 18px; }
+.lede { font-size: 1.15rem; color: var(--ink-2); }
+.meta { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 18px; }
+
+section { display: grid; gap: 20px; }
+.prose { display: grid; gap: 12px; color: var(--ink-2); }
+.prose strong { color: var(--ink); }
+
+/* Scoreboard */
+.board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 860px) { .board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 460px) { .board { grid-template-columns: 1fr; } }
+.score { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.score .what { font-family: var(--display); font-stretch: 85%; font-weight: 700; font-size: 1.05rem; }
+.score .cfg { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); }
+.score .big { font-family: var(--display); font-stretch: 80%; font-weight: 800; font-size: 2.1rem; line-height: 1; }
+.score .unit { font-size: 0.85rem; color: var(--ink-2); }
+.score .why { font-size: 0.9rem; color: var(--ink-2); }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 600; padding: 2px 9px 2px 7px; border-radius: 99px; border: 1px solid currentColor; justify-self: start; }
+.pill.good { color: var(--good); }
+.pill.bad { color: var(--critical); }
+.pill.none { color: var(--neutral-pill); }
+
+/* Stat row */
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+@media (max-width: 760px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stat { padding: 16px 16px 16px 0; display: grid; gap: 4px; min-width: 0; }
+.stat .n { font-family: var(--display); font-stretch: 80%; font-weight: 800; font-size: 1.9rem; line-height: 1.05; }
+.stat .l { font-size: 0.86rem; color: var(--ink-2); }
+
+/* Figures */
+figure { margin: 0; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 18px 18px 12px; display: grid; gap: 10px; min-width: 0; }
+figure > header { display: grid; gap: 4px; }
+figure .sub { font-size: 0.85rem; color: var(--muted); }
+.chart { width: 100%; min-width: 0; }
+.chart svg { display: block; overflow: visible; }
+figcaption { font-size: 0.92rem; color: var(--ink-2); border-top: 1px solid var(--rule); padding-top: 10px; }
+figcaption strong { color: var(--ink); }
+.panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 640px) { .panels { grid-template-columns: 1fr; } }
+.panel { display: grid; gap: 6px; min-width: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.85rem; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; flex: none; }
+.sw.dot { border-radius: 50%; }
+.sw.ring { border-radius: 50%; background: var(--panel); border: 2px solid var(--s2); }
+.sw.s1 { background: var(--s1); } .sw.s2 { background: var(--s2); } .sw.s3 { background: var(--s3); }
+
+details { font-size: 0.85rem; color: var(--ink-2); }
+summary { cursor: pointer; font-family: var(--mono); font-size: 0.75rem; color: var(--muted); letter-spacing: 0.04em; }
+.tbl-wrap { overflow-x: auto; margin-top: 8px; }
+table { border-collapse: collapse; font-variant-numeric: tabular-nums; width: 100%; }
+th, td { text-align: right; padding: 5px 10px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-weight: 600; color: var(--ink); font-size: 0.8rem; }
+
+/* SVG chart parts */
+.ax { font: 11px var(--mono); fill: var(--muted); }
+.axl { font: 11.5px var(--sans); fill: var(--muted); }
+.grid { stroke: var(--rule); stroke-width: 1; }
+.base { stroke: var(--axis); stroke-width: 1.2; }
+.lbl { font: 600 13px var(--sans); fill: var(--ink); }
+.lbl2 { font: 12px var(--sans); fill: var(--muted); }
+.val { font: 500 12px var(--mono); fill: var(--ink); }
+.valm { font: 12px var(--mono); fill: var(--ink-2); }
+.f-s1 { fill: var(--s1); } .f-s2 { fill: var(--s2); } .f-s3 { fill: var(--s3); }
+.st-s1 { stroke: var(--s1); } .st-s2 { stroke: var(--s2); } .st-s3 { stroke: var(--s3); }
+.f-fast { fill: var(--fast-3); } .f-slow { fill: var(--slow-3); }
+.ring { stroke: var(--panel); stroke-width: 2; }
+.hollow { fill: var(--panel); stroke-width: 2; }
+.roof { fill: none; stroke: var(--ink); stroke-width: 2.2; }
+.drop { stroke-width: 1.4; stroke-dasharray: 3 3; fill: none; }
+.dash { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 3; fill: none; }
+.line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.area { opacity: 0.12; }
+.hit { fill: transparent; pointer-events: all; cursor: default; }
+.hit:focus-visible { outline: none; stroke: var(--accent); stroke-width: 2; }
+.hit:hover + .mk, .hit:focus-visible + .mk { stroke: var(--ink); stroke-width: 2; }
+
+/* Stage heatmap */
+.hm { min-width: 660px; }
+.hm th { text-align: center; vertical-align: bottom; padding: 6px 6px; line-height: 1.25; white-space: normal; font-size: 0.8rem; }
+.hm th:first-child { text-align: left; }
+.hm td { text-align: center; padding: 4px; border-bottom: 2px solid var(--panel); }
+.hm td:first-child { text-align: left; padding-left: 0; color: var(--ink); font-weight: 600; font-size: 0.88rem; white-space: normal; }
+.hm td:first-child .bm { display: block; font-family: var(--mono); font-weight: 400; font-size: 0.72rem; color: var(--muted); }
+.hm .cell { border-radius: 4px; padding: 7px 6px; display: grid; gap: 1px; }
+.hm .cell .p { font-family: var(--mono); font-weight: 500; font-size: 0.95rem; }
+.hm .cell .d { font-family: var(--mono); font-size: 0.72rem; opacity: 0.85; }
+.hm tr.grp td { border-bottom: 1px solid var(--rule); padding-top: 14px; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 400; }
+.b-noise { background: var(--noise); color: var(--muted); }
+.b-f1 { background: var(--fast-1); color: var(--ink); } .b-f2 { background: var(--fast-2); color: var(--ink); } .b-f3 { background: var(--fast-3); color: var(--cell-ink-strong); }
+.b-s1 { background: var(--slow-1); color: var(--ink); } .b-s2 { background: var(--slow-2); color: var(--ink); } .b-s3 { background: var(--slow-3); color: var(--cell-ink-strong); }
+.hmkey { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.8rem; color: var(--ink-2); }
+.hmkey span { display: inline-flex; align-items: center; gap: 6px; }
+.hmkey i { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+
+/* Next steps */
+ol.chain { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; counter-reset: step; }
+ol.chain li { counter-increment: step; display: grid; grid-template-columns: 2.4rem minmax(0, 1fr); gap: 4px 12px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px; }
+ol.chain li::before { content: counter(step); grid-row: span 2; font-family: var(--display); font-stretch: 80%; font-weight: 800; font-size: 1.8rem; line-height: 1; color: var(--accent); }
+ol.chain b { font-family: var(--display); font-stretch: 88%; font-weight: 700; font-size: 1.02rem; }
+ol.chain span { color: var(--ink-2); font-size: 0.93rem; }
+ul.limits { margin: 0; padding-left: 1.1rem; display: grid; gap: 8px; color: var(--ink-2); max-width: 72ch; }
+
+footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 16px; display: grid; gap: 6px; }
+
+#tip { position: fixed; z-index: 10; pointer-events: none; background: var(--ink); color: var(--panel); font-size: 0.8rem; line-height: 1.4; padding: 8px 10px; border-radius: 5px; max-width: 280px; box-shadow: 0 4px 16px rgba(0,0,0,0.18); }
+#tip .tt-h { font-weight: 600; margin-bottom: 2px; }
+@media (prefers-reduced-motion: no-preference) { #tip { transition: opacity 0.08s; } }
+</style>
+
+<main class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">ECE 6765 · team-03 · Milestone 2</div>
+    <h1>Four optimizations, one win</h1>
+    <p class="lede">Milestone 2 asks us to try four optimizations on the RAG pipeline. On altra-03 only one of them made queries faster. The reason is the hardware: the machine has one memory channel per socket, so 160 cores share about 26 GB/s, and generating an answer is limited by how many bytes each token has to read from memory.</p>
+    <div class="meta">
+      <span>Workload: short-query-answerable, 100 queries</span>
+      <span>Metric: per-query service time</span>
+      <span>Three launches per setup unless noted</span>
+    </div>
+  </header>
+
+  <section aria-labelledby="sb-h">
+    <h2 id="sb-h" class="eyebrow" style="font-family:var(--mono);font-size:0.75rem;font-weight:400">Result by optimization</h2>
+    <div class="board">
+      <article class="score">
+        <div class="what">Chunked database</div>
+        <div class="cfg">chunked-128-64 corpus</div>
+        <div><span class="big">9.5%</span> <span class="unit">faster</span></div>
+        <span class="pill good">✓ Win</span>
+        <p class="why">Shorter passages make shorter prompts, so generation has less to read.</p>
+      </article>
+      <article class="score">
+        <div class="what">Approximate search</div>
+        <div class="cfg">HNSW, M=32, efSearch=64</div>
+        <div><span class="big">3.4%</span> <span class="unit">faster</span></div>
+        <span class="pill none">○ Within noise</span>
+        <p class="why">Search got 17 times faster, but search is under 1% of query time.</p>
+      </article>
+      <article class="score">
+        <div class="what">Quantization</div>
+        <div class="cfg">BF16 generation weights</div>
+        <div><span class="big">31.4%</span> <span class="unit">slower</span></div>
+        <span class="pill bad">✕ Regression</span>
+        <p class="why">Decode got faster, but this CPU has no BF16 hardware, so prompt processing got three times slower.</p>
+      </article>
+      <article class="score">
+        <div class="what">Data parallelism</div>
+        <div class="cfg">4 queries in flight, 2 replicas · one launch</div>
+        <div><span class="big">3.7×</span> <span class="unit">slower per query</span></div>
+        <span class="pill bad">✕ Regression</span>
+        <p class="why">Throughput rose 6.9%. Every replica competes for the same scarce memory bandwidth.</p>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="hw-h">
+    <h2 id="hw-h">The machine sets the limits</h2>
+    <div class="prose">
+      <p>altra-03 is a two-socket Ampere Altra with 80 Neoverse-N1 cores per socket. The platform supports eight memory channels per socket, and <strong>each socket has one DIMM installed</strong>. That one fact explains most of what follows.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><span class="n">1 of 8</span><span class="l">memory channels populated per socket</span></div>
+      <div class="stat"><span class="n">26.4 GB/s</span><span class="l">peak bandwidth, shared by all 160 cores</span></div>
+      <div class="stat"><span class="n">43.8</span><span class="l">FLOP per byte at the roofline ridge (typical servers: 5 to 15)</span></div>
+      <div class="stat"><span class="n">5.7×</span><span class="l">remote vs local memory latency (655 ns vs 115 ns)</span></div>
+    </div>
+
+    <figure>
+      <header>
+        <h3>More threads do not add bandwidth</h3>
+        <div class="sub">STREAM triad bandwidth on NUMA node 0, local memory, GB/s</div>
+      </header>
+      <div class="chart" id="ch-bw" aria-label="Line chart of memory bandwidth against thread count"></div>
+      <figcaption><strong>One thread already reaches 14.2 GB/s, and bandwidth peaks at 8 threads.</strong> Past that, extra threads only add contention for the single DRAM channel. This is also why 48 threads, the existing setting, is already the best choice for decode.</figcaption>
+      <details><summary>Data table</summary><div class="tbl-wrap"><table>
+        <tr><th>Threads</th><th>1</th><th>2</th><th>4</th><th>8</th><th>16</th><th>32</th><th>64</th><th>80</th></tr>
+        <tr><td>GB/s</td><td>14.2</td><td>17.0</td><td>18.9</td><td>19.7</td><td>18.6</td><td>16.4</td><td>15.8</td><td>15.5</td></tr>
+      </table></div></details>
+    </figure>
+
+    <figure>
+      <header>
+        <h3>Generation is two different workloads</h3>
+        <div class="sub">Roofline with measured ceilings. Both axes are logarithmic.</div>
+      </header>
+      <div class="legend"><span><i class="sw dot s1"></i>Prefill (reading the prompt)</span><span><i class="sw dot s2"></i>Decode (writing each answer token)</span></div>
+      <div class="chart" id="ch-roof" aria-label="Roofline chart with decode and prefill placed against memory and compute ceilings"></div>
+      <figcaption><strong>Decode sits far below the ridge and already uses 64% of the memory ceiling.</strong> Each new token reads all 2.22 GiB of weights to do about 1.2 GFLOP of work, so it can only get faster by reading fewer bytes. Prefill reads the weights once for all 200 or so prompt tokens, which puts it on the compute side of the ridge. Any change that helps one half can hurt the other.</figcaption>
+      <details><summary>Data table</summary><div class="tbl-wrap"><table>
+        <tr><th>Phase</th><th>FLOP per byte</th><th>Achieved GFLOP/s</th><th>Ceiling GFLOP/s</th><th>Share of ceiling</th><th>Limited by</th></tr>
+        <tr><td>Decode</td><td>0.50</td><td>8.5</td><td>13.2</td><td>64%</td><td>memory bandwidth</td></tr>
+        <tr><td>Prefill</td><td>101</td><td>235.8</td><td>1157.2</td><td>20%</td><td>compute</td></tr>
+      </table></div></details>
+    </figure>
+  </section>
+
+  <section aria-labelledby="ev-h">
+    <h2 id="ev-h">Three launches changed two of the answers</h2>
+    <div class="prose">
+      <p>The first sweep ran each setup once. Two of those results did not hold up when repeated. The baseline itself varies by <strong>5.6%</strong> from launch to launch, which matches the 6% Milestone 1 measured, so a single launch cannot resolve a difference smaller than about 12%.</p>
+    </div>
+    <figure>
+      <header>
+        <h3>Change in per-query service time vs baseline</h3>
+        <div class="sub">Whiskers span two standard errors either side of the three-launch mean. A whisker that crosses zero is not a measurable effect.</div>
+      </header>
+      <div class="legend"><span><i class="sw dot s1"></i>Three launches, mean ± 2 SE</span><span><i class="sw ring"></i>One launch</span></div>
+      <div class="chart" id="ch-est" aria-label="Dot and whisker chart comparing one-launch and three-launch estimates"></div>
+      <figcaption><strong>HNSW looked 17.9% faster after one launch and 3.4% faster after three, with a whisker that crosses zero.</strong> Chunking held up at half its first size. BF16 got worse with more data. One useful check: HNSW changed only 2 of 100 answers, so the pipeline was doing the same work and had no way to become 18% faster.</figcaption>
+      <details><summary>Data table</summary><div class="tbl-wrap"><table>
+        <tr><th>Setup</th><th>One launch</th><th>Three launches</th><th>2 SE</th><th>Std. errors from zero</th><th>Answers changed</th></tr>
+        <tr><td>Chunked database</td><td>−19.5%</td><td>−9.5%</td><td>±7.0%</td><td>2.7</td><td>32 / 100</td></tr>
+        <tr><td>Approximate search</td><td>−17.9%</td><td>−3.4%</td><td>±8.4%</td><td>0.8</td><td>2 / 100</td></tr>
+        <tr><td>Quantization (BF16)</td><td>+20.0%</td><td>+31.4%</td><td>±7.2%</td><td>8.7</td><td>21 / 100</td></tr>
+      </table></div></details>
+    </figure>
+  </section>
+
+  <section aria-labelledby="st-h">
+    <h2 id="st-h">Which stages got faster, and which got slower</h2>
+    <div class="prose">
+      <p>A single total hides the trade. The pipeline logs the time of every stage for every query, so each change can be charged to the stage that paid for it. BF16 only touches generation, yet embedding and search moved by 8% and 13% in its runs. Changes that small are machine noise, so this table greys out timing changes under 15%.</p>
+    </div>
+    <figure>
+      <header>
+        <h3>Per-stage change vs baseline</h3>
+        <div class="sub">Mean per query, all launches pooled, warmup dropped. Baseline value under each row name.</div>
+      </header>
+      <div class="hmkey">
+        <span><i style="background:var(--fast-3)"></i>Much faster or less work</span>
+        <span><i style="background:var(--fast-1)"></i>Faster</span>
+        <span><i style="background:var(--noise);outline:1px solid var(--rule)"></i>Within timing noise (under 15%)</span>
+        <span><i style="background:var(--slow-1)"></i>Slower</span>
+        <span><i style="background:var(--slow-3)"></i>Much slower or more work</span>
+      </div>
+      <div class="tbl-wrap"><table class="hm" id="hm"></table></div>
+      <figcaption><strong>Chunking is the only real trade: search pays 16 ms more because the corpus is 1.62 times larger, and generation saves 508 ms because prompts are 21% shorter.</strong> HNSW cut the FAISS search by 94%, matching the standalone benchmark, and nothing else moved. Data parallelism slowed every stage, including embedding, which was neither replicated nor changed.</figcaption>
+    </figure>
+  </section>
+
+  <section aria-labelledby="q-h">
+    <h2 id="q-h">Quantization: faster decode, slower queries</h2>
+    <figure>
+      <header>
+        <h3>The two halves of generation moved in opposite directions</h3>
+        <div class="sub">Generation alone, one process, 4 queries, 48 forced answer tokens, 48 threads. Lower is better.</div>
+      </header>
+      <div class="legend"><span><i class="sw s1"></i>FP32 (baseline)</span><span><i class="sw s2"></i>BF16</span><span><i class="sw s3"></i>INT8, dynamic</span></div>
+      <div class="panels">
+        <div class="panel"><h4>Prefill, ms per query</h4><div class="chart" id="ch-q-pre" aria-label="Bar chart of prefill time by precision"></div></div>
+        <div class="panel"><h4>Decode, ms per answer token</h4><div class="chart" id="ch-q-dec" aria-label="Bar chart of decode time per token by precision"></div></div>
+      </div>
+      <figcaption><strong>BF16 halved the bytes and made decode 1.51 times faster, exactly as the roofline predicts, but it tripled prefill.</strong> A real query has about 270 prompt tokens and 24 answer tokens, so prefill is the bigger half, so the query got slower overall. BF16 also wrote 9% longer answers. INT8 was slower at both.</figcaption>
+      <details><summary>Data table</summary><div class="tbl-wrap"><table>
+        <tr><th>Precision</th><th>Weights</th><th>Prefill ms</th><th>Decode ms per token</th><th>Decode vs FP32</th></tr>
+        <tr><td>FP32</td><td>2.22 GiB</td><td>917.5</td><td>202.6</td><td>1.00×</td></tr>
+        <tr><td>BF16</td><td>1.11 GiB</td><td>2764.5</td><td>134.3</td><td>1.51× faster</td></tr>
+        <tr><td>INT8 (qnnpack)</td><td>1.13 GiB</td><td>1690.2</td><td>267.5</td><td>0.76× (slower)</td></tr>
+      </table></div></details>
+    </figure>
+    <div class="prose">
+      <h3>Why it did not help</h3>
+      <p><strong>BF16:</strong> the Neoverse-N1 cores have no BF16 instructions, so the library converts to FP32, computes, and converts back. That is more work than plain FP32. Decode hides the cost because it waits on memory; prefill pays all of it because it waits on arithmetic.</p>
+      <p><strong>INT8:</strong> PyTorch's dynamic quantization re-quantizes the activations on every call and uses kernels built for batches. Decode handles one token at a time, so that overhead is never spread out. It also leaves the 620 MB vocabulary table in FP32, which is why the weights only halved instead of shrinking to a quarter.</p>
+      <h3>What would make it work</h3>
+      <p>The cores do have fast INT8 dot-product instructions (SDOT). Storing only the weights as INT8 or INT4 and using kernels written for one token at a time, which is what llama.cpp does, would cut the bytes per token by 4 to 8 times without the per-call overhead. That needs a new dependency.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="dp-h">
+    <h2 id="dp-h">Data parallelism: more waiting, little more throughput</h2>
+    <figure>
+      <header>
+        <h3>Four queries in flight across two generation replicas</h3>
+        <div class="sub">One launch each, run back to back. All 100 answers were identical to the baseline, so the difference is contention alone.</div>
+      </header>
+      <div class="legend"><span><i class="sw s1"></i>Baseline</span><span><i class="sw s2"></i>4 in flight, 2 replicas</span></div>
+      <div class="panels">
+        <div class="panel"><h4>Throughput, requests per second</h4><div class="chart" id="ch-dp-tp" aria-label="Bar chart of throughput"></div></div>
+        <div class="panel"><h4>Per-query service time, seconds</h4><div class="chart" id="ch-dp-lat" aria-label="Grouped bar chart of service time percentiles"></div></div>
+      </div>
+      <figcaption><strong>Throughput rose 6.9% while the median query took 3.6 times longer.</strong> The slowest query took 139.6 seconds against 24.6 at baseline. One generation replica already uses about 64% of the machine's bandwidth, so a second one mostly takes turns with the first.</figcaption>
+      <details><summary>Data table</summary><div class="tbl-wrap"><table>
+        <tr><th>Setup</th><th>Requests/s</th><th>p50 s</th><th>p95 s</th><th>p99 s</th><th>Max s</th></tr>
+        <tr><td>Baseline</td><td>0.174</td><td>4.86</td><td>12.73</td><td>16.69</td><td>24.59</td></tr>
+        <tr><td>4 in flight, 2 replicas</td><td>0.186</td><td>17.50</td><td>43.59</td><td>64.54</td><td>139.58</td></tr>
+      </table></div></details>
+    </figure>
+    <div class="prose">
+      <h3>What would make it work</h3>
+      <p>Replication only pays once each replica is cheap. Quantization done properly would cut a replica's bandwidth use from about 64% to about 9%, leaving room for several. Better still is <strong>batching</strong>: decoding several queries' tokens together so one weight read serves all of them. Replicas copy the memory traffic; batching shares it. Today the generation service cannot batch, because its request takes a single query.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="an-h">
+    <h2 id="an-h">Approximate search: correct, but aimed at 0.7% of the time</h2>
+    <figure>
+      <header>
+        <h3>Search latency as the corpus grows</h3>
+        <div class="sub">Single-query FAISS search time, ms, the way the pipeline calls it</div>
+      </header>
+      <div class="legend"><span><i class="sw dot s1"></i>Exact search (flat index, baseline)</span><span><i class="sw dot s2"></i>HNSW, M=32, efSearch=64</span></div>
+      <div class="chart" id="ch-anns" aria-label="Line chart of search latency against corpus size for exact and HNSW search"></div>
+      <figcaption><strong>Exact search grows in step with the corpus, from 26 ms to 77 ms. HNSW stays under 2 ms and finds the same top passage 94.5% to 97.5% of the time.</strong> On the baseline corpus that saves 24.5 ms out of a 5.2-second query, about 0.5%, which is far below the noise.</figcaption>
+      <details><summary>Data table</summary><div class="tbl-wrap"><table>
+        <tr><th>Corpus</th><th>Passages</th><th>Exact ms</th><th>HNSW ms</th><th>Speedup</th><th>HNSW recall@1</th></tr>
+        <tr><td>baseline</td><td>178,890</td><td>26.05</td><td>1.52</td><td>17×</td><td>0.975</td></tr>
+        <tr><td>chunked-128-64</td><td>290,077</td><td>39.96</td><td>0.55</td><td>73×</td><td>0.975</td></tr>
+        <tr><td>chunked-64-32</td><td>578,082</td><td>77.16</td><td>0.74</td><td>104×</td><td>0.945</td></tr>
+      </table></div></details>
+    </figure>
+    <div class="prose">
+      <h3>What would make it matter</h3>
+      <p>Search only matters if it becomes a bigger share of the query: a much larger corpus, a larger top-k, or generation becoming many times faster. Here its real value is memory. IVFPQ shrinks the 64-32 index from 1,694 MB to 61 MB, which on a 29 GiB machine frees room for another generation replica, at the cost of recall dropping to 0.56.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="ch-h">
+    <h2 id="ch-h">Chunking: spend 17 ms in search to save 508 ms in generation</h2>
+    <figure>
+      <header>
+        <h3>Change in per-query time by stage, chunked-128-64 vs baseline</h3>
+        <div class="sub">Milliseconds, three launches each, pooled</div>
+      </header>
+      <div class="chart" id="ch-chunk" aria-label="Diverging bar chart of per-stage time change for chunking"></div>
+      <figcaption><strong>Search pays a little because the corpus is 1.62 times larger; generation saves a lot because prompts dropped from 267 to 211 tokens.</strong> Quality held: ROUGE-L F1 was 25.93% against 25.01%, with 32 of 100 answers changed because different chunks were retrieved.</figcaption>
+      <details><summary>Data table</summary><div class="tbl-wrap"><table>
+        <tr><th>Stage</th><th>Baseline ms</th><th>Chunked ms</th><th>Change ms</th></tr>
+        <tr><td>Embedding</td><td>170.34</td><td>163.18</td><td>−7.2</td></tr>
+        <tr><td>Search</td><td>34.27</td><td>51.47</td><td>+17.2</td></tr>
+        <tr><td>Generation</td><td>5027.84</td><td>4519.59</td><td>−508.3</td></tr>
+        <tr><td>Total per query</td><td>5232.54</td><td>4734.37</td><td>−498.2</td></tr>
+      </table></div></details>
+    </figure>
+    <div class="prose">
+      <p>This is a generation optimization that happens to live in the retrieval data. The 64-32 corpus has even shorter passages and should shorten prompts further, but it has not been measured end to end yet. It is the cheapest experiment left.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="nx-h">
+    <h2 id="nx-h">What it would take, in order</h2>
+    <div class="prose"><p>The four directions depend on each other. Treating them as separate checkboxes is how we got one win out of four. Each step below makes the next one possible.</p></div>
+    <ol class="chain">
+      <li><b>Weight-only INT8 or INT4 generation</b><span>The only change that reduces bytes per token, which is the only thing decode is waiting on. llama.cpp's kernels use the SDOT instructions this CPU has.</span></li>
+      <li><b>Batched decoding</b><span>One weight read serves several queries. Needs the internal generate request to accept a list of queries; the public API stays the same.</span></li>
+      <li><b>Then data parallelism</b><span>Once each replica uses a small share of bandwidth, several can run side by side.</span></li>
+      <li><b>Approximate search for memory headroom</b><span>A smaller index leaves room for those replicas, which is worth more here than the latency saving.</span></li>
+      <li><b>Extend chunking to 64-32</b><span>Independent of the rest, and the one direction already shown to work.</span></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="lm-h">
+    <h2 id="lm-h">Limits of these results</h2>
+    <ul class="limits">
+      <li>Only short-query-answerable was measured end to end. The other three traces were not.</li>
+      <li>Data parallelism was run once. Its effect is far larger than the noise and every answer matched the baseline, but it has no error bars.</li>
+      <li>The top-down CPU counter analysis has not been run yet; it needs root.</li>
+      <li>With more than one query in flight, the per-service timing logs report negative transport times, so the stage split for data parallelism should be read as stage totals only.</li>
+      <li>These conclusions are about this machine's memory layout as much as the workload. With all eight channels populated per socket, the ridge would drop to roughly 5 FLOP per byte and the ranking could change.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <span>Data: <code>results/m2/</code> on branch <code>feat/m2/profiling-and-optimization</code>, pull request #4 in cornell-ece6765/team-03.</span>
+    <span>Machine: en-ec-altra-03, Ubuntu 24.04.4, kernel 6.8.0. Models: Qwen3-0.6B for generation, jina-embeddings-v5-text-nano for embedding.</span>
+  </footer>
+</main>
+
+<div id="tip" role="tooltip" hidden></div>
+
+<script>
+(function () {
+  const NS = "http://www.w3.org/2000/svg";
+  function s(tag, attrs, parent) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs || {}) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function t(parent, x, y, text, cls, anchor) {
+    const e = s("text", { x: x, y: y, class: cls || "", "text-anchor": anchor || "start" }, parent);
+    e.textContent = text;
+    return e;
+  }
+  const lin = (d0, d1, r0, r1) => v => r0 + (v - d0) / (d1 - d0) * (r1 - r0);
+  const lg = (d0, d1, r0, r1) => { const a = Math.log10(d0), b = Math.log10(d1); return v => r0 + (Math.log10(v) - a) / (b - a) * (r1 - r0); };
+  function frame(id, h) {
+    const host = document.getElementById(id);
+    host.textContent = "";
+    const w = Math.max(280, Math.floor(host.clientWidth));
+    const svg = s("svg", { width: w, height: h, viewBox: "0 0 " + w + " " + h }, host);
+    return { svg: svg, w: w, h: h };
+  }
+  function hit(el, tip) { el.setAttribute("data-tip", tip); el.setAttribute("tabindex", "0"); el.setAttribute("role", "img"); el.setAttribute("aria-label", tip.replace(/\n/g, ". ")); return el; }
+  const fmt = (v, d) => v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+  function barPath(x, y, w, h, r) {
+    r = Math.min(r, w / 2, h);
+    if (h <= 0) return "";
+    return "M" + x + "," + (y + h) + "V" + (y + r) + "Q" + x + "," + y + " " + (x + r) + "," + y + "H" + (x + w - r) + "Q" + (x + w) + "," + y + " " + (x + w) + "," + (y + r) + "V" + (y + h) + "Z";
+  }
+  function hbarPath(x0, x1, y, h, r) {
+    // Horizontal bar anchored at x0, rounded only at the data end x1.
+    const w = Math.abs(x1 - x0); r = Math.min(r, w, h / 2);
+    if (w < 0.5) return "";
+    if (x1 >= x0) return "M" + x0 + "," + y + "H" + (x1 - r) + "Q" + x1 + "," + y + " " + x1 + "," + (y + r) + "V" + (y + h - r) + "Q" + x1 + "," + (y + h) + " " + (x1 - r) + "," + (y + h) + "H" + x0 + "Z";
+    return "M" + x0 + "," + y + "H" + (x1 + r) + "Q" + x1 + "," + y + " " + x1 + "," + (y + r) + "V" + (y + h - r) + "Q" + x1 + "," + (y + h) + " " + (x1 + r) + "," + (y + h) + "H" + x0 + "Z";
+  }
+
+  /* Bandwidth vs threads */
+  function drawBW() {
+    const { svg, w, h } = frame("ch-bw", 230);
+    const L = 40, R = 18, T = 26, B = 40;
+    const data = [[1, 14.2], [2, 17.0], [4, 18.9], [8, 19.7], [16, 18.6], [32, 16.4], [64, 15.8], [80, 15.5]];
+    const x = lg(1, 80, L, w - R), y = lin(0, 22, h - B, T);
+    [0, 5, 10, 15, 20].forEach(v => { s("line", { x1: L, x2: w - R, y1: y(v), y2: y(v), class: v === 0 ? "base" : "grid" }, svg); t(svg, L - 8, y(v) + 4, String(v), "ax", "end"); });
+    let lastX = -99;
+    data.forEach(([th]) => { const px = x(th); if (px - lastX > 26 || th === 80) { if (th === 64 && x(80) - px < 26) return; t(svg, px, h - B + 17, String(th), "ax", "middle"); lastX = px; } });
+    t(svg, L, T - 12, "GB/s", "axl");
+    t(svg, (L + w - R) / 2, h - 6, "threads", "axl", "middle");
+    const pts = data.map(([a, b]) => [x(a), y(b)]);
+    s("path", { d: "M" + pts[0][0] + "," + y(0) + pts.map(p => "L" + p[0] + "," + p[1]).join("") + "L" + pts[pts.length - 1][0] + "," + y(0) + "Z", class: "f-s1 area" }, svg);
+    s("path", { d: "M" + pts.map(p => p[0] + "," + p[1]).join("L"), class: "line st-s1" }, svg);
+    data.forEach(([th, gb], i) => {
+      const g = s("g", {}, svg);
+      hit(s("circle", { cx: pts[i][0], cy: pts[i][1], r: 12, class: "hit" }, g), th + (th === 1 ? " thread" : " threads") + "\n" + fmt(gb, 1) + " GB/s");
+      s("circle", { cx: pts[i][0], cy: pts[i][1], r: (th === 8 || th === 80) ? 5.5 : 4, class: "f-s1 ring mk" }, g);
+    });
+    const pk = pts[3];
+    t(svg, pk[0], pk[1] - 12, "19.7 peak at 8", "val", "middle");
+    const en = pts[pts.length - 1];
+    t(svg, en[0] - 4, en[1] + 22, "15.5 at 80", "valm", "end");
+  }
+
+  /* Roofline */
+  function drawRoof() {
+    const { svg, w, h } = frame("ch-roof", 330);
+    const L = 50, R = 16, T = 18, B = 44;
+    const x = lg(0.1, 1000, L, w - R), y = lg(1, 3000, h - B, T);
+    const bw = 26.4, peak = 1157.2, ridge = peak / bw;
+    [0.1, 1, 10, 100, 1000].forEach(v => { s("line", { x1: x(v), x2: x(v), y1: T, y2: h - B, class: "grid" }, svg); t(svg, x(v), h - B + 17, String(v), "ax", "middle"); });
+    [1, 10, 100, 1000].forEach(v => { s("line", { x1: L, x2: w - R, y1: y(v), y2: y(v), class: "grid" }, svg); t(svg, L - 8, y(v) + 4, v.toLocaleString("en-US"), "ax", "end"); });
+    s("line", { x1: L, x2: w - R, y1: h - B, y2: h - B, class: "base" }, svg);
+    t(svg, (L + w - R) / 2, h - 8, "FLOP per byte of memory traffic", "axl", "middle");
+    t(svg, L, T - 6, "GFLOP/s", "axl");
+    s("polyline", { points: x(0.1) + "," + y(bw * 0.1) + " " + x(ridge) + "," + y(peak) + " " + x(1000) + "," + y(peak), class: "roof" }, svg);
+    s("line", { x1: x(ridge), x2: x(ridge), y1: y(peak), y2: h - B, class: "dash" }, svg);
+    t(svg, x(ridge) + 6, h - B - 8, "ridge 43.8", "ax");
+    t(svg, w - R - 4, y(peak) - 8, "compute roof 1,157 GFLOP/s", "valm", "end");
+    const ax0 = 0.25, ay0 = bw * ax0, ax1 = 2.5, ay1 = bw * ax1;
+    const ang = Math.atan2(y(ay1) - y(ay0), x(ax1) - x(ax0)) * 180 / Math.PI;
+    const lx = x(ax0), ly = y(ay0) - 9;
+    t(svg, lx, ly, "memory roof 26.4 GB/s", "valm").setAttribute("transform", "rotate(" + ang.toFixed(1) + " " + lx + " " + ly + ")");
+    const phases = [
+      { k: "Prefill", ai: 101, got: 235.8, ceil: 1157.2, pct: 20, cls: "s1", lim: "compute", anchor: "end" },
+      { k: "Decode", ai: 0.5, got: 8.47, ceil: 13.2, pct: 64, cls: "s2", lim: "memory bandwidth", anchor: "start" }
+    ];
+    phases.forEach(p => {
+      s("line", { x1: x(p.ai), x2: x(p.ai), y1: y(p.ceil), y2: y(p.got), class: "drop st-" + p.cls }, svg);
+      const g = s("g", {}, svg);
+      hit(s("circle", { cx: x(p.ai), cy: y(p.got), r: 14, class: "hit" }, g), p.k + "\n" + p.ai + " FLOP per byte\n" + fmt(p.got, 1) + " of " + fmt(p.ceil, 1) + " GFLOP/s possible (" + p.pct + "%)\nLimited by " + p.lim);
+      s("circle", { cx: x(p.ai), cy: y(p.got), r: 6, class: "f-" + p.cls + " ring mk" }, g);
+      const dx = p.anchor === "start" ? 11 : -11;
+      t(svg, x(p.ai) + dx, y(p.got) + 4, p.k + ", " + p.pct + "% of roof", "lbl", p.anchor);
+    });
+  }
+
+  /* One launch vs three launches */
+  function drawEst() {
+    const rows = [
+      { name: "Chunked database", sub: "chunked-128-64", n3: -9.5, ci: 6.98, n1: -19.5, se: 2.7 },
+      { name: "Approximate search", sub: "HNSW", n3: -3.4, ci: 8.37, n1: -17.9, se: 0.8 },
+      { name: "Quantization", sub: "BF16", n3: 31.4, ci: 7.20, n1: 20.0, se: 8.7 }
+    ];
+    const rowH = 66, T = 8, B = 44;
+    const { svg, w, h } = frame("ch-est", T + rows.length * rowH + B);
+    const L = 8, R = 10;
+    const x = lin(-30, 45, L, w - R);
+    const y0 = T, y1 = T + rows.length * rowH;
+    [-20, -10, 0, 10, 20, 30, 40].forEach(v => {
+      s("line", { x1: x(v), x2: x(v), y1: y0, y2: y1, class: v === 0 ? "base" : "grid" }, svg);
+      t(svg, x(v), y1 + 16, (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v) + "%", "ax", "middle");
+    });
+    t(svg, x(0) - 8, y1 + 34, "← faster", "axl", "end");
+    t(svg, x(0) + 8, y1 + 34, "slower →", "axl", "start");
+    rows.forEach((r, i) => {
+      const cy = T + i * rowH + 44;
+      const lab = t(svg, L, cy - 22, r.name, "lbl");
+      const sp = s("tspan", { class: "lbl2", dx: 6 }, lab); sp.textContent = r.sub;
+      const sign = r.n3 > 0 ? "+" : "−";
+      t(svg, w - R, cy - 22, sign + Math.abs(r.n3).toFixed(1) + "%  " + r.se + " SE", "val", "end");
+      const g = s("g", {}, svg);
+      hit(s("rect", { x: L, y: cy - 34, width: w - L - R, height: 50, class: "hit" }, g),
+        r.name + " (" + r.sub + ")\nThree launches: " + Math.abs(r.n3).toFixed(1) + "% " + (r.n3 < 0 ? "faster" : "slower") + ", ±" + r.ci.toFixed(1) + "%, " + r.se + " SE\nOne launch: " + Math.abs(r.n1).toFixed(1) + "% " + (r.n1 < 0 ? "faster" : "slower"));
+      s("line", { x1: x(r.n1), x2: x(r.n3), y1: cy, y2: cy, class: "dash" }, svg);
+      s("line", { x1: x(r.n3 - r.ci), x2: x(r.n3 + r.ci), y1: cy, y2: cy, class: "line st-s1" }, svg);
+      [r.n3 - r.ci, r.n3 + r.ci].forEach(v => s("line", { x1: x(v), x2: x(v), y1: cy - 6, y2: cy + 6, class: "line st-s1" }, svg));
+      s("circle", { cx: x(r.n1), cy: cy, r: 6, class: "hollow st-s2" }, svg);
+      s("circle", { cx: x(r.n3), cy: cy, r: 6.5, class: "f-s1 ring" }, svg);
+    });
+  }
+
+  /* Vertical bar panel */
+  function drawBars(id, items, opts) {
+    const { svg, w, h } = frame(id, 220);
+    const L = 44, R = 8, T = 22, B = 30;
+    const max = opts.max;
+    const y = lin(0, max, h - B, T);
+    opts.ticks.forEach(v => { s("line", { x1: L, x2: w - R, y1: y(v), y2: y(v), class: v === 0 ? "base" : "grid" }, svg); t(svg, L - 8, y(v) + 4, opts.tick(v), "ax", "end"); });
+    const groups = opts.groups || [null];
+    const per = items.length / groups.length;
+    const band = (w - L - R) / groups.length;
+    groups.forEach((gname, gi) => {
+      const gx = L + gi * band;
+      const inner = band * 0.78;
+      const bw = Math.min(46, (inner - (per - 1) * 2) / per);
+      const startX = gx + (band - (bw * per + 2 * (per - 1))) / 2;
+      for (let j = 0; j < per; j++) {
+        const it = items[gi * per + j];
+        const bx = startX + j * (bw + 2);
+        const g = s("g", {}, svg);
+        hit(s("rect", { x: bx - 2, y: T, width: bw + 4, height: h - B - T, class: "hit" }, g), it.tip);
+        s("path", { d: barPath(bx, y(it.v), bw, y(0) - y(it.v), 4), class: "f-" + it.cls + " mk" }, g);
+        if (opts.labelAll || per === 1 || groups.length === 1) t(svg, bx + bw / 2, y(it.v) - 6, opts.val(it.v), "val", "middle");
+        if (!gname) t(svg, bx + bw / 2, h - B + 17, it.label, "ax", "middle");
+      }
+      if (gname) t(svg, gx + band / 2, h - B + 17, gname, "ax", "middle");
+    });
+  }
+
+  function drawQuant() {
+    drawBars("ch-q-pre", [
+      { v: 917.5, cls: "s1", label: "FP32", tip: "FP32\nPrefill 917.5 ms per query" },
+      { v: 2764.5, cls: "s2", label: "BF16", tip: "BF16\nPrefill 2,764.5 ms per query\n3.0× FP32" },
+      { v: 1690.2, cls: "s3", label: "INT8", tip: "INT8, dynamic (qnnpack)\nPrefill 1,690.2 ms per query\n1.8× FP32" }
+    ], { max: 3200, ticks: [0, 1000, 2000, 3000], tick: v => v === 0 ? "0" : (v / 1000) + "k", val: v => fmt(v, 0) });
+    drawBars("ch-q-dec", [
+      { v: 202.6, cls: "s1", label: "FP32", tip: "FP32\nDecode 202.6 ms per token" },
+      { v: 134.3, cls: "s2", label: "BF16", tip: "BF16\nDecode 134.3 ms per token\n1.51× faster than FP32" },
+      { v: 267.5, cls: "s3", label: "INT8", tip: "INT8, dynamic (qnnpack)\nDecode 267.5 ms per token\n1.32× slower than FP32" }
+    ], { max: 300, ticks: [0, 100, 200, 300], tick: v => String(v), val: v => fmt(v, 1) });
+  }
+
+  function drawDP() {
+    drawBars("ch-dp-tp", [
+      { v: 0.174, cls: "s1", label: "Baseline", tip: "Baseline\n0.174 requests per second" },
+      { v: 0.186, cls: "s2", label: "4 × 2", tip: "4 in flight, 2 replicas\n0.186 requests per second\n+6.9% vs baseline" }
+    ], { max: 0.22, ticks: [0, 0.05, 0.10, 0.15, 0.20], tick: v => v.toFixed(2), val: v => v.toFixed(3) });
+    const b = [4.86, 12.73, 16.69], d = [17.50, 43.59, 64.54], names = ["p50", "p95", "p99"];
+    const items = [];
+    names.forEach((n, i) => {
+      items.push({ v: b[i], cls: "s1", tip: "Baseline, " + n + "\n" + fmt(b[i], 2) + " s per query" });
+      items.push({ v: d[i], cls: "s2", tip: "4 in flight, 2 replicas, " + n + "\n" + fmt(d[i], 2) + " s per query\n" + (d[i] / b[i]).toFixed(1) + "× baseline" });
+    });
+    drawBars("ch-dp-lat", items, { groups: names, max: 72, ticks: [0, 20, 40, 60], tick: v => String(v), val: v => v.toFixed(1), labelAll: true });
+  }
+
+  function drawANNS() {
+    const { svg, w, h } = frame("ch-anns", 270);
+    const L = 40, T = 22, B = 46;
+    const R = w < 520 ? 16 : 120;
+    const x = lin(150000, 610000, L, w - R), y = lin(0, 85, h - B, T);
+    [0, 20, 40, 60, 80].forEach(v => { s("line", { x1: L, x2: w - R, y1: y(v), y2: y(v), class: v === 0 ? "base" : "grid" }, svg); t(svg, L - 8, y(v) + 4, String(v), "ax", "end"); });
+    t(svg, L, T - 8, "ms", "axl");
+    const corp = [[178890, "baseline"], [290077, "128-64"], [578082, "64-32"]];
+    corp.forEach(([n, lab]) => { t(svg, x(n), h - B + 16, Math.round(n / 1000) + "k", "ax", "middle"); t(svg, x(n), h - B + 30, lab, "axl", "middle"); });
+    const series = [
+      { k: "Exact search", cls: "s1", v: [26.05, 39.96, 77.16], rec: [1, 1, 1] },
+      { k: "HNSW", cls: "s2", v: [1.52, 0.55, 0.74], rec: [0.975, 0.975, 0.945] }
+    ];
+    series.forEach(sr => {
+      const pts = corp.map(([n], i) => [x(n), y(sr.v[i])]);
+      s("path", { d: "M" + pts.map(p => p[0] + "," + p[1]).join("L"), class: "line st-" + sr.cls }, svg);
+      pts.forEach((p, i) => {
+        const g = s("g", {}, svg);
+        hit(s("circle", { cx: p[0], cy: p[1], r: 12, class: "hit" }, g), sr.k + ", " + corp[i][1] + " corpus\n" + corp[i][0].toLocaleString("en-US") + " passages\n" + fmt(sr.v[i], 2) + " ms per query\nRecall@1 " + sr.rec[i].toFixed(3));
+        s("circle", { cx: p[0], cy: p[1], r: 4.5, class: "f-" + sr.cls + " ring mk" }, g);
+      });
+      if (w >= 520) {
+        const last = pts[pts.length - 1];
+        t(svg, last[0] + 10, last[1] + 4, sr.k + " " + fmt(sr.v[2], sr.v[2] < 10 ? 2 : 1) + " ms", "lbl", "start");
+      }
+    });
+  }
+
+  function drawChunk() {
+    const rows = [
+      { k: "Embedding", v: -7.2 },
+      { k: "Search", v: 17.2, note: "FAISS index +16.0 ms" },
+      { k: "Generation", v: -508.3 },
+      { k: "Total per query", v: -498.2, bold: true }
+    ];
+    const rowH = 46, T = 6, B = 30;
+    const { svg, w, h } = frame("ch-chunk", T + rows.length * rowH + B);
+    const narrow = w < 520;
+    const LW = narrow ? 0 : 130, R = 8;
+    const x = lin(-560, 80, LW + 6, w - R - (narrow ? 0 : 70));
+    const yb = T + rows.length * rowH;
+    [-500, -400, -300, -200, -100, 0].forEach(v => {
+      s("line", { x1: x(v), x2: x(v), y1: T, y2: yb, class: v === 0 ? "base" : "grid" }, svg);
+      if (!narrow || v % 200 === 0) t(svg, x(v), yb + 16, (v < 0 ? "−" : "") + Math.abs(v), "ax", "middle");
+    });
+    rows.forEach((r, i) => {
+      const top = T + i * rowH;
+      const barY = narrow ? top + 22 : top + 12;
+      const barH = narrow ? 16 : 20;
+      if (narrow) t(svg, 0, top + 15, r.k, "lbl");
+      else t(svg, 0, barY + barH / 2 + 4, r.k, "lbl");
+      const g = s("g", {}, svg);
+      hit(s("rect", { x: 0, y: top + 2, width: w, height: rowH - 4, class: "hit" }, g), r.k + "\n" + (r.v > 0 ? "+" : "−") + fmt(Math.abs(r.v), 1) + " ms per query" + (r.note ? "\n" + r.note : ""));
+      s("path", { d: hbarPath(x(0), x(r.v), barY, barH, 4), class: (r.v < 0 ? "f-fast" : "f-slow") + " mk" }, g);
+      const txt = (r.v > 0 ? "+" : "−") + fmt(Math.abs(r.v), 1) + " ms";
+      if (narrow) t(svg, w - R, top + 15, txt, r.bold ? "val" : "valm", "end");
+      else t(svg, w - R, barY + barH / 2 + 4, txt, r.bold ? "val" : "valm", "end");
+    });
+  }
+
+  /* Stage heatmap table */
+  function buildHeatmap() {
+    const cols = ["Quantization<br>BF16", "Approx. search<br>HNSW", "Chunked<br>128-64", "Data parallel<br>4×2, one launch"];
+    const rows = [
+      { grp: "Time per query" },
+      { k: "Embedding", base: 170.34, v: [184.00, 156.57, 163.18, 950.18], unit: "ms" },
+      { k: "FAISS search", base: 26.02, v: [29.15, 1.56, 41.97, 37.97], unit: "ms" },
+      { k: "Tokenize prompt", base: 8.84, v: [6.35, 8.77, 6.27, 9.35], unit: "ms" },
+      { k: "Model forward pass", base: 5008.30, v: [6636.41, 4865.95, 4502.00, 20348.04], unit: "ms" },
+      { k: "Total per query", base: 5232.54, v: [6875.42, 5054.48, 4734.37, 21139.50], unit: "ms" },
+      { grp: "Work per query (exact counts, no timing noise)" },
+      { k: "Prompt tokens", base: 266.8, v: [266.8, 265.7, 211.0, 266.8], unit: "tok", count: true },
+      { k: "Answer tokens", base: 23.9, v: [26.0, 23.7, 22.4, 23.9], unit: "tok", count: true }
+    ];
+    const tbl = document.getElementById("hm");
+    let html = "<thead><tr><th>Stage</th>" + cols.map(c => "<th>" + c + "</th>").join("") + "</tr></thead><tbody>";
+    rows.forEach(r => {
+      if (r.grp) { html += '<tr class="grp"><td colspan="5">' + r.grp + "</td></tr>"; return; }
+      html += "<tr><td>" + r.k + '<span class="bm">' + fmt(r.base, r.count ? 1 : 2) + " " + r.unit + "</span></td>";
+      r.v.forEach((v, i) => {
+        const pct = (v - r.base) / r.base * 100;
+        const a = Math.abs(pct);
+        let cls;
+        if (r.count ? a < 0.5 : a < 15) cls = "b-noise";
+        else { const lvl = a >= 150 ? 3 : a >= 50 ? 2 : 1; cls = (pct < 0 ? "b-f" : "b-s") + lvl; }
+        const d = v - r.base;
+        const pTxt = (a < 0.05) ? "0%" : (pct > 0 ? "+" : "−") + (a >= 10 ? Math.round(a) : a.toFixed(1)) + "%";
+        const dTxt = (d >= 0 ? "+" : "−") + fmt(Math.abs(d), r.count ? 1 : (Math.abs(d) >= 100 ? 0 : 1)) + " " + r.unit;
+        const label = r.k + ", " + cols[i].replace("<br>", " ") + ": " + pTxt + " (" + dTxt + ")" + (cls === "b-noise" && !r.count ? ", within timing noise" : "");
+        html += '<td><div class="cell ' + cls + '" title="' + label + '"><span class="p">' + pTxt + '</span><span class="d">' + dTxt + "</span></div></td>";
+      });
+      html += "</tr>";
+    });
+    tbl.innerHTML = html + "</tbody>";
+  }
+
+  /* Tooltip */
+  const tipEl = document.getElementById("tip");
+  function showTip(text, cx, cy) {
+    tipEl.textContent = "";
+    text.split("\n").forEach((line, i) => { const d = document.createElement("div"); d.textContent = line; if (i === 0) d.className = "tt-h"; tipEl.appendChild(d); });
+    tipEl.hidden = false;
+    const r = tipEl.getBoundingClientRect();
+    let left = cx + 14, top = cy + 14;
+    if (left + r.width > window.innerWidth - 8) left = Math.max(8, cx - r.width - 14);
+    if (top + r.height > window.innerHeight - 8) top = Math.max(8, cy - r.height - 14);
+    tipEl.style.left = left + "px"; tipEl.style.top = top + "px";
+  }
+  document.addEventListener("pointermove", e => {
+    const m = e.target && e.target.closest ? e.target.closest("[data-tip]") : null;
+    if (m) showTip(m.getAttribute("data-tip"), e.clientX, e.clientY); else tipEl.hidden = true;
+  });
+  document.addEventListener("focusin", e => {
+    const m = e.target && e.target.closest ? e.target.closest("[data-tip]") : null;
+    if (m) { const b = m.getBoundingClientRect(); showTip(m.getAttribute("data-tip"), b.left + b.width / 2, b.top + b.height / 2); }
+  });
+  document.addEventListener("focusout", () => { tipEl.hidden = true; });
+  document.addEventListener("scroll", () => { tipEl.hidden = true; }, { passive: true });
+
+  function renderAll() { drawBW(); drawRoof(); drawEst(); drawQuant(); drawDP(); drawANNS(); drawChunk(); }
+  buildHeatmap();
+  renderAll();
+  let lastW = document.querySelector(".wrap").clientWidth, raf = 0;
+  new ResizeObserver(() => {
+    const nw = document.querySelector(".wrap").clientWidth;
+    if (nw === lastW) return;
+    lastW = nw; cancelAnimationFrame(raf); raf = requestAnimationFrame(renderAll);
+  }).observe(document.querySelector(".wrap"));
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(renderAll);
+})();
+</script>
+
+</body></html>
