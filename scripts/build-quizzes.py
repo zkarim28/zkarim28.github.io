@@ -472,6 +472,12 @@ def quizzes():
                         'active vs inactive low-power modes, the 90%-dynamic-range payoff. '
                         '6 multiple choice + 6 true/false, with the paper\'s figures.'},
              'paper-quiz/5/quiz-paper8.md', 'paper-quiz/5/answer-key.md'),
+        load({'id': 'practice-thunderbolt', 'official': False, 'kind': 'practice',
+              'title': 'Practice: Thunderbolt + Topic 3 Lecture',
+              'subtitle': 'Paper 9, Li et al., OSDI \'20 + Topic 3 §4.3–5.4',
+              'covers': 'Network I/O overheads, sync vs async, top-down analysis, datacenter taxes; '
+                        'Thunderbolt load shaping (RUMD, thresholds), CPU bandwidth control, CPU jailing, QoS differentiation.'},
+             'combo-quiz/5/combo-quiz-5.md'),
     ]
 
 
