@@ -478,6 +478,13 @@ def quizzes():
               'covers': 'Network I/O overheads, sync vs async, top-down analysis, datacenter taxes; '
                         'Thunderbolt load shaping (RUMD, thresholds), CPU bandwidth control, CPU jailing, QoS differentiation.'},
              'combo-quiz/5/combo-quiz-5.md'),
+        load({'id': 'practice-topic4', 'official': False, 'kind': 'practice',
+              'title': 'Practice: Topic 4 Energy and Power',
+              'subtitle': 'Topic 4 lectures (Oct 14) + handout + wire-energy reading',
+              'covers': 'PUE/SPUE/TPUE, power delivery losses, energy proportionality, P-/C-states, DRAM vs SSD, '
+                        'optical links, oversubscription and stranded power, synchronized training, Thunderbolt, '
+                        'CV\u00b2 wire energy and the end of Dennard scaling.'},
+             'topic-quiz/6/topic-quiz-6.md'),
     ]
 
 
