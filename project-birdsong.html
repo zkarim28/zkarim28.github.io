@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Birdsong Synthesizer — DDS on Raspberry Pi Pico 2 — Zarif Karim</title>
+  <meta content="Birdsong synthesizer on the Raspberry Pi Pico 2 (RP2350) using direct digital synthesis, SPI DAC, ADC slider, and keypad record/playback — ECE 5730, Cornell University" name="description">
+  <meta content="embedded systems, Raspberry Pi Pico 2, RP2350, DDS, SPI, DAC, ADC, protothreads, ECE 5730, Cornell, audio synthesis" name="keywords">
+
+  <link href="assets/img/kiwi.png" rel="icon">
+
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <link href="assets/css/style.css" rel="stylesheet">
+
+  <style>
+    .proj-section { margin-bottom: 40px; }
+    .proj-section h3 {
+      font-size: 1rem;
+      font-family: var(--mono, monospace);
+      color: var(--cyan, #00d4ff);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border, #1e3a5f);
+    }
+    .proj-section p {
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text-secondary, #94a3b8);
+      margin-bottom: 10px;
+    }
+    .proj-section ul {
+      padding-left: 18px;
+      margin: 0;
+    }
+    .proj-section ul li {
+      font-size: 14px;
+      color: var(--text-secondary, #94a3b8);
+      line-height: 1.8;
+      margin-bottom: 4px;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-family: var(--mono, monospace);
+      color: var(--cyan, #00d4ff);
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 3px;
+      padding: 2px 8px;
+      margin: 3px 3px 3px 0;
+    }
+    .portfolio-details-slider .swiper-slide iframe {
+      width: 100%;
+      aspect-ratio: 16/9;
+      height: auto;
+      display: block;
+      border: none;
+      border-radius: 4px;
+    }
+    .portfolio-details-slider .swiper-slide img {
+      width: 100%;
+      height: 420px;
+      object-fit: contain;
+      background: #0d1426;
+      border-radius: 4px;
+      display: block;
+    }
+    .portfolio-info strong { color: var(--cyan, #00d4ff); }
+    .portfolio-info a { color: var(--cyan, #00d4ff); }
+    .portfolio-info a:hover { color: #7ee8ff; }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header id="header" class="fixed-top header-inner-pages">
+    <div class="container d-flex align-items-center justify-content-between">
+
+      <h1 class="logo"><a href="index.html">Zarif Karim</a></h1>
+
+      <nav id="navbar" class="navbar">
+        <ul>
+          <li><a class="nav-link" href="/index.html#hero">Home</a></li>
+          <li><a class="nav-link" href="/index.html#about">About</a></li>
+          <li><a class="nav-link active" href="/index.html#portfolio">Portfolio</a></li>
+          <li><a class="nav-link" href="/index.html#skills">Skills</a></li>
+          <li><a class="nav-link" href="/index.html#coursework">Coursework</a></li>
+          <li><a class="nav-link" href="/index.html#yt">YouTube</a></li>
+          <li><a class="nav-link" href="/index.html#resume">Resume</a></li>
+          <li><a class="nav-link" href="/index.html#pd">Songs</a></li>
+          <li><a class="nav-link" href="/index.html#contact">Contact</a></li>
+        </ul>
+        <i class="bi bi-list mobile-nav-toggle"></i>
+      </nav>
+
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- Breadcrumbs -->
+    <section class="breadcrumbs">
+      <div class="container">
+        <div class="section-title text-center">
+          <h1>Birdsong Synthesizer — DDS on the Raspberry Pi Pico 2</h1>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Embedded Project 1 — ECE 5730</h2>
+          <ol>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="/index.html#portfolio">Portfolio</a></li>
+            <li>Project Details</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- Portfolio Details -->
+    <section id="portfolio-details" class="portfolio-details">
+      <div class="container">
+
+        <div class="row gy-4">
+
+          <!-- Left: media slider -->
+          <div class="col-lg-8">
+            <div class="portfolio-details-slider swiper">
+              <div class="swiper-wrapper align-items-center">
+
+                <div class="swiper-slide">
+                  <img src="assets/img/portfolio/birdsong_cover.jpg" alt="Northern Cardinal — the target birdsong">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="assets/img/portfolio/birdsong_dds.jpg" alt="DDS Phase Increment Formula">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="assets/img/portfolio/birdsong_wiring.jpg" alt="Wiring Diagram">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="assets/img/portfolio/birdsong_setup.jpg" alt="Initial DDS Circuit and 800 Hz Sine Wave">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="assets/img/portfolio/birdsong_isr.jpg" alt="Timer ISR Scope Output (20 µs Period)">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="assets/img/portfolio/birdsong_debounce.jpg" alt="Debounce FSM and Mode Flags">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="assets/img/portfolio/birdsong_fsm.jpg" alt="Main Control FSM — Play, Record, Compose">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="assets/img/portfolio/birdsong_scope.jpg" alt="4.7 kHz Output on Oscilloscope">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="assets/img/portfolio/birdsong_merlin.jpg" alt="Merlin Bird ID Listening to the Synthesizer">
+                </div>
+
+              </div>
+              <div class="swiper-pagination"></div>
+            </div>
+          </div>
+
+          <!-- Right: sidebar -->
+          <div class="col-lg-4">
+
+            <div class="portfolio-info">
+              <h3>Project information</h3>
+              <ul>
+                <li><strong>Course:</strong> ECE 5730</li>
+                <li><strong>Date:</strong> September 2026</li>
+                <li><strong>Team:</strong> Amber Li, Ivan Huang, Zarif Karim</li>
+                <li><strong>Platform:</strong> Raspberry Pi Pico 2 (RP2350)</li>
+                <li><strong>Peripherals:</strong> MCP4822 12-bit SPI DAC, slide potentiometer, 3×4 keypad, SPDT switch</li>
+                <li><strong>Report:</strong> <a href="assets/reports/ECE5730_Lab1_Birdsong_Synthesizer.pdf" target="_blank">Lab Report (PDF)</a></li>
+              </ul>
+            </div>
+
+            <!-- Tags -->
+            <div style="margin-top:20px;">
+              <span class="tag">Embedded C</span>
+              <span class="tag">RP2350</span>
+              <span class="tag">DDS</span>
+              <span class="tag">SPI</span>
+              <span class="tag">ADC / DAC</span>
+              <span class="tag">Interrupts</span>
+              <span class="tag">Protothreads</span>
+              <span class="tag">Audio Synthesis</span>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Write-up -->
+        <div class="row mt-5">
+          <div class="col-12">
+
+            <div class="proj-section">
+              <h3>Summary</h3>
+              <p>As part of Cornell's ECE 5730 microcontroller course, my team built a birdsong synthesizer on the Raspberry Pi Pico 2 (RP2350). The goal was to reproduce bird whistles accurately enough for the Merlin Bird ID app to recognize them. Audio is generated with Direct Digital Synthesis (DDS), sent over SPI to an external 12-bit DAC, and played through a 3.5 mm audio jack. A slide potentiometer sets pitch or volume, and a keypad lets you record, play back, and compose sequences of sound bites like a bird song.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>Direct Digital Synthesis</h3>
+              <p>A 32-bit phase accumulator is incremented at a fixed 50 kHz sample rate. The top 8 bits index a 256-entry sine lookup table, and the output frequency is set by the phase increment N = (F<sub>out</sub> / F<sub>s</sub>) · 2<sup>32</sup>.</p>
+              <ul>
+                <li>The sine table is scaled to ±2047 and offset by 2048 so it fills the DAC's full unsigned 0–4095 range without clipping</li>
+                <li>Silence is produced by setting the phase increment to 0 rather than zeroing the DAC, so the output holds its last value and avoids start-up clicks</li>
+                <li>Sample generation runs in a timer ISR so audio is never disturbed by the protothread scheduler</li>
+              </ul>
+            </div>
+
+            <div class="proj-section">
+              <h3>Audio Output: SPI and DAC</h3>
+              <p>The Pico talks to the MCP4822 over SPI1 at 20 MHz with 16-bit frames: four configuration bits (channel, 1× gain, active mode) followed by 12 data bits. LDAC is tied low so outputs update immediately. The waveform was first verified on an oscilloscope at 800 Hz, then wired to the audio socket and speakers.</p>
+              <p>The ISR was timed by toggling a spare GPIO on entry and exit, confirming that each sample completes well inside the 20 µs interrupt period.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>Controls</h3>
+              <ul>
+                <li><strong>Slide potentiometer:</strong> read by the on-board ADC and mapped to 0–10 kHz</li>
+                <li><strong>SPDT switch:</strong> selects whether the slider controls frequency or volume, where volume scales the sine table output in the ISR</li>
+                <li><strong>Keypad:</strong> scanned row by row with pull-ups on the columns and 330 Ω series resistors on the rows to protect the GPIOs from multi-key shorts</li>
+                <li><strong>Debouncing:</strong> a four-state FSM (Not Pressed, Maybe Pressed, Pressed, Maybe Not Pressed) confirms a key across consecutive scans before acting</li>
+              </ul>
+            </div>
+
+            <div class="proj-section">
+              <h3>Record, Playback, and Compose</h3>
+              <p>Mode flags set by the debounce FSM move the device between live tone, record, playback, and compose modes. While recording, a dedicated protothread samples the slider frequency into a per-key buffer, so you can sweep the pitch to sketch a chirp and assign it to a digit. Pressing that digit replays the sound, and compose mode queues several recorded keys to play back as a sequence.</p>
+            </div>
+
+            <div class="proj-section">
+              <h3>Results</h3>
+              <p>The system produced clean, stable tones up to several kHz, including a 4.7 kHz output captured on the oscilloscope and heard by Merlin as a bird. Merlin did not identify a Northern Cardinal, but it picked up the synthesized sound as a bird and displayed a spectrogram of the chirps. Along the way we learned to structure multi-task embedded firmware with protothreads and interrupts and to combine mixed-signal peripherals (ADC, DAC, SPI) into one system.</p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <div id="footer" class="text-center">
+    <div class="container">
+      <div class="socials-media text-center">
+        <ul class="list-unstyled">
+          <li><a href="https://github.com/zkarim28"><i class="bi bi-github"></i></a></li>
+          <li><a href="https://www.linkedin.com/in/zkarim28/"><i class="bi bi-linkedin"></i></a></li>
+          <li><a href="https://www.youtube.com/@zkarim28"><i class="bi bi-youtube"></i></a></li>
+        </ul>
+      </div>
+      <p>Check out my projects · connect with me · subscribe</p>
+      <div class="credits">
+        Template by <a href="https://bootstrapmade.com/" style="color:var(--text-muted); cursor:default;">BootstrapMade</a>
+      </div>
+    </div>
+  </div>
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="assets/vendor/typed.js/typed.umd.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+
+  <script src="assets/js/main.js"></script>
+
+</body>
+</html>
