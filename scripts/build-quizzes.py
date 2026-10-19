@@ -485,6 +485,13 @@ def quizzes():
                         'optical links, oversubscription and stranded power, synchronized training, Thunderbolt, '
                         'CV\u00b2 wire energy and the end of Dennard scaling.'},
              'topic-quiz/6/topic-quiz-6.md'),
+        load({'id': 'practice-memwall', 'official': False, 'kind': 'practice',
+              'title': 'Practice: AI and Memory Wall + Topic 4 Lecture',
+              'subtitle': 'Paper 10, Gholami et al., IEEE Micro 2024 + Topic 4 lecture gaps',
+              'covers': 'FLOPS vs DRAM/interconnect scaling, arithmetic intensity, BERT vs GPT-2 profile, batching and KV cache, '
+                        'checkpointing, INT4/pruning, cache-vs-compute hardware; C-state ladder, DDR/LPDDR/GDDR/HBM, '
+                        'shared NIC/PCIe links, co-location, specialization, PAM4, photonics.'},
+             'paper-quiz/7/paper-quiz-7.md'),
     ]
 
 
