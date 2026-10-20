@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VibeBox</title>
+  <meta name="robots" content="noindex">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg: #0f1020; --fg: #f3f3ff; --muted: #a3a3c2; --accent: #8b5cf6; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center;
+           background: var(--bg); color: var(--fg); font-family: Poppins, system-ui, sans-serif;
+           padding: 16px; text-align: center; }
+    h1 { font-size: 2.2rem; margin: 0 0 .3em; }
+    p { color: var(--muted); margin: .4em 0; }
+    .dot { display: inline-block; width: .6em; height: .6em; border-radius: 50%;
+           background: var(--accent); margin-right: .4em; animation: pulse 1.2s infinite; }
+    @keyframes pulse { 50% { opacity: .25; } }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>📦 VibeBox</h1>
+    <p id="status"><span class="dot"></span>Finding the game server…</p>
+    <p id="extra"></p>
+  </main>
+  <script>
+    // link.json is rewritten by the VibeBox server each time it opens a new
+    // tunnel. Anything after # is passed through: /vibebox/#/sudoku -> <server>/sudoku
+    const status = document.getElementById("status");
+    const extra = document.getElementById("extra");
+    const path = location.hash.startsWith("#/") ? location.hash.slice(1) : "/";
+    let tries = 0;
+
+    async function go() {
+      tries++;
+      try {
+        const r = await fetch("link.json?t=" + Date.now(), { cache: "no-store" });
+        const { url } = await r.json();
+        const ping = await fetch(url + "/ping?t=" + Date.now(), { cache: "no-store" });
+        if (ping.ok) { location.replace(url + path); return; }
+      } catch (e) { /* server down or restarting */ }
+      status.innerHTML = '<span class="dot"></span>The server is offline or restarting — retrying…';
+      if (tries >= 3) extra.textContent = "If it's been a few minutes, the host's computer may be off.";
+      setTimeout(go, 8000);
+    }
+    go();
+  </script>
+</body>
+</html>
