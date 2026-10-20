@@ -213,11 +213,6 @@
   window.addEventListener('load', () => {
     let portfolioContainer = select('.portfolio-container');
     if (portfolioContainer) {
-      let portfolioIsotope = new Isotope(portfolioContainer, {
-        itemSelector: '.portfolio-item',
-        layoutMode: 'fitRows'
-      });
-
       let portfolioFilters = select('#portfolio-flters li', true);
 
       on('click', '#portfolio-flters li', function(e) {
@@ -227,8 +222,9 @@
         });
         this.classList.add('filter-active');
 
-        portfolioIsotope.arrange({
-          filter: this.getAttribute('data-filter')
+        portfolioContainer.querySelectorAll('.portfolio-item').forEach(item => {
+          const f = this.getAttribute('data-filter');
+          item.style.display = (f === '*' || item.matches(f)) ? '' : 'none';
         });
 
       }, true);
@@ -246,7 +242,7 @@
   /**
    * Portfolio details slider
    */
-  new Swiper('.portfolio-details-slider', {
+  const detailsSlider = new Swiper('.portfolio-details-slider', {
     speed: 400,
     loop: true,
     autoplay: {
@@ -258,6 +254,11 @@
       type: 'bullets',
       clickable: true
     }
+  });
+
+  // Stop the slideshow from advancing while a video is playing
+  document.querySelectorAll('.portfolio-details-slider video').forEach(v => {
+    v.addEventListener('play', () => detailsSlider.autoplay.stop());
   });
 
 })()
