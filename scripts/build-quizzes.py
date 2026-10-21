@@ -492,6 +492,13 @@ def quizzes():
                         'checkpointing, INT4/pruning, cache-vs-compute hardware; C-state ladder, DDR/LPDDR/GDDR/HBM, '
                         'shared NIC/PCIe links, co-location, specialization, PAM4, photonics.'},
              'paper-quiz/7/paper-quiz-7.md'),
+        load({'id': 'practice-farmem', 'official': False, 'kind': 'practice',
+              'title': 'Practice: Software-Defined Far Memory + Topic 4 (Oct 19)',
+              'subtitle': 'Paper 11, Lagar-Cavilla et al., ASPLOS \'19 + Topic 4 lecture, Oct 19',
+              'covers': 'zswap far memory, cold age threshold, promotion-rate SLO, K/S controller, autotuner, '
+                        'TCO arithmetic; HBM/GDDR/LPDDR trade-offs, stranded power, training power swings, MVPP, '
+                        'Thunderbolt design choices, DIMMs per channel, mercurial cores.'},
+             'paper-quiz/8/paper-quiz-8.md'),
     ]
 
 
