@@ -91,3 +91,5 @@ svg.diagram #arr path{fill:var(--muted)}
   body{display:block} nav.side{position:static;width:auto;height:auto;border-right:0;border-bottom:1px solid var(--line)}
   main{padding:18px 16px 60px} dl.kv{grid-template-columns:1fr}
 }
+
+nav.side a.back{display:block;margin:0 0 14px;padding:7px 10px;border:1px solid var(--line);border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;color:var(--text)}nav.side a.back:hover{background:var(--accent);border-color:var(--accent);color:#fff}
