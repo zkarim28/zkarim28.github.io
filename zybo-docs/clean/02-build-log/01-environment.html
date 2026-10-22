@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Environment and prerequisites · Lorenz DDA on Zybo Z7-10 — clean build</title>
+<link rel="stylesheet" href="../styles.css"></head>
+<body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — clean build</p><p class="sub">Working flow only, from the second fresh start</p>
+<!-- <a class="switch" href="../../full/index.html">↔ Switch to the full site</a> -->
+<a class="l" href="../index.html">Overview and contents</a>
+<a class="l" href="../01-architecture.html">01 Architecture</a>
+<h4>Build log</h4>
+<a class="l sub2 cur" href="../02-build-log/01-environment.html">01 Environment</a>
+<a class="l sub2" href="../02-build-log/02-baseline.html">02 Fresh Digilent baseline</a>
+<a class="l sub2" href="../02-build-log/03-custom-ip.html">03 The Lorenz IP</a>
+<a class="l sub2" href="../02-build-log/04-block-design.html">04 Block design</a>
+<a class="l sub2" href="../02-build-log/05-bitstream-xsa.html">05 Bitstream and XSA</a>
+<a class="l sub2" href="../02-build-log/06-vitis-platform.html">06 Vitis platform</a>
+<a class="l sub2" href="../02-build-log/07-ps-driver.html">07 PS driver</a>
+<a class="l sub2" href="../02-build-log/08-plotter-demo.html">08 Plotter and demo app</a>
+<a class="l sub2" href="../02-build-log/09-run-sd-boot.html">09 Run, SD boot, repo</a>
+<h4>Reference</h4>
+<a class="l" href="../issues.html">Issues</a>
+<a class="l" href="../gotchas.html">Gotchas</a>
+<a class="l" href="../reference.html">Reference and snippets</a></nav><main><h1>Environment and prerequisites</h1><p class="lead">Things that must be true before the first click. The two Vivado items are permanent, one-time fixes.</p>
+<section class="step" id="step-env-tools"><h3><span class="no">01.1</span>Tools, board and cabling</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Vivado and Vitis <b>2024.1</b> on Windows 11; board Digilent <b>Zybo Z7-10</b> (part <code>xc7z010clg400-1</code>).</li><li>Micro-USB cable to the <b>PROG/UART</b> port (JTAG + serial); HDMI cable into the <b>HDMI TX (OUT)</b> connector and a monitor. The board is powered from the <b>wall plug</b> (5 V barrel supply, visible in the photo), so the power-source jumper is on <b>WALL</b>.</li><li>Serial terminal at <b>115200 8N1</b>, no flow control (the PS console is UART1 on MIO 48-49).</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Everything later (programming, UART keys, video) assumes this wiring; the RX connector is not used.</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-board-cabling-web.jpg" alt="Zybo Z7-10: PROG/UART micro-USB, HDMI cable in the TX connector, 5 V wall-plug barrel supply, boot jumper JP5"><figcaption><b>Figure.</b> Zybo Z7-10: PROG/UART micro-USB, HDMI cable in the TX connector, 5 V wall-plug barrel supply, boot jumper JP5</figcaption></figure>
+</section>
+<section class="step" id="step-env-hostname"><h3><span class="no">01.2</span>Use an ASCII-only computer name</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Check <code>$env:COMPUTERNAME</code> once. If it has a non-ASCII character (mine had a curly quote, U+2018), rename the PC and reboot.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Vivado embeds the host name in <code>.Xil/Vivado-&lt;pid&gt;-&lt;host&gt;</code>; a non-ASCII name makes every synthesis/IP spawn fail with <code>[Common 17-180] Spawn failed: No error</code>.</p></div>
+<div class="block codeb"><div class="label">Code · check and fix the computer name (needs a reboot) <span style="opacity:.7">(PowerShell)</span></div><pre><code>$env:COMPUTERNAME
+($env:COMPUTERNAME.ToCharArray() | ForEach-Object { [int]$_ }) -join ','   # any value &gt; 127 is a problem (8216 = U+2018)
+Rename-Computer -NewName "IvanLaptop" -Restart                        # plain ASCII, letters/digits/hyphen</code></pre></div>
+<div class="block why"><div class="label">Note</div><p>A permanent fix, so it is only a prerequisite in the working flow.<!--  Found during the first attempt. --></p></div>
+<!-- <a href="../../full/issues.html#i-01">I-01 (full history)</a> -->
+</section>
+<section class="step" id="step-env-short-path"><h3><span class="no">01.3</span>Package the IP from a short path</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>The IP packager creates a nested temp project; synthesis of the IP failed on Windows' 260-byte limit.</li><li>I created a separate short folder <b>outside</b> <code>MEng_ZYBO</code> for the IP-packaging project (<code>d:/xilinx/temp/lorenz_dda_driver_v1_0_project3</code>), after which the IP synthesised and repackaged.</li><li>The IP source stays in <code>ip_repo/lorenz_dda_driver_1_0</code>; the packager project only edits it.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Vivado prefixes the run directory to an already absolute path, so the effective path is roughly double.</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-ip-packager-summary.png" alt="IP Packager, Review and Package, running from the short-path project d:/xilinx/temp/lorenz_dda_driver_v1_0_project3"><figcaption><b>Figure.</b> IP Packager, Review and Package, running from the short-path project d:/xilinx/temp/lorenz_dda_driver_v1_0_project3</figcaption></figure>
+<!-- <a href="../../full/issues.html#i-02">I-02 (full history)</a> -->
+</section>
+<section class="step" id="step-env-layout"><h3><span class="no">01.4</span>Repository layout</h3>
+<div class="block did"><div class="label">What I did</div><ul><li><code>ivan_lorenz_hdmi/Zybo-Z7-HW</code> — Vivado project (PL) with <code>ip_repo/lorenz_dda_driver_1_0</code> and <code>Zybo-Z7-HW.ipdefs/repo</code> (Digilent vivado-library).</li><li><code>ivan_lorenz_hdmi/design_1_wrapper</code> — Vitis platform; <code>Zybo-Z7-10-HDMI</code> — application; <code>Zybo-Z7-10-HDMI_system</code> — system project (boot image).</li><li>Build junk (<code>*.runs</code>, <code>*.gen</code>, <code>.metadata</code>, <code>*.bit</code>, <code>*.xsa</code>, <code>*.elf</code>, <code>_ide</code>) is git-ignored.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Keeping hardware, platform and app in one folder makes relative paths in the Vitis project short and portable.</p></div>
+</section>
+<p class="links"><a href="../02-build-log/02-baseline.html">02 Fresh Digilent baseline →</a></p>
+<div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README).</div>
+</main></body></html>

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vitis platform and BSP · Lorenz DDA on Zybo Z7-10 — clean build</title>
+<link rel="stylesheet" href="../styles.css"></head>
+<body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — clean build</p><p class="sub">Working flow only, from the second fresh start</p>
+<!-- <a class="switch" href="../../full/index.html">↔ Switch to the full site</a> -->
+<a class="l" href="../index.html">Overview and contents</a>
+<a class="l" href="../01-architecture.html">01 Architecture</a>
+<h4>Build log</h4>
+<a class="l sub2" href="../02-build-log/01-environment.html">01 Environment</a>
+<a class="l sub2" href="../02-build-log/02-baseline.html">02 Fresh Digilent baseline</a>
+<a class="l sub2" href="../02-build-log/03-custom-ip.html">03 The Lorenz IP</a>
+<a class="l sub2" href="../02-build-log/04-block-design.html">04 Block design</a>
+<a class="l sub2" href="../02-build-log/05-bitstream-xsa.html">05 Bitstream and XSA</a>
+<a class="l sub2 cur" href="../02-build-log/06-vitis-platform.html">06 Vitis platform</a>
+<a class="l sub2" href="../02-build-log/07-ps-driver.html">07 PS driver</a>
+<a class="l sub2" href="../02-build-log/08-plotter-demo.html">08 Plotter and demo app</a>
+<a class="l sub2" href="../02-build-log/09-run-sd-boot.html">09 Run, SD boot, repo</a>
+<h4>Reference</h4>
+<a class="l" href="../issues.html">Issues</a>
+<a class="l" href="../gotchas.html">Gotchas</a>
+<a class="l" href="../reference.html">Reference and snippets</a></nav><main><h1>Vitis platform and BSP</h1><p class="lead">Make the BSP see the new hardware and get past the driver Makefile typo.</p>
+<section class="step" id="step-platform-update"><h3><span class="no">06.1</span>Update the Vitis platform</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Right-click platform <code>design_1_wrapper</code> → <b>Update Hardware Specification</b> → pick the new <code>design_1_wrapper.xsa</code>.</li><li>Clean Project, then Build Project on the platform (this rebuilds the BSP; there is no separate 'build BSP').</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Until this is done the BSP still holds the Digilent 2024-07-04 files and has no LORENZ macro; the app would still compile because the Lorenz code is behind <code>#ifdef</code>, and silently do nothing.</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-vitis-update-platform.png" alt="Assistant view: right-click design_1_wrapper [Platform] → Update Hardware Specification (Build and Clean are in the same menu)"><figcaption><b>Figure.</b> Assistant view: right-click design_1_wrapper [Platform] → Update Hardware Specification (Build and Clean are in the same menu)</figcaption></figure>
+<p class="links">Related: Issue <a href="../issues.html#i-06">I-06</a></p>
+</section>
+<section class="step" id="step-makefile-fix"><h3><span class="no">06.2</span>Fix the driver Makefile typo</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Platform build failed in <code>lorenz_dda_driver_v1_0</code>; fix <code>($wildcard ...)</code> → <code>$(wildcard ...)</code> (LIBSOURCES and OUTS).</li><li>Fix the <b>source</b> (<code>ip_repo/.../drivers/.../src/Makefile</code>) and re-export if the BSP re-extracts it; copies also live in <code>design_1_wrapper/hw/drivers</code>, <code>tempdsa/drivers</code>, the app BSP <code>libsrc</code>, the FSBL BSP <code>libsrc</code>, and <code>Zybo-Z7-HW.gen/.../ip/.../drivers</code>.</li><li>Rebuild the platform: 'Build Finished', libxil.a rebuilt for both BSPs.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The typo is in the Vivado-generated driver template, so it comes back with every fresh copy of the IP; the <code>cannot find -lrsa</code> error that follows is only a knock-on.</p></div>
+<div class="block codeb"><div class="label">Code · the symptom in the platform build log <span style="opacity:.7">(log)</span></div><pre><code>arm-xilinx-eabi-gcc.exe: error: (ildcard: linker input file not found: No such file or directory
+arm-xilinx-eabi-gcc.exe: error: *.c): linker input file not found: Invalid argument
+make[1]: *** [Makefile:46: ps7_cortexa9_0/libsrc/lorenz_dda_driver_v1_0/src/make.libs] Error 2
+Failed to generate the platform.  Reason: Failed to build the  zynq_fsbl application.</code></pre></div>
+<div class="block codeb"><div class="label">Code · driver Makefile — broken vs fixed <span style="opacity:.7">(make)</span></div><div class="where">drivers/lorenz_dda_driver_v1_0/src/Makefile</div><pre><code># broken (Vivado 2024.1 generated):
+LIBSOURCES=($wildcard *.c)      # make expands $w (empty) -&gt; gcc gets '(ildcard' and '*.c)'
+OUTS = ($wildcard *.o)
+
+# fixed:
+INCLUDEFILES=$(wildcard *.h)
+LIBSOURCES=$(wildcard *.c)
+OUTS = $(wildcard *.o)</code></pre></div>
+<p class="figtext"><b>Figure (text only).</b> The console output is the log excerpt above.</p>
+<!-- Related (full history): <a href="../../full/issues.html#i-07">Same bug in the team's other design</a> -->
+<p class="links">Related: Issue <a href="../issues.html#i-07">I-07</a></p>
+</section>
+<section class="step" id="step-xparams-check"><h3><span class="no">06.3</span>Confirm the macro exists</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Open the BSP <code>xparameters.h</code> and search <code>LORENZ</code>: <code>XPAR_LORENZ_DDA_DRIVER_0_S00_AXI_BASEADDR</code> = <code>0x43C30000</code>. The file must have a current modification time.</li><li>The generated <code>lorenz_dda_driver.h</code> in the BSP is stale (only <code>SLV_REG0-6</code>); it is not used — the app defines its own offsets.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>This macro is the switch that compiles the Lorenz code in.</p></div>
+<div class="block codeb"><div class="label">Code · what to look for in the regenerated BSP <span style="opacity:.7">(C)</span></div><div class="where">search the file for LORENZ; its modified time must be new (the stock file is dated 2024-07-04)</div><pre><code>/* design_1_wrapper/ps7_cortexa9_0/domain_ps7_cortexa9_0/bsp/ps7_cortexa9_0/include/xparameters.h */
+#define XPAR_LORENZ_DDA_DRIVER_0_S00_AXI_BASEADDR 0x43C30000</code></pre></div>
+<p class="figtext"><b>Figure (text only).</b> Searching the file for <code>LORENZ</code> finds one define, <code>XPAR_LORENZ_DDA_DRIVER_0_S00_AXI_BASEADDR</code> (see the snippet above).</p>
+</section>
+<p class="links"><a href="../02-build-log/05-bitstream-xsa.html">← 05 Bitstream and XSA</a> &nbsp;·&nbsp; <a href="../02-build-log/07-ps-driver.html">07 PS driver →</a></p>
+<div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README).</div>
+</main></body></html>

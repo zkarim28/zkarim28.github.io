@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Attempt 1 · the IP and packaging it (09-18) · Lorenz DDA on Zybo Z7-10 — full history</title>
+<link rel="stylesheet" href="../styles.css"></head>
+<body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — full history</p><p class="sub">Every attempt, dead end and fix</p>
+<a class="switch" href="../../clean/index.html">↔ Switch to the clean site</a>
+<a class="l" href="../index.html">Overview and contents</a>
+<a class="l" href="../01-architecture.html">01 Architecture</a>
+<h4>Build log</h4>
+<a class="l sub2" href="../02-build-log/00-background.html">00 Background (Feb-Sep 17)</a>
+<a class="l sub2 cur" href="../02-build-log/01-ip-packaging.html">01 Attempt 1 · the IP and its packaging</a>
+<a class="l sub2" href="../02-build-log/02-attempt1-simplified.html">02 Attempt 1 · simplified design</a>
+<a class="l sub2" href="../02-build-log/03-attempt2-fresh-start.html">03 Attempt 2 · first fresh restart</a>
+<a class="l sub2" href="../02-build-log/04-attempt3-hardware.html">04 Attempt 3 · hardware (working)</a>
+<a class="l sub2" href="../02-build-log/05-ps-driver-plotter.html">05 Attempt 3 · PS driver and plotter</a>
+<a class="l sub2" href="../02-build-log/06-ui-performance.html">06 Attempt 3 · UI and speed</a>
+<a class="l sub2" href="../02-build-log/07-sd-boot-repo.html">07 Attempt 3 · SD boot and repo</a>
+<h4>Reference</h4>
+<a class="l" href="../issues.html">Issues</a>
+<a class="l" href="../gotchas.html">Gotchas</a>
+<a class="l" href="../reference.html">Reference and snippets</a></nav><main><h1>Attempt 1 · the IP and packaging it (09-18)</h1><p class="lead">The IP source that all later attempts reuse, then the Vivado problems hit while packaging and integrating it.</p>
+<section class="step" id="step-ip-create"><h3><span class="no">01.1</span>Create the IP with the AXI4 peripheral wizard, then open it for editing</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Vivado: <b>Tools → Create and Package New IP…</b>, choose <b>Create a new AXI4 peripheral</b> (it generates the AXI4 IP, a driver, a software test application and a demo design).</li><li>Add Interfaces: one interface <code>S00_AXI</code>, type <b>Lite</b>, mode <b>Slave</b>, data width <b>32</b>, <b>Number of Registers = 7</b> (allowed 4-512; the capture shows the field at its minimum, 4). Name the IP (the capture shows the default <code>myip</code>; mine is <code>lorenz_dda_driver</code>) and put it under the project's <code>ip_repo</code>.</li><li>On the wizard's last page (<i>Create Peripheral</i>, Peripheral Generation Summary), leave <b>Edit IP</b> selected and click <b>Finish</b>.</li><li>Vivado opens a new, separate Vivado project for the IP, for example <code>edit_myip_v1_0</code> — call this the <b>first editor window</b> (the next step covers why it looks empty).</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The wizard produces a working AXI4-Lite slave with correct handshakes, so only the register map and the solver need custom code. The register count in the wizard only sizes the template: 7 registers gave a 5-bit address bus, but my final map (12 words, 7-bit address bus) comes from editing the Verilog, which is why the instance later had to be upgraded from that first revision (Rev 1). <b>Edit IP</b> is supposed to take you straight to the IP's sources, but in practice it opens a project shell first — from here: add the numeric core sources, add ports to the slave file, replace the wizard's register block with my 12-register map, and <b>Re-Package IP</b> (next steps).</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-vivado-create-ip.png" alt="Vivado: Tools → Create and Package New IP…"><figcaption><b>Figure.</b> Vivado: Tools → Create and Package New IP…</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="../../figures/step-vivado-create-axi-ip.png" alt="Create and Package New IP: 'Create a new AXI4 peripheral'"><figcaption><b>Figure.</b> Create and Package New IP: 'Create a new AXI4 peripheral'</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="../../figures/step-vivado-ip-reg-set.png" alt="Add Interfaces: S00_AXI, Lite, Slave, 32 bit, Number of Registers (set to 7 for the real IP)"><figcaption><b>Figure.</b> Add Interfaces: S00_AXI, Lite, Slave, 32 bit, Number of Registers (set to 7 for the real IP)</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="../../figures/step-ip-open-first-edit-window.png" alt="Wizard's Peripheral Generation Summary page: 'Edit IP' selected, click Finish"><figcaption><b>Figure.</b> Wizard's Peripheral Generation Summary page: 'Edit IP' selected, click Finish</figcaption></figure>
+</section>
+<section class="step" id="step-ip-fix-repo"><h3><span class="no">01.2</span>The first editor window has no sources — register the IP folder, then edit it in a second window</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>The first editor window's Sources panel is empty (Design Sources (0)) even though the IP was just created. That project's own <b>IP repository list doesn't include the folder</b> the new IP lives in (the one chosen when the IP was created), so it can't see the new IP's HDL as one of its sources.</li><li>Fix: in that window, <b>Tools → Settings → IP → Repository</b>.</li><li>Click <b>+</b>, browse to and select the IP's folder (here <code>ip_repo/myip_1_0</code>), click <b>Select</b>, then <b>OK</b>. Vivado confirms "1 repository was added to the project" and lists the IP found inside it.</li><li>Back in the same window, open <b>IP Catalog</b> and search for the IP's name. It now appears under <b>User Repository → AXI Peripheral</b> — this confirms the repository add worked.</li><li>Right-click the IP in the catalog and choose <b>Edit in IP Packager</b>. This opens a <b>second</b>, separate Vivado project (for example <code>myip_v1_0_project</code>) — this one is wired to the real files.</li><li>In this second editor window, <b>Sources</b> lists the IP's actual Design Sources (its <code>.v</code> files), and a <b>Package IP</b> tab walks through Identification → … → <b>Review and Package</b>, ending in a <b>Re-Package IP</b> button to write any edits back into the packaged IP.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The first window and the second window both look like an ordinary Vivado project, which makes it easy to assume the first one is already "the IP project" and start editing sources that aren't there, or that don't feed back into the package. Registering the IP's folder as a repository and picking <b>Edit in IP Packager</b> from the catalog is what actually opens a project pointed at the packaged source.</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-ip-first-edit-window-setting.png" alt="First editor window: Tools → Settings, about to open IP → Repository"><figcaption><b>Figure.</b> First editor window: Tools → Settings, about to open IP → Repository</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="../../figures/step-ip-first-edit-window-add-ip-repository.png" alt="Settings → IP → Repository: list is empty; + opens the folder browser (IP's own folder selected)"><figcaption><b>Figure.</b> Settings → IP → Repository: list is empty; + opens the folder browser (IP's own folder selected)</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="../../figures/step-ip-first-edit-window-include-new-ip-folder.png" alt="After Select → OK: '1 repository was added to the project', IPs (1) found"><figcaption><b>Figure.</b> After Select → OK: '1 repository was added to the project', IPs (1) found</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="../../figures/step-ip-first-edit-window-lookup-new-ip-in-catalog.png" alt="IP Catalog, searched by name: the IP now appears under User Repository → AXI Peripheral"><figcaption><b>Figure.</b> IP Catalog, searched by name: the IP now appears under User Repository → AXI Peripheral</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="../../figures/step-ip-first-edit-window-open-second-edit-window-in-catalog.png" alt="Right-click the IP in the catalog → Edit in IP Packager"><figcaption><b>Figure.</b> Right-click the IP in the catalog → Edit in IP Packager</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="../../figures/step-ip-second-edit-window-view.png" alt="Second editor window: Sources now lists the IP's real .v files; Package IP tab open"><figcaption><b>Figure.</b> Second editor window: Sources now lists the IP's real .v files; Package IP tab open</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="../../figures/step-ip-second-edit-window-repackage-ip-page.png" alt="Package IP, Review and Package: Re-Package IP applies the edits"><figcaption><b>Figure.</b> Package IP, Review and Package: Re-Package IP applies the edits</figcaption></figure>
+<div class="block why"><div class="label">Note</div><p>This is a general Vivado quirk, not specific to the Lorenz IP — it applies the same way any time an existing packaged IP is reopened for editing.</p></div>
+</section>
+<section class="step" id="step-ip-files"><h3><span class="no">01.3</span>IP source layout</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>IP lives in <code>ivan_lorenz_hdmi/Zybo-Z7-HW/ip_repo/lorenz_dda_driver_1_0</code>: <code>component.xml</code> (core revision 3), <code>hdl/</code> (top + AXI-Lite slave), <code>src/</code> (numeric core), <code>drivers/</code> (BSP driver stub), <code>xgui/</code>, <code>bd/</code>.</li><li>Numeric core (<code>src/</code>): <code>signed_mult.v</code>, <code>integrator.v</code>, <code>lorenz_solver.v</code>. Bus side (<code>hdl/</code>): <code>lorenz_dda_driver.v</code>, <code>lorenz_dda_driver_slave_lite_v1_0_S00_AXI.v</code>.</li><li>AXI-Lite address width is <b>7 bits</b> (<code>OPT_MEM_ADDR_BITS = 4</code> + <code>ADDR_LSB = 2</code>) = 32 word slots; 12 are used.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Solver logic is kept free of bus code; the slave file only maps registers to the solver's ports.</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-ip-packager-summary.png" alt="IP Packager, Review and Package, for lorenz_dda_driver 1.0 (root directory: ip_repo/lorenz_dda_driver_1_0)"><figcaption><b>Figure.</b> IP Packager, Review and Package, for lorenz_dda_driver 1.0 (root directory: ip_repo/lorenz_dda_driver_1_0)</figcaption></figure>
+</section>
+<section class="step" id="step-signed-mult"><h3><span class="no">01.4</span>Fixed-point multiplier</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>27-bit signed operands; full 54-bit product; keep <code>{sign, bits[45:20]}</code> → result has 20 fractional bits again.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>All state and parameters use the same format: 1 sign + 6 integer + 20 fractional bits (written Q6.20). Value = raw / 2<sup>20</sup>, range about ±64.</p></div>
+<div class="block codeb"><div class="label">Code · signed_mult.v — 27-bit fixed-point multiply <span style="opacity:.7">(Verilog)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-HW/ip_repo/lorenz_dda_driver_1_0/src/signed_mult.v</div><pre><code>`timescale 1ns / 1ps
+
+module signed_mult
+(
+output signed [26:0] out,
+input  signed [26:0] a,
+input  signed [26:0] b
+);
+    
+    wire signed [53:0] mult_out;
+    assign mult_out = a * b; 
+    assign out = {mult_out[53], mult_out[45:20]};
+endmodule</code></pre></div>
+</section>
+<section class="step" id="step-integrator"><h3><span class="no">01.5</span>Integrator with software <code>load</code></h3>
+<div class="block did"><div class="label">What I did</div><ul><li>One register per variable: <code>v ← v + funct</code> on a step pulse; reloads <code>InitialOut</code> when <code>reset | load</code>.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Reloading only on <code>reset</code> left the solver at (0,0,0) forever (the init registers are zero during reset). <code>load</code> lets software reload without a global reset. Details: <a href="../issues.html#i-05">I-05 in the full-history site</a>.</p></div>
+<div class="block codeb"><div class="label">Code · integrator.v — accumulator with software load <span style="opacity:.7">(Verilog)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-HW/ip_repo/lorenz_dda_driver_1_0/src/integrator.v</div><pre><code>`timescale 1ns / 1ps
+
+module integrator
+(
+input                   clk,
+input                   reset,
+input                   load,        // reload InitialOut without a global reset (software controlled)
+input                   enable,      // pulse high for one cycle to take a single integration step
+input signed [26:0]     funct,      //the dV/dt function
+input signed [26:0]     InitialOut,  //the initial state variable V
+
+output signed [26:0]    out //the state variable V
+);
+
+    reg  signed [26:0] v1 ;
+    wire signed [26:0] v1new ;
+    wire signed [26:0]  adder_out;
+
+    always @(posedge clk) begin
+        v1 &lt;= v1new;
+    end
+
+    assign adder_out = v1 + funct;   // Adder
+    assign v1new = (reset | load) ? InitialOut : (enable ? adder_out : v1); 
+
+    assign out = v1; // Assign output
+
+endmodule</code></pre></div>
+</section>
+<section class="step" id="step-solver"><h3><span class="no">01.6</span>Solver: one Euler step per rising edge</h3>
+<div class="block did"><div class="label">What I did</div><ul><li><code>step = enable &amp; ~enable_d</code> — software must write CTRL bit 0 as 1 then 0 for every step.</li><li><code>dt</code> is used as a <b>right-shift</b> (step size 2<sup>−dt</sup>), not as a fixed-point value.</li><li>dx = σ(y−x); dy = x(ρ−z) − y; dz = xy − βz, each scaled by the shift; <code>done</code> pulses one clock after a step.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Shifts instead of multiplying by dt saves DSPs; the PS sets pace by how often it steps.</p></div>
+<div class="block codeb"><div class="label">Code · lorenz_solver.v — step pulse + the three equations <span style="opacity:.7">(Verilog)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-HW/ip_repo/lorenz_dda_driver_1_0/src/lorenz_solver.v</div><pre><code>`timescale 1ns / 1ps
+
+module lorenz_solver 
+(
+    input  clk,
+    input  reset,
+    input  enable,
+    input  load,
+    output reg done,
+
+    input  signed [26:0] x_init,
+    input  signed [26:0] y_init,
+    input  signed [26:0] z_init,
+
+    input  signed [26:0] sig,
+    input  signed [26:0] rho,
+    input  signed [26:0] beta,
+    input  signed [26:0] dt,
+
+    output signed [26:0] x_next,
+    output signed [26:0] y_next,
+    output signed [26:0] z_next
+);
+
+    wire signed [26:0] funct_x, funct_y, funct_z;
+    wire signed [26:0] mult_xrhoz, mult_xy, mult_bz;
+    reg enable_d;
+    wire step = enable &amp; ~enable_d;
+
+    always @(posedge clk) begin
+        if (reset) begin
+            enable_d &lt;= 1'b0;
+            done     &lt;= 1'b0;
+        end else begin
+            enable_d &lt;= enable;
+            done     &lt;= step; 
+        end
+    end
+
+    // x' = sigma * (y - x), scaled by dt
+    signed_mult mult_dx (
+        .out(funct_x),
+        .a  (sig),
+        .b  ((y_next - x_next) &gt;&gt;&gt; dt)
+    );
+    integrator integrator_x (
+        .clk(clk), .reset(reset), .load(load), .enable(step),
+        .InitialOut(x_init), .funct(funct_x), .out(x_next)
+    );
+
+    // y' = x * (rho - z) - y, scaled by dt
+    signed_mult mult_xrhoz_i (
+        .out(mult_xrhoz),
+        .a  (x_next &gt;&gt;&gt; dt),
+        .b  (rho - z_next)
+    );
+    assign funct_y = mult_xrhoz - (y_next &gt;&gt;&gt; dt);
+    integrator integrator_y (
+        .clk(clk), .reset(reset), .load(load), .enable(step),
+        .InitialOut(y_init), .funct(funct_y), .out(y_next)
+    );
+
+    // z' = x * y - beta * z, scaled by dt
+    signed_mult mult_xy_i (
+        .out(mult_xy),
+        .a  (x_next &gt;&gt;&gt; dt),
+        .b  (y_next)
+    );
+    signed_mult mult_bz_i (
+        .out(mult_bz),
+        .a  (z_next &gt;&gt;&gt; dt),
+        .b  (beta)
+    );
+    assign funct_z = mult_xy - mult_bz;
+    integrator integrator_z (
+        .clk(clk), .reset(reset), .load(load), .enable(step),
+        .InitialOut(z_init), .funct(funct_z), .out(z_next)
+    );
+
+endmodule</code></pre></div>
+</section>
+<section class="step" id="step-regmap"><h3><span class="no">01.7</span>AXI-Lite register file</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>12 words at offsets 0x00-0x2C: CTRL, STATUS, X/Y/Z init, σ, ρ, β, DT (writable), X/Y/Z next (read-only).</li><li>CTRL bit 0 = enable (step on 0→1), bit 1 = load (level). STATUS bit 0 = done (one-clock pulse).</li><li>Results are sign-extended to 32 bits on read. All writable registers reset to 0 — software must write parameters before use.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>One flat register set is the whole interface, so the PS driver stays a page of <code>Xil_Out32/Xil_In32</code>.</p></div>
+<div class="block codeb"><div class="label">Code · register map and control wiring (AXI-Lite slave) <span style="opacity:.7">(Verilog)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-HW/ip_repo/lorenz_dda_driver_1_0/hdl/lorenz_dda_driver_slave_lite_v1_0_S00_AXI.v (lines 120-131, 162-171)</div><pre><code>	localparam integer REG_CTRL   = 0; // R/W bit0 = enable (0-&gt;1 edge = one step), bit1 = load init values
+	localparam integer REG_STATUS = 1; // R   bit0 = done
+	localparam integer REG_XINIT  = 2; // R/W signed[26:0]
+	localparam integer REG_YINIT  = 3; // R/W signed[26:0]
+	localparam integer REG_ZINIT  = 4; // R/W signed[26:0]
+	localparam integer REG_SIGMA  = 5; // R/W signed[26:0]
+	localparam integer REG_RHO    = 6; // R/W signed[26:0]
+	localparam integer REG_BETA   = 7; // R/W signed[26:0]
+	localparam integer REG_DT     = 8; // R/W signed[26:0]
+	localparam integer REG_XNEXT  = 9;  // R   signed[26:0]
+	localparam integer REG_YNEXT  = 10; // R   signed[26:0]
+	localparam integer REG_ZNEXT  = 11; // R   signed[26:0]
+...
+	// Drive the solver's parameter/enable inputs straight from the register file
+	assign enable = slv_reg_ctrl[0];
+	assign load   = slv_reg_ctrl[1]; 
+	assign x_init = slv_reg_x_init;
+	assign y_init = slv_reg_y_init;
+	assign z_init = slv_reg_z_init;
+	assign sigma  = slv_reg_sigma;
+	assign rho    = slv_reg_rho;
+	assign beta   = slv_reg_beta;
+	assign dt     = slv_reg_dt;</code></pre></div>
+<div class="block codeb"><div class="label">Code · read mux — result registers are sign-extended 27 -&gt; 32 bit <span style="opacity:.7">(Verilog)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-HW/ip_repo/lorenz_dda_driver_1_0/hdl/lorenz_dda_driver_slave_lite_v1_0_S00_AXI.v (lines 363-376)</div><pre><code>	  wire [OPT_MEM_ADDR_BITS:0] reg_raddr = axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB];
+	  assign S_AXI_RDATA = (reg_raddr == REG_CTRL)   ? slv_reg_ctrl :
+	                        (reg_raddr == REG_STATUS) ? {31'b0, done_reg} :
+	                        (reg_raddr == REG_XINIT)  ? {{5{slv_reg_x_init[26]}}, slv_reg_x_init} :
+	                        (reg_raddr == REG_YINIT)  ? {{5{slv_reg_y_init[26]}}, slv_reg_y_init} :
+	                        (reg_raddr == REG_ZINIT)  ? {{5{slv_reg_z_init[26]}}, slv_reg_z_init} :
+	                        (reg_raddr == REG_SIGMA)  ? {{5{slv_reg_sigma[26]}}, slv_reg_sigma} :
+	                        (reg_raddr == REG_RHO)    ? {{5{slv_reg_rho[26]}}, slv_reg_rho} :
+	                        (reg_raddr == REG_BETA)   ? {{5{slv_reg_beta[26]}}, slv_reg_beta} :
+	                        (reg_raddr == REG_DT)     ? {{5{slv_reg_dt[26]}}, slv_reg_dt} :
+	                        (reg_raddr == REG_XNEXT)  ? {{5{x_reg[26]}}, x_reg} :
+	                        (reg_raddr == REG_YNEXT)  ? {{5{y_reg[26]}}, y_reg} :
+	                        (reg_raddr == REG_ZNEXT)  ? {{5{z_reg[26]}}, z_reg} :
+	                        32'b0;</code></pre></div>
+</section>
+<section class="step" id="step-p-spawn"><h3><span class="no">01.8</span>Package the IP: Vivado 'Spawn failed'</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Synthesising the IP in the packager produced eight <code>[Common 17-180] Spawn failed: No error</code>.</li><li>Read the IP files (no <code>exec</code>/<code>spawn</code>); TEMP and project paths were ASCII; <code>hostname</code> printed <code>Ivan??sLaptop</code>; decoding <code>COMPUTERNAME</code> gave code point 8216 (curly quote).</li><li>Renamed the PC (plain ASCII) and rebooted — new logs show <code>Vivado-20976-IvanLaptop</code>.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Vivado creates <code>.Xil/Vivado-&lt;pid&gt;-&lt;host&gt;</code> for every run; a non-ASCII host makes the OS spawn fail with no error code.</p></div>
+<div class="block codeb"><div class="label">Code · check and fix the computer name (needs a reboot) <span style="opacity:.7">(PowerShell)</span></div><pre><code>$env:COMPUTERNAME
+($env:COMPUTERNAME.ToCharArray() | ForEach-Object { [int]$_ }) -join ','   # any value &gt; 127 is a problem (8216 = U+2018)
+Rename-Computer -NewName "IvanLaptop" -Restart                        # plain ASCII, letters/digits/hyphen</code></pre></div>
+<p class="links">Related: Issue <a href="../issues.html#i-01">I-01</a></p>
+</section>
+<section class="step" id="step-p-path"><h3><span class="no">01.9</span>Package the IP: path over 260 bytes</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Next error: <code>[Common 17-680] Path length exceeds 260-Byte maximum</code>. The IP packager's temp project sat inside <code>Zybo-Z7-HW.tmp/lorenz_dda_driver_v1_0_project/...</code> (~175 chars) and Vivado prepended the same run path again (~400+).</li><li>Fix: edit/package the IP from a short folder outside <code>MEng_ZYBO</code>; delete the stale <code>*_project*</code> folders; <code>subst</code> alone is not enough because of the doubling.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Path problems show up only in the IP packager's synthesis, not in the main project.</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-ip-packager-summary.png" alt="IP Packager running from d:/xilinx/temp/lorenz_dda_driver_v1_0_project3"><figcaption><b>Figure.</b> IP Packager running from d:/xilinx/temp/lorenz_dda_driver_v1_0_project3</figcaption></figure>
+<p class="links">Related: Issue <a href="../issues.html#i-02">I-02</a></p>
+</section>
+<section class="step" id="step-p-repo"><h3><span class="no">01.10</span>Integrate: instance upgraded against a stale definition</h3>
+<div class="block did"><div class="label">What I did</div><ul><li><code>ip_upgrade.log</code> said the instance went from Rev 13 to Rev 1 and address ports shrank 7 → 4 bits, although <code>component.xml</code> was Rev 3 / 7-bit.</li><li><code>Zybo-Z7-HW.xpr</code> listed four overlapping repo paths, one pointing at a deleted copy. Fix: two paths (<code>../ip_repo</code>, <code>Zybo-Z7-HW.ipdefs/repo</code>), rebuild the catalog, check <code>core_revision</code>, then <code>upgrade_ip</code> → Rev 1 → 3 and width 7. Typing vendor <code>xilinx</code> instead of <code>xilinx.com</code> found nothing.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The catalog, not the file on disk, decides what an upgrade uses.</p></div>
+<div class="block codeb"><div class="label">Code · attempt 1: replace 4 overlapping repo paths with 2, rebuild, verify <span style="opacity:.7">(Tcl)</span></div><pre><code>set_property ip_repo_paths [list \
+  [file normalize [get_property directory [current_project]]/../ip_repo] \
+  [file normalize [get_property directory [current_project]]/Zybo-Z7-HW.ipdefs/repo] \
+] [current_project]
+update_ip_catalog -rebuild
+get_property ip_repo_paths [current_project]
+get_property core_revision [get_ipdefs xilinx.com:user:lorenz_dda_driver:1.0]   ;# 3
+get_property core_revision [get_ips design_1_lorenz_dda_driver_0_0]              ;# 1 -&gt; needs upgrade</code></pre></div>
+<div class="block codeb"><div class="label">Code · upgrade the instance and check the address width <span style="opacity:.7">(Tcl)</span></div><pre><code>report_ip_status
+upgrade_ip [get_ips design_1_lorenz_dda_driver_0_0]
+get_property CONFIG.C_S00_AXI_ADDR_WIDTH [get_ips design_1_lorenz_dda_driver_0_0]   ;# expect 7
+validate_bd_design
+save_bd_design</code></pre></div>
+<p class="links">Related: Issue <a href="../issues.html#i-03">I-03</a></p>
+</section>
+<section class="step" id="step-p-nummi"><h3><span class="no">01.11</span>Integrate: validate warning on <code>M04_AXI</code></h3>
+<div class="block did"><div class="label">What I did</div><ul><li><code>[BD 41-2670]</code>/<code>[BD 5-699]</code> incomplete address path on <code>axi_interconnect_gp0/M04_AXI</code>. The Lorenz IP was on M02 at 0x43C10000 and fine; M04 had no net (leftover from a removed peripheral).</li><li>Fix: <code>NUM_MI</code> 5 → 4, validate, <code>save_bd_design</code> (the stray <code>save_bd_design_as</code> was a mistyped command).</li><li>Synthesis then finished <code>synth_design Complete!</code>; only crossbar-internal width warnings remained.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Unused ports are harmless functionally but block validation.</p></div>
+<div class="block codeb"><div class="label">Code · attempt 1: remove the unused fifth master port <span style="opacity:.7">(Tcl)</span></div><pre><code>get_property CONFIG.NUM_MI [get_bd_cells axi_interconnect_gp0]                ;# 5
+get_bd_intf_nets -of_objects [get_bd_intf_pins axi_interconnect_gp0/M04_AXI]   ;# none -&gt; unused
+set_property CONFIG.NUM_MI 4 [get_bd_cells axi_interconnect_gp0]
+validate_bd_design
+save_bd_design          ;# not save_bd_design_as</code></pre></div>
+<p class="links">Related: Issue <a href="../issues.html#i-04">I-04</a></p>
+</section>
+<p class="links"><a href="../02-build-log/00-background.html">← 00 Background (Feb-Sep 17)</a> &nbsp;·&nbsp; <a href="../02-build-log/02-attempt1-simplified.html">02 Attempt 1 · simplified design →</a></p>
+<div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README). Yellow <span class="todo">TODO(user)</span> marks facts I could not find.</div>
+</main></body></html>

@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Attempt 3 · PS driver and plotter (09-22) · Lorenz DDA on Zybo Z7-10 — full history</title>
+<link rel="stylesheet" href="../styles.css"></head>
+<body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — full history</p><p class="sub">Every attempt, dead end and fix</p>
+<a class="switch" href="../../clean/index.html">↔ Switch to the clean site</a>
+<a class="l" href="../index.html">Overview and contents</a>
+<a class="l" href="../01-architecture.html">01 Architecture</a>
+<h4>Build log</h4>
+<a class="l sub2" href="../02-build-log/00-background.html">00 Background (Feb-Sep 17)</a>
+<a class="l sub2" href="../02-build-log/01-ip-packaging.html">01 Attempt 1 · the IP and its packaging</a>
+<a class="l sub2" href="../02-build-log/02-attempt1-simplified.html">02 Attempt 1 · simplified design</a>
+<a class="l sub2" href="../02-build-log/03-attempt2-fresh-start.html">03 Attempt 2 · first fresh restart</a>
+<a class="l sub2" href="../02-build-log/04-attempt3-hardware.html">04 Attempt 3 · hardware (working)</a>
+<a class="l sub2 cur" href="../02-build-log/05-ps-driver-plotter.html">05 Attempt 3 · PS driver and plotter</a>
+<a class="l sub2" href="../02-build-log/06-ui-performance.html">06 Attempt 3 · UI and speed</a>
+<a class="l sub2" href="../02-build-log/07-sd-boot-repo.html">07 Attempt 3 · SD boot and repo</a>
+<h4>Reference</h4>
+<a class="l" href="../issues.html">Issues</a>
+<a class="l" href="../gotchas.html">Gotchas</a>
+<a class="l" href="../reference.html">Reference and snippets</a></nav><main><h1>Attempt 3 · PS driver and plotter (09-22)</h1><p class="lead">The register driver, framebuffer drawing and the demo app.</p>
+<section class="step" id="step-ps-folder"><h3><span class="no">05.1</span>Add <code>src/lorenz_dda/</code> to the app</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>New files <code>lorenz_dda.c</code> / <code>lorenz_dda.h</code> under <code>Zybo-Z7-10-HDMI/src</code>; refresh the project so Vitis compiles them.</li><li>Register offsets are hand-copied from the Verilog map (word index × 4).</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The auto-generated BSP driver only knows <code>SLV_REG0-6</code>, so the app owns the register names.</p></div>
+<div class="block codeb"><div class="label">Code · register offsets and fixed-point helpers <span style="opacity:.7">(C)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-10-HDMI/src/lorenz_dda/lorenz_dda.c (lines 6-26)</div><pre><code>/* lorenz_dda_driver AXI4-Lite register offsets - see lorenz_dda_driver_slave_lite_v1_0_S00_AXI.v's REG_* localparams (word index * 4 = byte offset). */
+#define LORENZ_DDA_CTRL_OFFSET   0x00 /* R/W  bit0=enable(pulse), bit1=load(pulse) */
+#define LORENZ_DDA_STATUS_OFFSET 0x04 /* R    bit0=done (1 AXI-clock pulse only) */
+#define LORENZ_DDA_XINIT_OFFSET  0x08 /* R/W  signed Q6.20 */
+#define LORENZ_DDA_YINIT_OFFSET  0x0C /* R/W  signed Q6.20 */
+#define LORENZ_DDA_ZINIT_OFFSET  0x10 /* R/W  signed Q6.20 */
+#define LORENZ_DDA_SIGMA_OFFSET  0x14 /* R/W  signed Q6.20 */
+#define LORENZ_DDA_RHO_OFFSET    0x18 /* R/W  signed Q6.20 */
+#define LORENZ_DDA_BETA_OFFSET   0x1C /* R/W  signed Q6.20 */
+#define LORENZ_DDA_DT_OFFSET     0x20 /* R/W  raw right-shift count, NOT Q6.20 - see header */
+#define LORENZ_DDA_XNEXT_OFFSET  0x24 /* R    signed Q6.20 */
+#define LORENZ_DDA_YNEXT_OFFSET  0x28 /* R    signed Q6.20 */
+#define LORENZ_DDA_ZNEXT_OFFSET  0x2C /* R    signed Q6.20 */
+
+#define LORENZ_DDA_CTRL_ENABLE_BIT 0x1u
+#define LORENZ_DDA_CTRL_LOAD_BIT   0x2u
+
+/* Q6.20 fixed point &lt;-&gt; float, same format the IP/solver uses. */
+typedef signed int lorenz_fix;
+#define LORENZ_FIX2FLOAT(a) (((float)(a)) / 1048576.0f)
+#define LORENZ_FLOAT2FIX(f) ((lorenz_fix)((f) * 1048576.0f))</code></pre></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-vitis-app-tree.png" alt="Vitis Explorer: Zybo-Z7-10-HDMI/src with lorenz_dda/"><figcaption><b>Figure.</b> Vitis Explorer: Zybo-Z7-10-HDMI/src with lorenz_dda/</figcaption></figure>
+</section>
+<section class="step" id="step-q620"><h3><span class="no">05.2</span>Fixed-point and the DT trap</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Values ↔ float with <code>raw / 1048576.0f</code> (2<sup>20</sup>); use signed 32-bit <code>lorenz_fix</code> so sign extension works.</li><li><b>DT is not Q6.20</b>: write the raw shift count (dt=10 → step 2<sup>−10</sup>).</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Writing dt as fixed-point would silently give a huge shift and a frozen or garbage trace.</p></div>
+</section>
+<section class="step" id="step-driver-fns"><h3><span class="no">05.3</span>Driver functions</h3>
+<div class="block did"><div class="label">What I did</div><ul><li><code>LorenzDDA_SetParams</code> writes x0,y0,z0,σ,ρ,β (Q6.20) and dt (raw).</li><li><code>Load</code>: CTRL=2 then 0. <code>Step</code>: CTRL=1 then 0. <code>ReadState</code>: XNEXT/YNEXT/ZNEXT. <code>ReadParams</code>: read-back for checks.</li><li>Usage pattern below.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Two writes per pulse because the hardware detects the rising edge (<code>step</code>) or the level (<code>load</code>).</p></div>
+<div class="block codeb"><div class="label">Code · register-level driver functions <span style="opacity:.7">(C)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-10-HDMI/src/lorenz_dda/lorenz_dda.c (lines 383-422)</div><pre><code>void LorenzDDA_SetParams(u32 baseAddr, float x0, float y0, float z0,
+                          float sigma, float rho, float beta, u32 dtShift)
+{
+	Xil_Out32(baseAddr + LORENZ_DDA_XINIT_OFFSET, (u32) LORENZ_FLOAT2FIX(x0));
+	Xil_Out32(baseAddr + LORENZ_DDA_YINIT_OFFSET, (u32) LORENZ_FLOAT2FIX(y0));
+	Xil_Out32(baseAddr + LORENZ_DDA_ZINIT_OFFSET, (u32) LORENZ_FLOAT2FIX(z0));
+	Xil_Out32(baseAddr + LORENZ_DDA_SIGMA_OFFSET, (u32) LORENZ_FLOAT2FIX(sigma));
+	Xil_Out32(baseAddr + LORENZ_DDA_RHO_OFFSET,   (u32) LORENZ_FLOAT2FIX(rho));
+	Xil_Out32(baseAddr + LORENZ_DDA_BETA_OFFSET,  (u32) LORENZ_FLOAT2FIX(beta));
+	/* Raw shift count, NOT Q6.20 - see the file header comment. */
+	Xil_Out32(baseAddr + LORENZ_DDA_DT_OFFSET, dtShift);
+}
+
+void LorenzDDA_Load(u32 baseAddr)
+{
+	Xil_Out32(baseAddr + LORENZ_DDA_CTRL_OFFSET, LORENZ_DDA_CTRL_LOAD_BIT);
+	Xil_Out32(baseAddr + LORENZ_DDA_CTRL_OFFSET, 0);
+}
+
+void LorenzDDA_Step(u32 baseAddr)
+{
+	Xil_Out32(baseAddr + LORENZ_DDA_CTRL_OFFSET, LORENZ_DDA_CTRL_ENABLE_BIT);
+	Xil_Out32(baseAddr + LORENZ_DDA_CTRL_OFFSET, 0);
+}
+
+void LorenzDDA_ReadState(u32 baseAddr, float *x, float *y, float *z)
+{
+	*x = LORENZ_FIX2FLOAT((lorenz_fix) Xil_In32(baseAddr + LORENZ_DDA_XNEXT_OFFSET));
+	*y = LORENZ_FIX2FLOAT((lorenz_fix) Xil_In32(baseAddr + LORENZ_DDA_YNEXT_OFFSET));
+	*z = LORENZ_FIX2FLOAT((lorenz_fix) Xil_In32(baseAddr + LORENZ_DDA_ZNEXT_OFFSET));
+}
+
+void LorenzDDA_ReadParams(u32 baseAddr, float *sigma, float *rho, float *beta, u32 *dtShift)
+{
+	*sigma = LORENZ_FIX2FLOAT((lorenz_fix) Xil_In32(baseAddr + LORENZ_DDA_SIGMA_OFFSET));
+	*rho   = LORENZ_FIX2FLOAT((lorenz_fix) Xil_In32(baseAddr + LORENZ_DDA_RHO_OFFSET));
+	*beta  = LORENZ_FIX2FLOAT((lorenz_fix) Xil_In32(baseAddr + LORENZ_DDA_BETA_OFFSET));
+	*dtShift = Xil_In32(baseAddr + LORENZ_DDA_DT_OFFSET);
+}</code></pre></div>
+<div class="block codeb"><div class="label">Code · the whole software protocol in five lines <span style="opacity:.7">(C)</span></div><pre><code>LorenzDDA_SetParams(base, x0, y0, z0, sigma, rho, beta, dtShift); /* write 6 Q6.20 values + raw shift */
+LorenzDDA_Load(base);                                            /* CTRL=2, CTRL=0: x/y/z := init   */
+for (;;) {
+    LorenzDDA_Step(base);                                        /* CTRL=1, CTRL=0: one Euler step  */
+    LorenzDDA_ReadState(base, &amp;x, &amp;y, &amp;z);                       /* XNEXT/YNEXT/ZNEXT               */
+}</code></pre></div>
+
+</section>
+<section class="step" id="step-fb-basics"><h3><span class="no">05.4</span>Framebuffer basics</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Four 1920×1080×3-byte frame buffers in DDR (<code>DISPLAY_NUM_FRAMES</code> = 4, aligned 0x20); the VDMA scans the current one out through HP0.</li><li>Pixel = 3 bytes, order <b>R, B, G</b>; address = <code>x*3 + y*stride</code>, stride = 1920*3.</li><li>After drawing, flush the D-cache for the frame (whole frame in the working build) so the VDMA reads fresh pixels.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The plot is drawn by the CPU; the PL only supplies numbers. The video path is the stock Digilent one.</p></div>
+<div class="block codeb"><div class="label">Code · pixel addressing used everywhere (3 bytes/pixel, order R,B,G) <span style="opacity:.7">(C)</span></div><div class="where">lorenz_dda.c / video_demo.h / video_demo.c</div><pre><code>addr = ((plot-&gt;xOrigin + x) * 3) + ((plot-&gt;yOrigin + y) * stride);
+frame[addr]     = red;
+frame[addr + 1] = blue;   /* second byte */
+frame[addr + 2] = green;  /* third byte  */
+
+/* frame buffers (video_demo.h): */
+#define DEMO_MAX_FRAME (1920*1080*3)
+#define DEMO_STRIDE    (1920 * 3)
+
+/* after drawing, push pixels out of the D-cache so the VDMA scans fresh data: */
+Xil_DCacheFlushRange((unsigned int) pFrames[dispCtrl.curFrame], DEMO_MAX_FRAME);</code></pre></div>
+</section>
+<section class="step" id="step-phaseplot"><h3><span class="no">05.5</span>Phase-plane plot</h3>
+<div class="block did"><div class="label">What I did</div><ul><li><code>PhasePlot</code> = screen rectangle + axis ranges + colour + last pixel. Points accumulate (no erase) so the attractor builds up.</li><li>Value → pixel (clamped to the axis range, vertical flipped); consecutive points joined by a <b>Bresenham line</b>.</li><li>A jump larger than half the box (a reload, or a big legitimate move) is drawn as a 2×2 dot instead of a streak.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Line drawing makes the trace continuous even when only every 16th solver step is plotted.</p></div>
+<div class="block codeb"><div class="label">Code · PhasePlot_AddPoint — map value to pixel, line or dot <span style="opacity:.7">(C)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-10-HDMI/src/lorenz_dda/lorenz_dda.c</div><pre><code>static void PhasePlot_AddPoint(u8 *frame, u32 stride, PhasePlot *plot,
+                                float hVal, float vVal)
+{
+	float th, tv;
+	int px, py, dx, dy;
+
+	th = (hVal - plot-&gt;minH) / (plot-&gt;maxH - plot-&gt;minH);
+	if (th &lt; 0.0f) th = 0.0f;
+	if (th &gt; 1.0f) th = 1.0f;
+
+	tv = (vVal - plot-&gt;minV) / (plot-&gt;maxV - plot-&gt;minV);
+	if (tv &lt; 0.0f) tv = 0.0f;
+	if (tv &gt; 1.0f) tv = 1.0f;
+
+	px = (int) (th * (plot-&gt;width - 1));
+	py = (int) (plot-&gt;height - 1) - (int) (tv * (plot-&gt;height - 1));
+
+	if (plot-&gt;hasLast)
+	{
+		dx = (px &gt; plot-&gt;lastPx) ? (px - plot-&gt;lastPx) : (plot-&gt;lastPx - px);
+		dy = (py &gt; plot-&gt;lastPy) ? (py - plot-&gt;lastPy) : (plot-&gt;lastPy - py);
+
+		/* A jump over half the plot means we straddled a LorenzDDA_Load() reset (or, since steps are batched, is just a big-but-legitimate move) - draw a fresh dot instead of a long streak. */
+		if (dx &gt; (int) (plot-&gt;width / 2) || dy &gt; (int) (plot-&gt;height / 2))
+		{
+			PhasePlot_DrawDot(frame, stride, plot, px, py);
+		}
+		else
+		{
+			PhasePlot_DrawLine(frame, stride,
+			                    (int) plot-&gt;xOrigin + plot-&gt;lastPx, (int) plot-&gt;yOrigin + plot-&gt;lastPy,
+			                    (int) plot-&gt;xOrigin + px, (int) plot-&gt;yOrigin + py,
+			                    plot-&gt;red, plot-&gt;blue, plot-&gt;green);
+		}
+	}
+	else
+	{
+		PhasePlot_DrawDot(frame, stride, plot, px, py);
+	}
+
+	plot-&gt;lastPx = px;
+	plot-&gt;lastPy = py;
+	plot-&gt;hasLast = 1;
+}</code></pre></div>
+</section>
+<section class="step" id="step-layout"><h3><span class="no">05.6</span>Four-quadrant 1920×1080 screen</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>XY top-left, YZ top-right, XZ bottom-left, parameter panel bottom-right; each quadrant 960×540 with a 40 px margin; dim divider cross.</li><li>Axis ranges: X ±20, Y ±25 (XY) / ±25 (YZ), Z 0-50 — the classic σ=10, ρ=28, β=8/3 envelope.</li><li>Panel: left column = init values (X0,Y0,Z0,S,R,B,D, drawn once); right column = live X,Y,Z redrawn every update. 5×7 bitmap font drawn at scale 4.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>One screen shows all three projections plus the numbers, so no terminal is needed to read state.</p></div>
+<div class="block codeb"><div class="label">Code · 1920x1080 four-quadrant layout constants <span style="opacity:.7">(C)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-10-HDMI/src/lorenz_dda/lorenz_dda.c (lines 308-333)</div><pre><code>/* Four-quadrant 1920x1080 layout: XY top-left, YZ top-right, XZ bottom-left, parameter panel bottom-right, each quadrant 960x540 with a 40px margin, separated by a thin divider cross. */
+#define SCREEN_W 1920
+#define SCREEN_H 1080
+#define QUAD_W   (SCREEN_W / 2) /* 960 */
+#define QUAD_H   (SCREEN_H / 2) /* 540 */
+#define QUAD_MARGIN 40
+
+#define PLOT_W (QUAD_W - 2 * QUAD_MARGIN) /* 880 */
+#define PLOT_H (QUAD_H - 2 * QUAD_MARGIN) /* 460 */
+
+#define PANEL_X (QUAD_W + QUAD_MARGIN) /* 1000 */
+#define PANEL_Y (QUAD_H + QUAD_MARGIN) /* 580 */
+#define PANEL_W PLOT_W
+#define PANEL_H PLOT_H
+#define PANEL_TEXT_SCALE 4
+#define PANEL_LINE_PITCH 42
+#define PANEL_LINE_Y(i)  (PANEL_Y + 10 + (i) * PANEL_LINE_PITCH)
+#define PANEL_LABEL_CHARS 2 /* e.g. "X:" */
+/* Left column: init/config values (x0,y0,z0,sigma,rho,beta,dt), drawn once. Right column: live current x/y/z, redrawn every frame - rows 0-2 line up with the left column's X/Y/Z rows. */
+#define PANEL_MID_X    (PANEL_X + PANEL_W / 2)
+#define PANEL_LEFT_X   (PANEL_X + 10)
+#define PANEL_RIGHT_X  (PANEL_MID_X + 20)
+#define PANEL_LEFT_NUM_X  (PANEL_LEFT_X  + PANEL_LABEL_CHARS * (5 + 1) * PANEL_TEXT_SCALE)
+#define PANEL_RIGHT_NUM_X (PANEL_RIGHT_X + PANEL_LABEL_CHARS * (5 + 1) * PANEL_TEXT_SCALE)
+
+#define DIVIDER_GRAY 60</code></pre></div>
+<div class="block codeb"><div class="label">Code · plot boxes and axis ranges <span style="opacity:.7">(C)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-10-HDMI/src/lorenz_dda/lorenz_dda.c</div><pre><code>void LorenzDDAPlot_Init(void)
+{
+	/* X, Y ranges follow the classic attractor envelope for sigma=10, rho=28, beta=8/3; Z runs roughly 0-50. */
+	PhasePlot_Init(&amp;plotXY, QUAD_MARGIN,           QUAD_MARGIN,           PLOT_W, PLOT_H,
+	               -20.0f, 20.0f, -25.0f, 25.0f, 255, 0,   0);   /* X-Y, red */
+	PhasePlot_Init(&amp;plotYZ, QUAD_W + QUAD_MARGIN,  QUAD_MARGIN,           PLOT_W, PLOT_H,
+	               -25.0f, 25.0f,   0.0f, 50.0f, 0,   0,   255); /* Y-Z, green */
+	PhasePlot_Init(&amp;plotXZ, QUAD_MARGIN,           QUAD_H + QUAD_MARGIN,  PLOT_W, PLOT_H,
+	               -20.0f, 20.0f,   0.0f, 50.0f, 0,   255, 0);   /* X-Z, blue */
+}</code></pre></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-display-full-screen.jpg" alt="Running display: XY (top-left), YZ (top-right), XZ (bottom-left) and the parameter panel; parameters shown: σ=10, ρ=28, β=2.67, dt=10"><figcaption><b>Figure.</b> Running display: XY (top-left), YZ (top-right), XZ (bottom-left) and the parameter panel; parameters shown: σ=10, ρ=28, β=2.67, dt=10</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="../../figures/step-display-panel-closeup.jpg" alt="Parameter panel: initial values on the left, live X/Y/Z on the right"><figcaption><b>Figure.</b> Parameter panel: initial values on the left, live X/Y/Z on the right</figcaption></figure>
+</section>
+<section class="step" id="step-update"><h3><span class="no">05.7</span>One update: 16 solver steps per plotted point</h3>
+<div class="block did"><div class="label">What I did</div><ul><li><code>LorenzDDAPlot_Update</code>: 16× <code>Step</code>, one <code>ReadState</code>, add a point to the three plots, redraw live X/Y/Z.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>A single tiny Euler step per point made the trace crawl; batching costs 16 cheap AXI pulses but only one redraw.</p></div>
+<div class="block codeb"><div class="label">Code · one plot update = 16 solver steps, read once, plot 3 projections <span style="opacity:.7">(C)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-10-HDMI/src/lorenz_dda/lorenz_dda.c (lines 444-463)</div><pre><code>/* Hardware steps performed per displayed point - batched so the trace doesn't crawl one tiny Euler step at a time, without touching dtShift or the PS-side redraw cadence. */
+#define LORENZ_DDA_STEPS_PER_UPDATE 16u
+
+void LorenzDDAPlot_Update(u8 *frame, u32 stride, u32 baseAddr)
+{
+	float x, y, z;
+	u32 i;
+
+	for (i = 0; i &lt; LORENZ_DDA_STEPS_PER_UPDATE; i++)
+		LorenzDDA_Step(baseAddr);
+	LorenzDDA_ReadState(baseAddr, &amp;x, &amp;y, &amp;z);
+
+	PhasePlot_AddPoint(frame, stride, &amp;plotXY, x, y);
+	PhasePlot_AddPoint(frame, stride, &amp;plotYZ, y, z);
+	PhasePlot_AddPoint(frame, stride, &amp;plotXZ, x, z);
+
+	DrawCurrentValues(frame, stride, x, y, z);
+}</code></pre></div>
+</section>
+<section class="step" id="step-demo-gating"><h3><span class="no">05.8</span>Hook into <code>video_demo.c</code></h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Stock <code>video_demo.c</code> was cut down to the HDMI-out path: no test patterns, no resolution menu, no capture, no interrupts (the RX/capture sources are still in <code>src/</code> but not called).</li><li>Lorenz code is compiled only if the BSP defines <code>XPAR_LORENZ_DDA_DRIVER_0_S00_AXI_BASEADDR</code>; otherwise the app prints a hint and only waits for <code>q</code>.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The guard lets the project build before the hardware is exported — and is why a stale BSP fails silently (I-06).</p></div>
+<div class="block codeb"><div class="label">Code · video_demo.c — compile the Lorenz code only if the BSP has the macro <span style="opacity:.7">(C)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-10-HDMI/src/video_demo.c</div><pre><code>/* Needs XPAR_LORENZ_DDA_DRIVER_0_S00_AXI_BASEADDR in xparameters.h - edit both lines below if your IP instance is named differently, or re-export hardware from Vivado if it's missing entirely. */
+#ifdef XPAR_LORENZ_DDA_DRIVER_0_S00_AXI_BASEADDR                 /* &lt;-- EDIT: replace with your macro */
+#define HAVE_LORENZ_DDA
+#define LORENZ_DDA_BASEADDR	XPAR_LORENZ_DDA_DRIVER_0_S00_AXI_BASEADDR /* &lt;-- EDIT: replace with your macro */
+#endif
+/* ============================================================== */</code></pre></div>
+</section>
+<section class="step" id="step-demo-init-run"><h3><span class="no">05.9</span>Start-up and main loop</h3>
+<div class="block did"><div class="label">What I did</div><ul><li><code>DemoInitialize</code>: timer, VDMA, <code>DisplayInitialize/Start</code> (stock 640×480), then <code>DisplayStop → DisplaySetMode(VMODE_1920x1080) → DisplayStart</code>. Frame buffers are zero (BSS), so the screen starts black.</li><li><code>DemoRun</code>: init plots and panel, write default parameters, <code>Load</code>, print the key menu, then loop: update+flush, delay, poll UART.</li><li>Defaults in the committed source: x0=0.5, y0=0, z0=0, σ=10, ρ=25, β=2, dt shift=10, delay 6000 µs.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The loop is polled (no interrupts) — simplest thing that works and keeps the stock display driver untouched.</p></div>
+<div class="block codeb"><div class="label">Code · DemoInitialize — stock display bring-up, then switch to 1080p <span style="opacity:.7">(C)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-10-HDMI/src/video_demo.c</div><pre><code>void DemoInitialize()
+{
+	int Status;
+	XAxiVdma_Config *vdmaConfig;
+	int i;
+
+	/* Initialize an array of pointers to the 3 frame buffers */
+	for (i = 0; i &lt; DISPLAY_NUM_FRAMES; i++)
+	{
+		pFrames[i] = frameBuf[i];
+	}
+
+	/* Initialize a timer used for a simple delay */
+	TimerInitialize(SCU_TIMER_ID);
+
+	/* Initialize VDMA driver */
+	vdmaConfig = XAxiVdma_LookupConfig(VDMA_ID);
+	if (!vdmaConfig)
+	{
+		xil_printf("No video DMA found for ID %d\r\n", VDMA_ID);
+		return;
+	}
+	Status = XAxiVdma_CfgInitialize(&amp;vdma, vdmaConfig, vdmaConfig-&gt;BaseAddress);
+	if (Status != XST_SUCCESS)
+	{
+		xil_printf("VDMA Configuration Initialization failed %d\r\n", Status);
+		return;
+	}
+
+	/* Initialize the Display controller and start it */
+	Status = DisplayInitialize(&amp;dispCtrl, &amp;vdma, HDMI_OUT_VTC_ID, DYNCLK_BASEADDR, pFrames, DEMO_STRIDE);
+	if (Status != XST_SUCCESS)
+	{
+		xil_printf("Display Ctrl initialization failed during demo initialization%d\r\n", Status);
+		return;
+	}
+	Status = DisplayStart(&amp;dispCtrl);
+	if (Status != XST_SUCCESS)
+	{
+		xil_printf("Couldn't start display during demo initialization%d\r\n", Status);
+		return;
+	}
+
+	/* DisplayInitialize() defaults to 640x480 - switch up to 1920x1080 for real screen real estate. */
+	DisplayStop(&amp;dispCtrl);
+	DisplaySetMode(&amp;dispCtrl, &amp;VMODE_1920x1080);
+	Status = DisplayStart(&amp;dispCtrl);
+	if (Status != XST_SUCCESS)
+	{
+		xil_printf("Couldn't switch display to 1920x1080 %d\r\n", Status);
+		return;
+	}
+
+	/* Framebuffers start zeroed (BSS) and no test pattern is drawn, so the screen starts black - LorenzDDAPlot_ClearAll() in DemoRun() draws the chrome. */
+
+	return;
+}</code></pre></div>
+<div class="block codeb"><div class="label">Code · DemoRun — main loop and key handling <span style="opacity:.7">(C)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-10-HDMI/src/video_demo.c</div><pre><code>void DemoRun()
+{
+	char userInput = 0;
+#ifdef HAVE_LORENZ_DDA
+	/* PS-side delay between displayed points (no HW speed divider); 6000us is 5x the original 30000us default. */
+	u32 stepDelayUs = 6000u;
+	u8 paused = 0;
+	/* Current Lorenz parameters (classic sigma=10, rho=28, beta=8/3); dtShift is a raw HW shift count, not Q6.20 - kept as vars so 's' can show/update them. */
+	float x0 = 0.5f, y0 = 0.0f, z0 = 0.0f;
+	float sigma = 10.0f, rho = 25.0f, beta = 2.0f;
+	u32 dtShift = 10u;
+#endif
+
+	/* Flush UART FIFO */
+	while (XUartPs_IsReceiveData(UART_BASEADDR))
+	{
+		XUartPs_ReadReg(UART_BASEADDR, XUARTPS_FIFO_OFFSET);
+	}
+
+#ifdef HAVE_LORENZ_DDA
+	LorenzDDAPlot_Init();
+	LorenzDDAPlot_ClearAll(pFrames[dispCtrl.curFrame], DEMO_STRIDE);
+	LorenzDDA_SetParams(LORENZ_DDA_BASEADDR, x0, y0, z0, sigma, rho, beta, dtShift);
+	LorenzDDA_Load(LORENZ_DDA_BASEADDR);
+	LorenzDDAPlot_ShowInitValues(pFrames[dispCtrl.curFrame], DEMO_STRIDE, x0, y0, z0, sigma, rho, beta, dtShift);
+	Xil_DCacheFlushRange((unsigned int) pFrames[dispCtrl.curFrame], DEMO_MAX_FRAME);
+
+	DemoPrintMenu();
+
+	while (userInput != 'q')
+	{
+		while (!XUartPs_IsReceiveData(UART_BASEADDR))
+		{
+			if (!paused)
+			{
+				LorenzDDAPlot_Update(pFrames[dispCtrl.curFrame], DEMO_STRIDE, LORENZ_DDA_BASEADDR);
+				Xil_DCacheFlushRange((unsigned int) pFrames[dispCtrl.curFrame], DEMO_MAX_FRAME);
+			}
+			TimerDelay(stepDelayUs);
+		}
+		userInput = XUartPs_ReadReg(UART_BASEADDR, XUARTPS_FIFO_OFFSET);
+		xil_printf("%c", userInput);
+
+		switch (userInput)
+		{
+		case '+':
+			/* Halve the delay (2x speed), floored at 100us. */
+			if (stepDelayUs &gt; 1u)
+				stepDelayUs /= 2;
+			xil_printf("\n\rStep delay: %lu us\n\r", (unsigned long) stepDelayUs);
+			break;
+		case '-':
+			/* Double the delay (0.5x speed), capped at ~1s. */
+			if (stepDelayUs &lt; 1000000u)
+				stepDelayUs *= 2;
+			xil_printf("\n\rStep delay: %lu us\n\r", (unsigned long) stepDelayUs);
+			break;
+		case 'p':
+		case 'P':
+			paused = !paused;
+			xil_printf("\n\r%s\n\r", paused ? "Paused - 'p' resumes" : "Resumed");
+			break;
+		case 'i':
+		case 'I':
+			LorenzDDA_Load(LORENZ_DDA_BASEADDR);
+			LorenzDDAPlot_ClearAll(pFrames[dispCtrl.curFrame], DEMO_STRIDE);
+			LorenzDDAPlot_ShowInitValues(pFrames[dispCtrl.curFrame], DEMO_STRIDE, x0, y0, z0, sigma, rho, beta, dtShift);
+			Xil_DCacheFlushRange((unsigned int) pFrames[dispCtrl.curFrame], DEMO_MAX_FRAME);
+			xil_printf("\n\rReloaded initial conditions\n\r");
+			break;
+		case 's':
+		case 'S':
+			xil_printf("\n\rSet Lorenz parameters (Enter keeps the current value shown in brackets):\n\r");
+			x0    = DemoPromptFloat("x0",    x0);
+			y0    = DemoPromptFloat("y0",    y0);
+			z0    = DemoPromptFloat("z0",    z0);
+			sigma = DemoPromptFloat("sigma", sigma);
+			rho   = DemoPromptFloat("rho",   rho);
+			beta  = DemoPromptFloat("beta",  beta);
+			dtShift = DemoPromptUInt("dt (raw shift count, larger = slower/more stable)", dtShift);
+
+			LorenzDDA_SetParams(LORENZ_DDA_BASEADDR, x0, y0, z0, sigma, rho, beta, dtShift);
+			LorenzDDA_Load(LORENZ_DDA_BASEADDR);
+			LorenzDDAPlot_ClearAll(pFrames[dispCtrl.curFrame], DEMO_STRIDE);
+			LorenzDDAPlot_ShowInitValues(pFrames[dispCtrl.curFrame], DEMO_STRIDE, x0, y0, z0, sigma, rho, beta, dtShift);
+			Xil_DCacheFlushRange((unsigned int) pFrames[dispCtrl.curFrame], DEMO_MAX_FRAME);
+			xil_printf("\n\rParameters updated, trace reloaded\n\r");
+			break;
+		case 'q':
+			break;
+		default:
+			xil_printf("\n\rInvalid selection\n\r");
+		}
+	}</code></pre></div>
+</section>
+<p class="links"><a href="../02-build-log/04-attempt3-hardware.html">← 04 Attempt 3 · hardware (working)</a> &nbsp;·&nbsp; <a href="../02-build-log/06-ui-performance.html">06 Attempt 3 · UI and speed →</a></p>
+<div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README). Yellow <span class="todo">TODO(user)</span> marks facts I could not find.</div>
+</main></body></html>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Block design: add and wire the IP · Lorenz DDA on Zybo Z7-10 — clean build</title>
+<link rel="stylesheet" href="../styles.css"></head>
+<body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — clean build</p><p class="sub">Working flow only, from the second fresh start</p>
+<!-- <a class="switch" href="../../full/index.html">↔ Switch to the full site</a> -->
+<a class="l" href="../index.html">Overview and contents</a>
+<a class="l" href="../01-architecture.html">01 Architecture</a>
+<h4>Build log</h4>
+<a class="l sub2" href="../02-build-log/01-environment.html">01 Environment</a>
+<a class="l sub2" href="../02-build-log/02-baseline.html">02 Fresh Digilent baseline</a>
+<a class="l sub2" href="../02-build-log/03-custom-ip.html">03 The Lorenz IP</a>
+<a class="l sub2 cur" href="../02-build-log/04-block-design.html">04 Block design</a>
+<a class="l sub2" href="../02-build-log/05-bitstream-xsa.html">05 Bitstream and XSA</a>
+<a class="l sub2" href="../02-build-log/06-vitis-platform.html">06 Vitis platform</a>
+<a class="l sub2" href="../02-build-log/07-ps-driver.html">07 PS driver</a>
+<a class="l sub2" href="../02-build-log/08-plotter-demo.html">08 Plotter and demo app</a>
+<a class="l sub2" href="../02-build-log/09-run-sd-boot.html">09 Run, SD boot, repo</a>
+<h4>Reference</h4>
+<a class="l" href="../issues.html">Issues</a>
+<a class="l" href="../gotchas.html">Gotchas</a>
+<a class="l" href="../reference.html">Reference and snippets</a></nav><main><h1>Block design: add and wire the IP</h1><p class="lead">Put the IP on GP0 next to the other control registers, upgrade it to the current revision, validate.</p>
+<section class="step" id="step-repo-path"><h3><span class="no">04.1</span>Add the IP repository to the project</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Project Settings → IP → Repository: add <code>ip_repo/lorenz_dda_driver_1_0</code> (it is listed as a <i>Project</i> repository); click Refresh All and check the definition shows revision 3.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The BD can only instantiate what the catalog holds; a stale or duplicated path gives an older definition.<!--  See I-03. --></p></div>
+<div class="block codeb"><div class="label">Code · point the project at the IP repositories and verify the revision <span style="opacity:.7">(Tcl)</span></div><div class="where">Zybo-Z7-HW.xpr records both paths as IPRepoPath (the Settings dialog lists only the Lorenz folder); the vendor is xilinx.com, not xilinx</div><pre><code>set_property ip_repo_paths [list \
+  [file normalize [get_property directory [current_project]]/ip_repo/lorenz_dda_driver_1_0] \
+  [file normalize [get_property directory [current_project]]/Zybo-Z7-HW.ipdefs/repo] \
+] [current_project]
+update_ip_catalog -rebuild
+get_ipdefs -all *lorenz_dda_driver*                       ;# xilinx.com:user:lorenz_dda_driver:1.0
+get_property core_revision [get_ipdefs xilinx.com:user:lorenz_dda_driver:1.0]   ;# expect 3</code></pre></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-repo-ip-settings.png" alt="Project Settings → IP → Repository listing ip_repo/lorenz_dda_driver_1_0"><figcaption><b>Figure.</b> Project Settings → IP → Repository listing ip_repo/lorenz_dda_driver_1_0</figcaption></figure>
+<!-- Related (full history): <a href="../../full/issues.html#i-03">Repo-path trouble in attempt 1</a> -->
+</section>
+<section class="step" id="step-add-ip"><h3><span class="no">04.2</span>Instantiate and wire <code>lorenz_dda_driver_0</code></h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Add the IP to <code>design_1</code> and run <b>Run Connection Automation</b>; the result is <code>S00_AXI</code> on a <b>new master port M05_AXI</b> of <code>axi_interconnect_gp0</code> (<code>NUM_MI</code> = 6).</li><li>Clock <code>s00_axi_aclk</code> and <code>M05_ACLK</code> = <code>FCLK_CLK0</code> (100 MHz, net <code>ACLK_2</code>); reset <code>s00_axi_aresetn</code> and <code>M05_ARESETN</code> = <code>proc_sys_reset_fclk0/peripheral_aresetn</code>.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The IP is a plain AXI-Lite peripheral on the same clock/reset as the other control registers; no interrupts, no extra I/O ports.</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-bd-lorenz-connections.png" alt="lorenz_dda_driver_0 on axi_interconnect_gp0/M05_AXI, clock and reset connected (highlighted in orange)"><figcaption><b>Figure.</b> lorenz_dda_driver_0 on axi_interconnect_gp0/M05_AXI, clock and reset connected (highlighted in orange)</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="../../figures/step-ip-block-design.png" alt="Whole design_1 with lorenz_dda_driver_0 added (highlighted)"><figcaption><b>Figure.</b> Whole design_1 with lorenz_dda_driver_0 added (highlighted)</figcaption></figure>
+</section>
+<section class="step" id="step-address"><h3><span class="no">04.3</span>Address assignment</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Address Editor: <code>/lorenz_dda_driver_0/S00_AXI/S00_AXI_reg</code> = <b>0x43C30000</b>, range 64K (0x43C30000-0x43C3FFFF).</li><li>Existing slaves keep their addresses (VDMA 0x43000000, dynclk 0x43C00000, v_tc_in 0x43C10000, v_tc_out 0x43C20000, gpio 0x41200000).</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The software base address comes from <code>xparameters.h</code>, but knowing 0x43C30000 makes a wrong-bitstream fault easy to recognise.</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-bd-address-editor.png" alt="Address Editor showing 0x43C30000 / 64K for lorenz_dda_driver_0"><figcaption><b>Figure.</b> Address Editor showing 0x43C30000 / 64K for lorenz_dda_driver_0</figcaption></figure>
+</section>
+<section class="step" id="step-ip-upgrade"><h3><span class="no">04.4</span>Upgrade the instance to revision 3</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>The instance had been created from the first packaging (Rev 1: the wizard version with the 7 registers I entered, 5-bit address). Report IP Status → <b>Upgrade Selected</b> moved it to Rev 3.</li><li>The log ends with CAUTION and a Critical Warning about port-width differences (5 → 7 bits). That is expected: the parameter is disabled in the new revision, so Vivado ignores the old value and keeps 7.</li><li>Verify <code>CONFIG.C_S00_AXI_ADDR_WIDTH</code> = 7, validate the design, save.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Rev 3 decodes 12 registers, which needs a 7-bit bus; a 5-bit instance could only reach the first 8 words, so BETA/DT/X-Y-Z-next would not exist.</p></div>
+<div class="block codeb"><div class="label">Code · ip_upgrade.log — the warnings are expected <span style="opacity:.7">(log)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-HW/ip_upgrade.log</div><pre><code>CAUTION (success, with warnings) in the upgrade of design_1_lorenz_dda_driver_0_0
+  (xilinx.com:user:lorenz_dda_driver:1.0) from (Rev. 1) to (Rev. 3)
+-Upgraded port 's00_axi_araddr' width 7 differs from original width 5
+-Upgraded port 's00_axi_awaddr' width 7 differs from original width 5
+An attempt to modify the value of disabled parameter 'C_S00_AXI_ADDR_WIDTH' from '7' to '5'
+  has been ignored for IP 'design_1_lorenz_dda_driver_0_0'</code></pre></div>
+<div class="block codeb"><div class="label">Code · upgrade the instance and check the address width <span style="opacity:.7">(Tcl)</span></div><pre><code>report_ip_status
+upgrade_ip [get_ips design_1_lorenz_dda_driver_0_0]
+get_property CONFIG.C_S00_AXI_ADDR_WIDTH [get_ips design_1_lorenz_dda_driver_0_0]   ;# expect 7
+validate_bd_design
+save_bd_design</code></pre></div>
+<p class="figtext"><b>Figure (text only).</b> Report IP Status lists <code>design_1_lorenz_dda_driver_0_0</code> as <i>IP revision change</i> with recommendation <b>Upgrade IP</b>; <b>Upgrade Selected</b> performs it.</p>
+<figure class="fig"><img loading="lazy" src="../../figures/issue-ip-upgrade-report.png" alt="ip_upgrade.log: upgraded port widths 7 differ from original width 5"><figcaption><b>Figure.</b> ip_upgrade.log: upgraded port widths 7 differ from original width 5</figcaption></figure>
+<p class="links">Related: Issue <a href="../issues.html#i-03">I-03</a></p>
+</section>
+<section class="step" id="step-validate"><h3><span class="no">04.5</span>Validate, generate output products, wrapper</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Validate Design (F6) — no errors; Generate Output Products (Global); use the Vivado-managed <code>design_1_wrapper</code>.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Catches unconnected clocks/resets before a 10-minute synthesis run.</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-bd-validate-ok.png" alt="Validate Design: 'Validation successful'"><figcaption><b>Figure.</b> Validate Design: 'Validation successful'</figcaption></figure>
+</section>
+<p class="links"><a href="../02-build-log/03-custom-ip.html">← 03 The Lorenz IP</a> &nbsp;·&nbsp; <a href="../02-build-log/05-bitstream-xsa.html">05 Bitstream and XSA →</a></p>
+<div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README).</div>
+</main></body></html>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Attempt 1 · simplified HDMI-out-only design (09-18 → 09-21) · Lorenz DDA on Zybo Z7-10 — full history</title>
+<link rel="stylesheet" href="../styles.css"></head>
+<body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — full history</p><p class="sub">Every attempt, dead end and fix</p>
+<a class="switch" href="../../clean/index.html">↔ Switch to the clean site</a>
+<a class="l" href="../index.html">Overview and contents</a>
+<a class="l" href="../01-architecture.html">01 Architecture</a>
+<h4>Build log</h4>
+<a class="l sub2" href="../02-build-log/00-background.html">00 Background (Feb-Sep 17)</a>
+<a class="l sub2" href="../02-build-log/01-ip-packaging.html">01 Attempt 1 · the IP and its packaging</a>
+<a class="l sub2 cur" href="../02-build-log/02-attempt1-simplified.html">02 Attempt 1 · simplified design</a>
+<a class="l sub2" href="../02-build-log/03-attempt2-fresh-start.html">03 Attempt 2 · first fresh restart</a>
+<a class="l sub2" href="../02-build-log/04-attempt3-hardware.html">04 Attempt 3 · hardware (working)</a>
+<a class="l sub2" href="../02-build-log/05-ps-driver-plotter.html">05 Attempt 3 · PS driver and plotter</a>
+<a class="l sub2" href="../02-build-log/06-ui-performance.html">06 Attempt 3 · UI and speed</a>
+<a class="l sub2" href="../02-build-log/07-sd-boot-repo.html">07 Attempt 3 · SD boot and repo</a>
+<h4>Reference</h4>
+<a class="l" href="../issues.html">Issues</a>
+<a class="l" href="../gotchas.html">Gotchas</a>
+<a class="l" href="../reference.html">Reference and snippets</a></nav><main><h1>Attempt 1 · simplified HDMI-out-only design (09-18 → 09-21)</h1><p class="lead">IP on a hand-simplified block design at 0x43C10000. Ended with no output and was abandoned.</p>
+<section class="step" id="step-a1-analysis"><h3><span class="no">02.1</span>Attempt 1: what was wrong with the platform</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>The Vitis project pointed at an XSA dated 2024-07-04 with no Lorenz IP. The newly exported XSA (<code>lorenz_ivan_9_18.xsa</code>) had the IP at <b>0x43C10000</b> but <b>no RX blocks</b> (no <code>v_tc_in</code>, no <code>axi_gpio_video</code>, no dvi2rgb).</li><li>The stock <code>video_demo.c</code> uses <code>XPAR_V_TC_IN_*</code>, <code>XPAR_AXI_GPIO_VIDEO_*</code> and <code>video_capture</code>, so it could not compile against that platform.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>This is why the simplified design needed a cut-down demo and a rebuilt platform.</p></div>
+<p class="links">Related: Issue <a href="../issues.html#i-06">I-06</a></p>
+</section>
+<section class="step" id="step-a1-load-bug"><h3><span class="no">02.2</span>Attempt 1: found the solver could never leave zero</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Reading the RTL before writing PS code showed the integrators load <code>InitialOut</code> only while <code>reset</code> is high; during reset the AXI registers are 0, so the state seeds to (0,0,0) — a fixed point of the Lorenz equations.</li><li>Added <code>load</code> = CTRL bit 1: <code>slv_reg_ctrl[1]</code> → <code>lorenz_dda_driver.v</code> → <code>lorenz_solver.v</code> → each <code>integrator</code> (<code>reset | load</code> reloads init). Top-level ports did not change, so <code>component.xml</code> needed no edit.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Without it, no software could ever start the solver.</p></div>
+<div class="block codeb"><div class="label">Code · integrator.v — accumulator with software load <span style="opacity:.7">(Verilog)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-HW/ip_repo/lorenz_dda_driver_1_0/src/integrator.v</div><pre><code>`timescale 1ns / 1ps
+
+module integrator
+(
+input                   clk,
+input                   reset,
+input                   load,        // reload InitialOut without a global reset (software controlled)
+input                   enable,      // pulse high for one cycle to take a single integration step
+input signed [26:0]     funct,      //the dV/dt function
+input signed [26:0]     InitialOut,  //the initial state variable V
+
+output signed [26:0]    out //the state variable V
+);
+
+    reg  signed [26:0] v1 ;
+    wire signed [26:0] v1new ;
+    wire signed [26:0]  adder_out;
+
+    always @(posedge clk) begin
+        v1 &lt;= v1new;
+    end
+
+    assign adder_out = v1 + funct;   // Adder
+    assign v1new = (reset | load) ? InitialOut : (enable ? adder_out : v1); 
+
+    assign out = v1; // Assign output
+
+endmodule</code></pre></div>
+<div class="block why"><div class="label">Note</div><p>Edited untested in simulation; it worked on hardware in attempt 3.</p></div>
+<p class="links">Related: Issue <a href="../issues.html#i-05">I-05</a></p>
+</section>
+<section class="step" id="step-a1-xsa"><h3><span class="no">02.3</span>Attempt 1: repackage, upgrade, bitstream, export</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Re-Package IP → refresh catalog → Report IP Status → Upgrade Selected → validate → bitstream → export <code>lorenz_hdmi.xsa</code> (includes <code>lorenz_hdmi.bit</code>; IP at 0x43C10000, IP core revision 4).</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Standard loop after any IP source change.</p></div>
+</section>
+<section class="step" id="step-a1-platform-app"><h3><span class="no">02.4</span>Attempt 1: platform and app</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Update Hardware Specification with <code>lorenz_hdmi.xsa</code>; platform build failed on the driver Makefile (I-07) and was fixed in six copies.</li><li>App cut down to the HDMI-out path (capture, interrupts, menu items 5-8 removed); <code>src/video_capture</code> deleted because it needs <code>xgpio</code>. All files compiled with the ARM compiler against the new <code>xparameters.h</code>.</li><li>Launch-config bitstream name was stale (<code>design_1_wrapper.bit</code> vs <code>lorenz_hdmi.bit</code>) and fixed.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Removing the RX code was the price of the simplified PL.</p></div>
+<div class="block codeb"><div class="label">Code · driver Makefile — broken vs fixed <span style="opacity:.7">(make)</span></div><div class="where">drivers/lorenz_dda_driver_v1_0/src/Makefile</div><pre><code># broken (Vivado 2024.1 generated):
+LIBSOURCES=($wildcard *.c)      # make expands $w (empty) -&gt; gcc gets '(ildcard' and '*.c)'
+OUTS = ($wildcard *.o)
+
+# fixed:
+INCLUDEFILES=$(wildcard *.h)
+LIBSOURCES=$(wildcard *.c)
+OUTS = $(wildcard *.o)</code></pre></div>
+<p class="links">Related: Issue <a href="../issues.html#i-07">I-07</a></p>
+</section>
+<section class="step" id="step-a1-run"><h3><span class="no">02.5</span>Attempt 1: no UART output, no HDMI signal — abandoned</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Board programmed and app launched: <b>nothing on the terminal and 'no signal' on the monitor</b>.</li><li>Checks: TX pins/TMDS_33 in the XDC were right; PS UART1 on MIO 48-49 and STDOUT 0xE0001000 were right; the ELF was older than the latest edits; boot markers <code>[1]</code>-<code>[5]</code> were added; debugger 'Suspend' inspection was suggested.</li><li>The cause was never found. Decision: <b>throw the simplified design away and restart from a fresh Digilent project</b>.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>A stock, known-good design was cheaper than debugging a hand-modified one.</p></div>
+<figure class="fig missing"><img src="../../figures/issue-no-signal.png" alt="Monitor showing 'no signal' (attempt 1)" onload="this.parentNode.classList.remove('missing')" onerror="this.parentNode.classList.add('missing')"><div class="ph"><b>FIGURE PLACEHOLDER</b><br>save screenshot as <code>docs-site/figures/issue-no-signal.png</code></div><figcaption><b>Figure.</b> Monitor showing 'no signal' (attempt 1)</figcaption></figure>
+<p class="links">Related: Issue <a href="../issues.html#i-08">I-08</a></p>
+</section>
+<p class="links"><a href="../02-build-log/01-ip-packaging.html">← 01 Attempt 1 · the IP and its packaging</a> &nbsp;·&nbsp; <a href="../02-build-log/03-attempt2-fresh-start.html">03 Attempt 2 · first fresh restart →</a></p>
+<div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README). Yellow <span class="todo">TODO(user)</span> marks facts I could not find.</div>
+</main></body></html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Run on hardware, boot from SD, keep the repo clean · Lorenz DDA on Zybo Z7-10 — clean build</title>
+<link rel="stylesheet" href="../styles.css"></head>
+<body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — clean build</p><p class="sub">Working flow only, from the second fresh start</p>
+<!-- <a class="switch" href="../../full/index.html">↔ Switch to the full site</a> -->
+<a class="l" href="../index.html">Overview and contents</a>
+<a class="l" href="../01-architecture.html">01 Architecture</a>
+<h4>Build log</h4>
+<a class="l sub2" href="../02-build-log/01-environment.html">01 Environment</a>
+<a class="l sub2" href="../02-build-log/02-baseline.html">02 Fresh Digilent baseline</a>
+<a class="l sub2" href="../02-build-log/03-custom-ip.html">03 The Lorenz IP</a>
+<a class="l sub2" href="../02-build-log/04-block-design.html">04 Block design</a>
+<a class="l sub2" href="../02-build-log/05-bitstream-xsa.html">05 Bitstream and XSA</a>
+<a class="l sub2" href="../02-build-log/06-vitis-platform.html">06 Vitis platform</a>
+<a class="l sub2" href="../02-build-log/07-ps-driver.html">07 PS driver</a>
+<a class="l sub2" href="../02-build-log/08-plotter-demo.html">08 Plotter and demo app</a>
+<a class="l sub2 cur" href="../02-build-log/09-run-sd-boot.html">09 Run, SD boot, repo</a>
+<h4>Reference</h4>
+<a class="l" href="../issues.html">Issues</a>
+<a class="l" href="../gotchas.html">Gotchas</a>
+<a class="l" href="../reference.html">Reference and snippets</a></nav><main><h1>Run on hardware, boot from SD, keep the repo clean</h1><p class="lead">Prove it over JTAG, then make it run from power-up.</p>
+<section class="step" id="step-run-jtag"><h3><span class="no">09.1</span>Run over JTAG</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>JP5 = <b>JTAG</b>. Terminal open at 115200 first (text printed before it opens is lost).</li><li>Xilinx → Program Device with the new bitstream. Answering <b>Yes</b> to 'executables ... doesn't exist' is fine — no ELF is chosen there.</li><li>Build the app: right-click <code>Zybo-Z7-10-HDMI</code> → Build Project (Clean first if the project was regenerated).</li><li>Right-click <code>Zybo-Z7-10-HDMI</code> → Run As → Launch Hardware (Single Application Debug).</li><li>Expect: black 1080p screen with the divider cross, the key menu on the terminal, and the three traces building up.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Confirms the whole chain (bitstream, XSA/BSP, app) before making it persistent.</p></div>
+<p class="figtext"><b>Figure (text only).</b> Menu <b>Xilinx → Program Device</b>, pick the new bitstream and click Program.</p>
+<figure class="fig"><img loading="lazy" src="../../figures/step-vitis-build-project.png" alt="Right-click the app project → Build Project"><figcaption><b>Figure.</b> Right-click the app project → Build Project</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="../../figures/step-vitis-launch-hardware.png" alt="Run As → Launch Hardware (Single Application Debug); the console shows the finished build"><figcaption><b>Figure.</b> Run As → Launch Hardware (Single Application Debug); the console shows the finished build</figcaption></figure>
+</section>
+<section class="step" id="step-sd-image"><h3><span class="no">09.2</span>Create the boot image</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Right-click <code>Zybo-Z7-10-HDMI_system</code> → <b>Create Boot Image</b>: partitions are <code>fsbl.elf</code>, the bitstream and the app ELF. Check each path points at the current build.</li><li>The system project still referenced Digilent's old workspace (<code>D:/Zybo-Z7-SW/ws/...</code>), so Vitis could not build the template; I pointed <code>Zybo-Z7-10-HDMI_system.sprj</code> at the local <code>design_1_wrapper.xpfm</code> (and refreshed the project).</li><li>Output: <code>Zybo-Z7-10-HDMI_system/_ide/bootimage/BOOT.bin</code>. The old <code>Debug/sd_card/BOOT.BIN</code> (2024-07-04) is stale — do not use it.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>A stale BOOT.BIN would run Digilent's old app with an old bitstream.</p></div>
+<div class="block codeb"><div class="label">Code · system.bif — what goes into BOOT.BIN <span style="opacity:.7">(bif)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-10-HDMI_system/Debug/system.bif</div><pre><code>/*design_1_wrapper*/
+the_ROM_image:
+{
+ [bootloader] &lt;design_1_wrapper/boot/fsbl.elf&gt;
+ &lt;bitstream&gt;
+ &lt;elf,ps7_cortexa9_0&gt;
+}</code></pre></div>
+<div class="block codeb"><div class="label">Code · command-line alternative to Create Boot Image <span style="opacity:.7">(shell)</span></div><div class="where">system.bif = fsbl.elf + &lt;bitstream&gt; + application ELF</div><pre><code>cd ivan_lorenz_hdmi/Zybo-Z7-10-HDMI_system/Debug
+bootgen -image system.bif -o sd_card/BOOT.BIN -w</code></pre></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-vitis-create-boot-image.png" alt="Right-click Zybo-Z7-10-HDMI_system → Create Boot Image (console: the system-project build running bootgen)"><figcaption><b>Figure.</b> Right-click Zybo-Z7-10-HDMI_system → Create Boot Image (console: the system-project build running bootgen)</figcaption></figure>
+<p class="links">Related: Issue <a href="../issues.html#i-10">I-10</a> · Issue <a href="../issues.html#i-18">I-18</a></p>
+</section>
+<section class="step" id="step-sd-result"><h3><span class="no">09.3</span>Boot from SD</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>FAT32 SD card, copy the new <code>BOOT.bin</code> to the root; JP5 = <b>SD</b>; insert card; power on.</li><li>Result: the FPGA loads and the plot starts by itself at power-up, no PC needed.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>PL configuration is volatile; only the SD (or QSPI) image survives a power cycle.</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-sd-boot-running.jpg" alt="Boot-mode jumper JP5 on the SD position"><figcaption><b>Figure.</b> Boot-mode jumper JP5 on the SD position</figcaption></figure>
+</section>
+<section class="step" id="step-gitignore"><h3><span class="no">09.4</span>Keep the repo pushable</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>A push failed because <code>Zybo-Z7-10-HDMI-hw.xpr.zip</code> (117 MB) exceeded GitHub's 100 MB limit. The two Digilent archives were removed from the two unpushed commits and <code>*.zip</code> added to <code>.gitignore</code>.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Only source, project files and IP go into git; everything regenerable stays out.</p></div>
+<div class="block codeb"><div class="label">Code · build junk that must stay out of git (excerpt) <span style="opacity:.7">(gitignore)</span></div><div class="where">.gitignore (root) — the .zip line was added after the 117 MB push rejection</div><pre><code>*.bit
+*.xsa
+*.xci
+*.runs/  *.gen/  *.cache/  *.hw/  *.sim/  *.ip_user_files/
+.metadata/
+_ide/  Debug/  Release/
+*.elf  *.bin  *.o  *.d
+# plus the two Digilent release archives:
+*.zip</code></pre></div>
+<p class="links">Related: Issue <a href="../issues.html#i-17">I-17</a></p>
+</section>
+<p class="links"><a href="../02-build-log/08-plotter-demo.html">← 08 Plotter and demo app</a></p>
+<div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README).</div>
+</main></body></html>

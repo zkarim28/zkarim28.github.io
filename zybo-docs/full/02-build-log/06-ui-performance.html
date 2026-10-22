@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Attempt 3 · controls, colours and speed (09-22) · Lorenz DDA on Zybo Z7-10 — full history</title>
+<link rel="stylesheet" href="../styles.css"></head>
+<body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — full history</p><p class="sub">Every attempt, dead end and fix</p>
+<a class="switch" href="../../clean/index.html">↔ Switch to the clean site</a>
+<a class="l" href="../index.html">Overview and contents</a>
+<a class="l" href="../01-architecture.html">01 Architecture</a>
+<h4>Build log</h4>
+<a class="l sub2" href="../02-build-log/00-background.html">00 Background (Feb-Sep 17)</a>
+<a class="l sub2" href="../02-build-log/01-ip-packaging.html">01 Attempt 1 · the IP and its packaging</a>
+<a class="l sub2" href="../02-build-log/02-attempt1-simplified.html">02 Attempt 1 · simplified design</a>
+<a class="l sub2" href="../02-build-log/03-attempt2-fresh-start.html">03 Attempt 2 · first fresh restart</a>
+<a class="l sub2" href="../02-build-log/04-attempt3-hardware.html">04 Attempt 3 · hardware (working)</a>
+<a class="l sub2" href="../02-build-log/05-ps-driver-plotter.html">05 Attempt 3 · PS driver and plotter</a>
+<a class="l sub2 cur" href="../02-build-log/06-ui-performance.html">06 Attempt 3 · UI and speed</a>
+<a class="l sub2" href="../02-build-log/07-sd-boot-repo.html">07 Attempt 3 · SD boot and repo</a>
+<h4>Reference</h4>
+<a class="l" href="../issues.html">Issues</a>
+<a class="l" href="../gotchas.html">Gotchas</a>
+<a class="l" href="../reference.html">Reference and snippets</a></nav><main><h1>Attempt 3 · controls, colours and speed (09-22)</h1><p class="lead">Polish after the first picture appeared.</p>
+<section class="step" id="step-keys"><h3><span class="no">06.1</span>UART keys and the <code>s</code> command</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Keys: <code>+</code>/<code>-</code> speed up/down, <code>p</code> pause/resume, <code>i</code> reload initial conditions, <code>s</code> set x0,y0,z0,σ,ρ,β,dt (Enter keeps the shown value), <code>q</code> quit.</li><li><code>s</code> reads whole lines with a small echoing line editor. Floats are formatted with <code>snprintf</code> and printed with <code>xil_printf</code>.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p><code>xil_printf</code> has no <code>%f</code>; the first version used <code>printf</code> and the prompts never appeared.</p></div>
+<div class="block codeb"><div class="label">Code · DemoPromptFloat — format floats with snprintf, print with xil_printf <span style="opacity:.7">(C)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-10-HDMI/src/video_demo.c</div><pre><code>static float DemoPromptFloat(const char *label, float current)
+{
+	char buf[32];
+	char valBuf[16];
+
+	/* xil_printf has no %f, and printf's buffering can swallow output with no trailing '\n' - so format via snprintf (proven to work) and print via xil_printf. */
+	snprintf(valBuf, sizeof(valBuf), "%.4f", current);
+	xil_printf("%s [%s]: ", label, valBuf);
+	DemoReadLine(buf, sizeof(buf));
+	if (buf[0] == '\0')
+		return current;
+	return (float) atof(buf);
+}</code></pre></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-uart-menu.png" alt="PuTTY on COM6: key menu, then +, -, p, i and an 's' parameter session"><figcaption><b>Figure.</b> PuTTY on COM6: key menu, then +, -, p, i and an 's' parameter session</figcaption></figure>
+<div class="block why"><div class="label">Note</div><p>Known cosmetic bug visible in this capture: the 'Step delay' value printed after <code>+</code>/<code>-</code> is garbage (e.g. 12888659988524 us). Suspected cause: <code>%lu</code> in <code>xil_printf</code> (not verified); the delay variable itself is a 32-bit value.</p></div>
+<p class="links">Related: Issue <a href="../issues.html#i-14">I-14</a></p>
+</section>
+<section class="step" id="step-colors"><h3><span class="no">06.2</span>Colour order</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Framebuffer bytes are (red, blue, green), so the helper's argument order is <code>(red, blue, green)</code>. YZ and XZ colours were swapped relative to their labels; fixed so YZ is green and XZ is blue.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Easy to miss because the code compiled and drew fine.</p></div>
+<p class="links">Related: Issue <a href="../issues.html#i-15">I-15</a></p>
+</section>
+<section class="step" id="step-speed-tuning"><h3><span class="no">06.3</span>Speed and layout tuning</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>First run: plot worked but frames looked clipped and the trace crawled. Boxes enlarged, 16 steps per point, default delay lowered 30 ms → 6 ms; <code>+</code>/<code>-</code> halve/double the delay (floor 100 µs, cap ~1 s).</li><li>A dirty-rectangle flush was tried to avoid flushing 6.2 MB per point; it did not work as intended and was dropped on purpose. The <b>whole-frame flush stays</b> and the speed is good enough.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Whole-frame flush is the simplest correct behaviour; the speed goal was already met by batching steps.</p></div>
+<p class="figtext"><b>Figure (text only).</b> First run: the traces looked cut off at the plot-box edge; the boxes were then enlarged.</p>
+<p class="links">Related: Issue <a href="../issues.html#i-16">I-16</a></p>
+</section>
+<p class="links"><a href="../02-build-log/05-ps-driver-plotter.html">← 05 Attempt 3 · PS driver and plotter</a> &nbsp;·&nbsp; <a href="../02-build-log/07-sd-boot-repo.html">07 Attempt 3 · SD boot and repo →</a></p>
+<div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README). Yellow <span class="todo">TODO(user)</span> marks facts I could not find.</div>
+</main></body></html>

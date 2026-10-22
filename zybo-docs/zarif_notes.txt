@@ -1,0 +1,43 @@
+Zarif Edit suggestions:
+
+Overview and Contents section:
+Update arrow to a bi-directional arrow into the lorenz_dda_driver on the PL side
+- this is show that it has both inputs and outputs
+We can get rid of Scope tbh. We should have an acknoelegments section that contains things of our experience like our scope. and the Result. 
+Instead writing the result, we should post a YouTube link embed to the Lorenz system working
+- Note to self: post a YouTube video
+
+01 Architecutre page:
+- write things out into more bullet points then long sentences, epsecaill for what the origianl Diligent demo
+PL and PS can be broken up into bullet points
+
+2 what I cahnges and why section. 
+will want to revisit this later, still unsure how to handle this section
+
+4. THe lorenz core: type out the equations in latex and display as Proper formulas
+
+01 Environemnt and prerequeisites
+for the tools boar dandc bcliange. make it read off like, "What do we need?"
+
+the ASCII-only ocmputer name thing defnietly just put that in the Gotchas or the Issues section instead. this is not too common of a problem, mostly for those working on their own laptop
+for repository layout, defineitly want to show a picutre of the folder tree instead
+- Note to self: get a screenshot of that to input soon
+
+I think for some of these steps, I wil definietly merge these steps with that of my own instructions becuase they have way more screenshots to follow too, but that we will take care of later
+
+03 THe Lorezn IP, not very clear to tell reader to set the number fo restier to 7. make it bold text
+maybe return back to 03.1 Create IP skeleton... section and make it even more bullet points for the specifications on what to set AXI settings
+
+I dont see a section that shows how to import the files into my project 
+
+
+Minor Aesthetic changes:
+- Toggle Light/Dark Mode
+- Make sure the insutrctions scale to the page, make it easier to read
+
+Remind me to recall all ece 5760 lab steps specifcally for what the checkoffs are and whatnot
+
+Still need to find a way to test verilog code. like 
+
+Future ideas for checkoffs:
+- make a checkoff where the final demo must be run from an SD card alone. and you must show the process of actually booting your own bitstream (as to avoid students from simply borrowing other students SD cards)

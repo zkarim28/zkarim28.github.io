@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Baseline: a fresh Digilent demo · Lorenz DDA on Zybo Z7-10 — clean build</title>
+<link rel="stylesheet" href="../styles.css"></head>
+<body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — clean build</p><p class="sub">Working flow only, from the second fresh start</p>
+<!-- <a class="switch" href="../../full/index.html">↔ Switch to the full site</a> -->
+<a class="l" href="../index.html">Overview and contents</a>
+<a class="l" href="../01-architecture.html">01 Architecture</a>
+<h4>Build log</h4>
+<a class="l sub2" href="../02-build-log/01-environment.html">01 Environment</a>
+<a class="l sub2 cur" href="../02-build-log/02-baseline.html">02 Fresh Digilent baseline</a>
+<a class="l sub2" href="../02-build-log/03-custom-ip.html">03 The Lorenz IP</a>
+<a class="l sub2" href="../02-build-log/04-block-design.html">04 Block design</a>
+<a class="l sub2" href="../02-build-log/05-bitstream-xsa.html">05 Bitstream and XSA</a>
+<a class="l sub2" href="../02-build-log/06-vitis-platform.html">06 Vitis platform</a>
+<a class="l sub2" href="../02-build-log/07-ps-driver.html">07 PS driver</a>
+<a class="l sub2" href="../02-build-log/08-plotter-demo.html">08 Plotter and demo app</a>
+<a class="l sub2" href="../02-build-log/09-run-sd-boot.html">09 Run, SD boot, repo</a>
+<h4>Reference</h4>
+<a class="l" href="../issues.html">Issues</a>
+<a class="l" href="../gotchas.html">Gotchas</a>
+<a class="l" href="../reference.html">Reference and snippets</a></nav><main><h1>Baseline: a fresh Digilent demo</h1><p class="lead">The working build starts from Digilent's own release archives, not from a hand-edited design.</p>
+<section class="step" id="step-baseline-archives"><h3><span class="no">02.1</span>Start from Digilent's release archives</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Download the demo from Digilent's <a href="https://digilent.com/reference/programmable-logic/zybo-z7/demos/hdmi">Zybo Z7 HDMI demo page</a> and extract the <b>Zybo-Z7-10-HDMI</b> release: the hardware archive (<code>Zybo-Z7-10-HDMI-hw.xpr.zip</code> → Vivado project <code>Zybo-Z7-HW</code>) and the software archive (<code>Zybo-Z7-10-HDMI-sw.ide.zip</code> → Vitis workspace with platform <code>design_1_wrapper</code>, app <code>Zybo-Z7-10-HDMI</code>, system project).</li><li>Open <code>Zybo-Z7-HW.xpr</code> in Vivado 2024.1. The archive already carries the Digilent IP repository (<code>axi_dynclk</code>, <code>rgb2dvi</code>, <code>dvi2rgb</code>, <code>tmds</code>) in <code>Zybo-Z7-HW.ipdefs/repo/vivado-library</code>.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p><!-- Two earlier attempts (a hand-simplified design, then a first fresh project) ended in problems that were not worth debugging; a clean, known-good baseline avoided all of them. -->A vendor-supplied, known-good baseline is easier to reason about than a hand-modified design, and every later problem can be attributed to the added IP or software.</p></div>
+<p class="figtext"><b>Figure (text only).</b> Opening <code>Zybo-Z7-HW.xpr</code> in Vivado 2024.1 shows the stock <code>design_1</code> block diagram (next figure).</p>
+<figure class="fig"><img loading="lazy" src="../../figures/step-baseline-vitis-explorer.png" alt="Folder ivan_lorenz_hdmi after extracting the archives: Vitis platform, app and system project, plus the Vivado project Zybo-Z7-HW"><figcaption><b>Figure.</b> Folder ivan_lorenz_hdmi after extracting the archives: Vitis platform, app and system project, plus the Vivado project Zybo-Z7-HW</figcaption></figure>
+<!-- Related (full history): <a href="../../full/02-build-log/02-attempt1-simplified.html">Earlier attempts</a> -->
+</section>
+<section class="step" id="step-baseline-bd"><h3><span class="no">02.2</span>What the stock block design contains</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>PS7 with GP0 (control) and HP0 (video DMA); <code>axi_interconnect_gp0</code> for AXI-Lite slaves; <code>axi_interconnect_hp0</code> for the VDMA.</li><li>TX chain: <code>axi_vdma_0</code> → <code>axis_subset_converter_out</code> → <code>v_axi4s_vid_out_0</code> (+ <code>v_tc_out</code>) → <code>rgb2dvi_1</code>; pixel clock from <code>axi_dynclk_0</code>.</li><li>RX chain (unused by my app, left in place): <code>dvi2rgb_0</code>, <code>v_tc_in</code>, <code>v_vid_in_axi4s_0</code>, <code>axi_gpio_video</code>.</li><li>Stock AXI-Lite addresses: <code>axi_vdma_0</code> 0x43000000, <code>axi_dynclk_0</code> 0x43C00000, <code>v_tc_in</code> 0x43C10000, <code>v_tc_out</code> 0x43C20000, <code>axi_gpio_video</code> 0x41200000.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The custom IP has to slot in next to these without disturbing the video path; knowing the map avoids address clashes.</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-baseline-block-design.png" alt="Stock design_1 block design before adding the Lorenz IP"><figcaption><b>Figure.</b> Stock design_1 block design before adding the Lorenz IP</figcaption></figure>
+</section>
+<p class="links"><a href="../02-build-log/01-environment.html">← 01 Environment</a> &nbsp;·&nbsp; <a href="../02-build-log/03-custom-ip.html">03 The Lorenz IP →</a></p>
+<div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README).</div>
+</main></body></html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Attempt 2 · first restart from a fresh Digilent project (09-21 evening) · Lorenz DDA on Zybo Z7-10 — full history</title>
+<link rel="stylesheet" href="../styles.css"></head>
+<body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — full history</p><p class="sub">Every attempt, dead end and fix</p>
+<a class="switch" href="../../clean/index.html">↔ Switch to the clean site</a>
+<a class="l" href="../index.html">Overview and contents</a>
+<a class="l" href="../01-architecture.html">01 Architecture</a>
+<h4>Build log</h4>
+<a class="l sub2" href="../02-build-log/00-background.html">00 Background (Feb-Sep 17)</a>
+<a class="l sub2" href="../02-build-log/01-ip-packaging.html">01 Attempt 1 · the IP and its packaging</a>
+<a class="l sub2" href="../02-build-log/02-attempt1-simplified.html">02 Attempt 1 · simplified design</a>
+<a class="l sub2 cur" href="../02-build-log/03-attempt2-fresh-start.html">03 Attempt 2 · first fresh restart</a>
+<a class="l sub2" href="../02-build-log/04-attempt3-hardware.html">04 Attempt 3 · hardware (working)</a>
+<a class="l sub2" href="../02-build-log/05-ps-driver-plotter.html">05 Attempt 3 · PS driver and plotter</a>
+<a class="l sub2" href="../02-build-log/06-ui-performance.html">06 Attempt 3 · UI and speed</a>
+<a class="l sub2" href="../02-build-log/07-sd-boot-repo.html">07 Attempt 3 · SD boot and repo</a>
+<h4>Reference</h4>
+<a class="l" href="../issues.html">Issues</a>
+<a class="l" href="../gotchas.html">Gotchas</a>
+<a class="l" href="../reference.html">Reference and snippets</a></nav><main><h1>Attempt 2 · first restart from a fresh Digilent project (09-21 evening)</h1><p class="lead">Full stock design plus the IP at 0x43C30000. A broken HP0 interconnect, a stale bitstream and a black box ended it.</p>
+<section class="step" id="step-a2-newproject"><h3><span class="no">03.1</span>Attempt 2: first fresh restart</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>New project <code>ivan_lorenz_hdmi/Zybo-Z7-HW</code> from the Digilent archive with <code>lorenz_dda_driver_0</code> added on <code>axi_interconnect_gp0/M05_AXI</code> at <b>0x43C30000</b> (RX path kept, stock app kept).</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Full stock design keeps the video path known-good.</p></div>
+<p><span class="todo">TODO(user): how you brought the IP into this project (copy of ip_repo, then repo path).</span></p>
+</section>
+<section class="step" id="step-a2-hp0"><h3><span class="no">03.2</span>Attempt 2: BD validation error on the HP0 interconnect</h3>
+<div class="block did"><div class="label">What I did</div><ul><li><code>[BD 41-758]</code> clock pins <code>axi_interconnect_hp0/s00_couplers/{M_ACLK,S_ACLK}</code> not connected, then <code>[BD 41-1031]</code> HDL generation failed.</li><li>In <code>design_1.bd</code> the HP0 interconnect hierarchy was half-saved (only <code>xbar</code> and an empty <code>s00_couplers</code>, no nets) — probably from the interconnect revision upgrade.</li><li><code>fix_hp0_interconnect.tcl</code> deleted and recreated it (2 slaves, 1 master, regslice 4, FCLK_CLK1 clock, <code>proc_sys_reset_fclk1</code> resets, VDMA → DDR address segments). Back up the BD first (untracked in git at the time).</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The Lorenz IP was not involved — the fault was in the stock video path's interconnect.</p></div>
+<figure class="fig missing"><img src="../../figures/issue-bd-41-758.png" alt="Validate Design error BD 41-758" onload="this.parentNode.classList.remove('missing')" onerror="this.parentNode.classList.add('missing')"><div class="ph"><b>FIGURE PLACEHOLDER</b><br>save screenshot as <code>docs-site/figures/issue-bd-41-758.png</code></div><figcaption><b>Figure.</b> Validate Design error BD 41-758</figcaption></figure>
+<p class="links">Related: Issue <a href="../issues.html#i-09">I-09</a></p>
+</section>
+<section class="step" id="step-a2-plot-v1"><h3><span class="no">03.3</span>Attempt 2: first PS version ('l' key, <code>lorenz_plot.c</code>)</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Added a <code>lorenz_plot/</code> module (ported from the <code>lorenz_reader</code> plotter) and an <code>l</code> menu entry: <code>Lorenz_Reset</code> writes σ=10, ρ=28, β=8/3, dt shift 7, init (1,1,1) and loads; <code>+/-</code> change steps per update; <code>r</code> reset.</li><li>Base address taken from <code>XPAR_LORENZ_DDA_DRIVER_0_S00_AXI_BASEADDR</code>, falling back to 0x43C30000 so it compiled before the BSP was regenerated.</li><li>Later changed to auto-start on a blank screen with only <code>p</code>/<code>r</code>, a register read-back line, and numbered boot markers <code>[0]</code>-<code>[7]</code>.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Reused a proven plotter to get the first picture quickly. It was replaced in attempt 3 by <code>lorenz_dda/</code>.</p></div>
+</section>
+<section class="step" id="step-a2-paths"><h3><span class="no">03.4</span>Attempt 2: stale Digilent workspace paths</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Building the app: <code>Zybo-Z7-10-HDMI_system.sprj</code> and <code>Zybo-Z7-10-HDMI.prj</code> pointed at <code>D:/Zybo-Z7-SW/ws/design_1_wrapper/export/...xpfm</code>; <code>.cproject</code> has include/linker paths under <code>D:/Zybo-Z7-SW/src/...</code>.</li><li>Fix: Update Hardware Specification + Build platform (creates the local <code>.xpfm</code>), Change Referenced Platform, or edit the path in the two project files with Vitis closed.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Digilent's archive was made in a different workspace location.</p></div>
+<p class="links">Related: Issue <a href="../issues.html#i-10">I-10</a></p>
+</section>
+<section class="step" id="step-a2-makefile"><h3><span class="no">03.5</span>Attempt 2: the Makefile typo again</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Platform build failed the same way; the fixed Makefile of attempt 1 had not carried over. Fixed all six copies again.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>New project = new copy of the same generated driver.</p></div>
+<p class="links">Related: Issue <a href="../issues.html#i-07">I-07</a></p>
+</section>
+<section class="step" id="step-a2-compile"><h3><span class="no">03.6</span>Attempt 2: compile error I introduced</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Adding the <code>case 'l'</code> block wrote three <code>\n\r</code> escapes in <code>xil_printf</code> strings as real newlines → 'missing terminating " character'. Restored the escapes.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Small edit-tool slip; listed so it is recognised next time.</p></div>
+<p class="links">Related: Issue <a href="../issues.html#i-11">I-11</a></p>
+</section>
+<section class="step" id="step-a2-abort"><h3><span class="no">03.7</span>Attempt 2: hang at the first Lorenz register write</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Terminal showed <code>[1]</code>..<code>[6]</code> (HDMI, VDMA, capture all fine) and stopped after <code>[6] plots cleared, writing regs</code>.</li><li>Debugger Suspend: CPU in <code>Xil_DataAbortHandler</code> (<code>cpsr = 0x600f01d7</code>, abort mode), faulting <code>str</code> in <code>Xil_Out32</code> → the first register write to 0x43C30000 got an error response.</li><li>XSCT: after <code>fpga -file ...bit</code>, <code>mrd 0x43C30000</code> → <b>Fault status 0x8</b>, <code>mrd 0x43C00000</code> OK → the running bitstream has no slave there.</li><li>Cause: the <code>impl_1</code> outputs were from 18:15, before the BD repair at 18:46; the 18:49 bitstream came from a <code>write_bitstream</code> that only reopened the stale routed checkpoint. Earlier claims of 'timing met' were from that stale run.</li><li>Fix: <code>reset_run synth_1</code>, re-launch to bitstream, re-check timing, re-export XSA, Update HW Spec.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>A data abort (not a stall) on a PL address means 'nothing decodes it' — a bitstream problem, not a software one.</p></div>
+<div class="block codeb"><div class="label">Code · attempt 2: prove the running bitstream has no slave at 0x43C30000 <span style="opacity:.7">(XSCT)</span></div><pre><code>targets 1
+fpga -file .../Zybo-Z7-HW.runs/impl_1/design_1_wrapper.bit
+targets 2
+mrd 0x43C30000     ;# Memory read error ... Fault status 0x8   (no slave decodes it)
+mrd 0x43C00000     ;# 43C00000: 00000000                          (axi_dynclk answers)</code></pre></div>
+<div class="block codeb"><div class="label">Code · attempt 2: force a real rebuild after the block design was repaired <span style="opacity:.7">(Tcl)</span></div><pre><code>reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 8
+wait_on_run impl_1
+report_timing_summary</code></pre></div>
+<figure class="fig missing"><img src="../../figures/issue-data-abort.png" alt="Vitis Debug view parked in Xil_DataAbortHandler" onload="this.parentNode.classList.remove('missing')" onerror="this.parentNode.classList.add('missing')"><div class="ph"><b>FIGURE PLACEHOLDER</b><br>save screenshot as <code>docs-site/figures/issue-data-abort.png</code></div><figcaption><b>Figure.</b> Vitis Debug view parked in Xil_DataAbortHandler</figcaption></figure>
+<figure class="fig missing"><img src="../../figures/issue-xsct-mrd.png" alt="XSCT mrd fault at 0x43C30000" onload="this.parentNode.classList.remove('missing')" onerror="this.parentNode.classList.add('missing')"><div class="ph"><b>FIGURE PLACEHOLDER</b><br>save screenshot as <code>docs-site/figures/issue-xsct-mrd.png</code></div><figcaption><b>Figure.</b> XSCT mrd fault at 0x43C30000</figcaption></figure>
+<p class="links">Related: Issue <a href="../issues.html#i-12">I-12</a></p>
+</section>
+<section class="step" id="step-a2-blackbox"><h3><span class="no">03.8</span>Attempt 2: synthesis error, <code>axi_dynclk</code> is a black box</h3>
+<div class="block did"><div class="label">What I did</div><ul><li><code>[DRC INBB-3] Cell 'design_1_i/axi_dynclk_0/U0' of type 'axi_dynclk' has undefined contents and is considered a black box</code>.</li><li>Root cause, from Zarif's fix in commit <code>f3a2572</code> for the same symptom: <code>axi_dynclk.vhd</code> instantiates <code>SyncAsync</code> with a <code>kResetPolarity</code> generic that <code>rgb2dvi</code>'s older bundled <code>SyncAsync.vhd</code> lacks — a primary-unit collision, so <code>axi_dynclk</code> fails to elaborate.</li><li>Not fixed in place: I restarted from a fresh Digilent project once more instead (attempt 3) and it did not recur.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Two IPs shipping different files with the same VHDL entity name is a library-version clash, not something to patch by hand in a fresh project.</p></div>
+<figure class="fig missing"><img src="../../figures/issue-inbb3.png" alt="DRC INBB-3 black-box message" onload="this.parentNode.classList.remove('missing')" onerror="this.parentNode.classList.add('missing')"><div class="ph"><b>FIGURE PLACEHOLDER</b><br>save screenshot as <code>docs-site/figures/issue-inbb3.png</code></div><figcaption><b>Figure.</b> DRC INBB-3 black-box message</figcaption></figure>
+<p class="links">Related: Issue <a href="../issues.html#i-13">I-13</a></p>
+</section>
+<section class="step" id="step-a2-decision"><h3><span class="no">03.9</span>Attempt 2 → 3: restart from fresh again</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>After the stale-bitstream and black-box problems I re-extracted the Digilent archive into a fresh <code>ivan_lorenz_hdmi</code> and re-did the hardware side. The HP0 repair script and the SyncAsync fix were <b>not needed</b> in the fresh tree; the PS side was rewritten as <code>lorenz_dda/</code>.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Repeatable, known-good start beats repairing a corrupted project. From here the flow is the clean site.</p></div>
+<p class="links">Related: <a href="../../clean/index.html">Clean flow</a></p>
+</section>
+<p class="links"><a href="../02-build-log/02-attempt1-simplified.html">← 02 Attempt 1 · simplified design</a> &nbsp;·&nbsp; <a href="../02-build-log/04-attempt3-hardware.html">04 Attempt 3 · hardware (working) →</a></p>
+<div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README). Yellow <span class="todo">TODO(user)</span> marks facts I could not find.</div>
+</main></body></html>

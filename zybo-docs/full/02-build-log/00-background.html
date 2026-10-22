@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Background before the transcripts · Lorenz DDA on Zybo Z7-10 — full history</title>
+<link rel="stylesheet" href="../styles.css"></head>
+<body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — full history</p><p class="sub">Every attempt, dead end and fix</p>
+<a class="switch" href="../../clean/index.html">↔ Switch to the clean site</a>
+<a class="l" href="../index.html">Overview and contents</a>
+<a class="l" href="../01-architecture.html">01 Architecture</a>
+<h4>Build log</h4>
+<a class="l sub2 cur" href="../02-build-log/00-background.html">00 Background (Feb-Sep 17)</a>
+<a class="l sub2" href="../02-build-log/01-ip-packaging.html">01 Attempt 1 · the IP and its packaging</a>
+<a class="l sub2" href="../02-build-log/02-attempt1-simplified.html">02 Attempt 1 · simplified design</a>
+<a class="l sub2" href="../02-build-log/03-attempt2-fresh-start.html">03 Attempt 2 · first fresh restart</a>
+<a class="l sub2" href="../02-build-log/04-attempt3-hardware.html">04 Attempt 3 · hardware (working)</a>
+<a class="l sub2" href="../02-build-log/05-ps-driver-plotter.html">05 Attempt 3 · PS driver and plotter</a>
+<a class="l sub2" href="../02-build-log/06-ui-performance.html">06 Attempt 3 · UI and speed</a>
+<a class="l sub2" href="../02-build-log/07-sd-boot-repo.html">07 Attempt 3 · SD boot and repo</a>
+<h4>Reference</h4>
+<a class="l" href="../issues.html">Issues</a>
+<a class="l" href="../gotchas.html">Gotchas</a>
+<a class="l" href="../reference.html">Reference and snippets</a></nav><main><h1>Background before the transcripts</h1><p class="lead">From commit history only — no chat record of these weeks.</p>
+<section class="step" id="step-bg-early"><h3><span class="no">00.1</span>February-March: blinky and a VGA dead end</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>02-28: blinky demo project uploaded. 03-07: VGA driver implemented, then found out the Zybo has no VGA connector (HDMI only).</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Establishes the toolchain and the move to HDMI.</p></div>
+</section>
+<section class="step" id="step-bg-sep"><h3><span class="no">00.2</span>September 8-17: Digilent HDMI sources and the first IP attempts</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>09-08: Digilent's HDMI PS sources imported; control code adjusted with Claude. Zarif's tutorial-video counter/Fibonacci hardware lives in <code>tut_vids/</code>.</li><li>09-11: PS draft; block design simplified; first custom AXI IP for a Lorenz DDA circuit — failed with an 'interface difference'.</li><li>09-17: repackaged IP would not synthesise ('try recreate new project next time'). The dates match the spawn/path-length problems diagnosed on 09-18 (I-01, I-02), but the cause was not recorded at the time.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Context only; these steps are not reproduced in the working flow.</p></div>
+<p><span class="todo">TODO(user): the exact interface difference of 09-11 is not remembered and did not reappear later.</span></p>
+</section>
+<p class="links"><a href="../02-build-log/01-ip-packaging.html">01 Attempt 1 · the IP and its packaging →</a></p>
+<div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README). Yellow <span class="todo">TODO(user)</span> marks facts I could not find.</div>
+</main></body></html>

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gotchas · Lorenz DDA on Zybo Z7-10 — clean build</title>
+<link rel="stylesheet" href="styles.css"></head>
+<body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — clean build</p><p class="sub">Working flow only, from the second fresh start</p>
+<!-- <a class="switch" href="../full/index.html">↔ Switch to the full site</a> -->
+<a class="l" href="index.html">Overview and contents</a>
+<a class="l" href="01-architecture.html">01 Architecture</a>
+<h4>Build log</h4>
+<a class="l sub2" href="02-build-log/01-environment.html">01 Environment</a>
+<a class="l sub2" href="02-build-log/02-baseline.html">02 Fresh Digilent baseline</a>
+<a class="l sub2" href="02-build-log/03-custom-ip.html">03 The Lorenz IP</a>
+<a class="l sub2" href="02-build-log/04-block-design.html">04 Block design</a>
+<a class="l sub2" href="02-build-log/05-bitstream-xsa.html">05 Bitstream and XSA</a>
+<a class="l sub2" href="02-build-log/06-vitis-platform.html">06 Vitis platform</a>
+<a class="l sub2" href="02-build-log/07-ps-driver.html">07 PS driver</a>
+<a class="l sub2" href="02-build-log/08-plotter-demo.html">08 Plotter and demo app</a>
+<a class="l sub2" href="02-build-log/09-run-sd-boot.html">09 Run, SD boot, repo</a>
+<h4>Reference</h4>
+<a class="l" href="issues.html">Issues</a>
+<a class="l cur" href="gotchas.html">Gotchas</a>
+<a class="l" href="reference.html">Reference and snippets</a></nav><main><h1>Gotchas</h1><p class="lead">Things to remember for next time that are not tied to one error.</p>
+<h2>Vivado</h2><ul><li>Computer name must be ASCII<!--  (I-01) -->. Check <code>$env:COMPUTERNAME</code> after any PC rename or restore.</li><li>260-byte path limit: package the IP from a short folder; Vivado doubles the run path.<!--  (I-02) --></li><li>Never hand-edit the <code>.xpr</code> while Vivado is open; set <code>ip_repo_paths</code> from the Tcl console.</li><li>After changing IP source: Re-Package → refresh catalog → Report IP Status → Upgrade → validate → regenerate outputs → synth/impl → export XSA.</li><li>The VLNV vendor is <code>xilinx.com</code>; <code>get_ipdefs xilinx:...</code> finds nothing.</li><li>Do not type <code>grep</code> in the Tcl console (it goes to the shell and chokes on regex); use an external shell.</li><li>The generated driver <code>Makefile</code> may contain <code>($wildcard ...)</code> (I-07); <code>save_bd_design_as</code> needs an argument, use <code>save_bd_design</code>.</li><li>Reopening a packaged IP: <b>Edit IP</b> from the wizard opens a project with no sources, because that project's own IP-repository list doesn't include the IP's folder yet. Fix it there (Tools → Settings → IP → Repository, add the folder), then reopen the IP from the <b>IP Catalog → Edit in IP Packager</b> — that opens a second project that actually has the sources.</li></ul>
+<h2>Checking a bitstream is real</h2><ul><li>Look at the modified times in <code>synth_1</code> and <code>impl_1</code> and grep the run logs for <code>lorenz</code> before trusting a bitstream.<!--  (I-12) --></li><li><code>write_bitstream</code> alone reuses the last routed checkpoint; if the block design changed, <code>reset_run synth_1</code> first.</li><li>PL address that gives <code>Fault status 0x8</code> / data abort = nothing decodes it = wrong bitstream or wrong address.</li></ul>
+<h2>IP and arithmetic</h2><ul><li>Format: 27-bit signed, 1 sign + 6 integer + 20 fractional bits (written Q6.20; older notes say Q7.20). value = raw / 2<sup>20</sup>, range about ±64.</li><li><b>DT (0x20) is a raw right-shift count</b>, not fixed point: step = 2<sup>−dt</sup>.</li><li>One Euler step per <b>rising edge</b> of CTRL bit 0: write 1 then 0. <b>load</b> is CTRL bit 1: write 1 then 0. STATUS.done is a one-clock pulse.</li><li>All writable registers read 0 after reset; write parameters and load before stepping.</li><li>The wizard's "Number of Registers" only sizes the generated template (I entered 7 → 5-bit bus; minimum is 4). Growing the register map later widens the address bus (5 → 7 bits here) and the instance in the block design must be upgraded (I-03).</li><li>Base address is 0x43C30000 in this project <!--  (it was 0x43C10000 in the simplified attempt-1 design) -->.</li></ul>
+<h2>Vitis / PS</h2><ul><li>Update Hardware Specification → Clean → Build platform → check <code>xparameters.h</code> (file date!) before building the app (I-06).</li><li>The BSP re-extracts the driver files from the XSA; fix the IP source and re-export, not just the BSP copies.</li><li>The app builds without the Lorenz macro (guarded by <code>#ifdef</code>) — a missing menu/plot means a stale BSP.</li><li>Digilent's project files carry <code>D:/Zybo-Z7-SW</code> paths; fix before Create Boot Image (I-10).</li><li>Program Device warning 'executables ... doesn't exist' is harmless when you run the app separately.</li><li><code>xil_printf</code> has no float support; use <code>snprintf</code>. Source files use CRLF — keep it when editing with sed.</li><li>Serial 115200 8N1; open the terminal before running or early prints are lost.</li><li>Pixels are 3 bytes in order R, B, G; flush the D-cache after drawing or the VDMA shows stale pixels.</li></ul>
+<h2>Board and boot</h2><ul><li>JP5: JTAG for Program/Run from Vitis, SD to boot from card. PL configuration is volatile.</li><li><code>Create Boot Image</code> writes to <code>_ide/bootimage/BOOT.bin</code>, not to the old <code>Debug/sd_card/</code> folder.</li><li>HDMI cable goes to the <b>TX (OUT)</b> connector.</li></ul>
+<h2>Repo</h2><ul><li>GitHub blocks files over 100 MB; keep <code>*.zip</code>, <code>*.bit</code>, <code>*.xsa</code>, <code>*.runs</code>, <code>.metadata</code>, <code>_ide</code>, <code>Debug</code> out of git (I-17).</li></ul>
+<!-- <p class="links">Lessons from the abandoned attempts (simplified design, HP0 repair, black box) are in the <a href="../full/gotchas.html">full-history gotchas</a>.</p> -->
+<div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README).</div>
+</main></body></html>

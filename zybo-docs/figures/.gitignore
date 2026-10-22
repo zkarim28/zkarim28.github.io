@@ -1,0 +1,3 @@
+# Raw screen recordings are too big for GitHub (100 MB limit); only the compressed web copies are committed.
+*.mp4
+!*-web.mp4

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Architecture · Lorenz DDA on Zybo Z7-10 — clean build</title>
+<link rel="stylesheet" href="styles.css"></head>
+<body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — clean build</p><p class="sub">Working flow only, from the second fresh start</p>
+<!-- <a class="switch" href="../full/index.html">↔ Switch to the full site</a> -->
+<a class="l" href="index.html">Overview and contents</a>
+<a class="l cur" href="01-architecture.html">01 Architecture</a>
+<h4>Build log</h4>
+<a class="l sub2" href="02-build-log/01-environment.html">01 Environment</a>
+<a class="l sub2" href="02-build-log/02-baseline.html">02 Fresh Digilent baseline</a>
+<a class="l sub2" href="02-build-log/03-custom-ip.html">03 The Lorenz IP</a>
+<a class="l sub2" href="02-build-log/04-block-design.html">04 Block design</a>
+<a class="l sub2" href="02-build-log/05-bitstream-xsa.html">05 Bitstream and XSA</a>
+<a class="l sub2" href="02-build-log/06-vitis-platform.html">06 Vitis platform</a>
+<a class="l sub2" href="02-build-log/07-ps-driver.html">07 PS driver</a>
+<a class="l sub2" href="02-build-log/08-plotter-demo.html">08 Plotter and demo app</a>
+<a class="l sub2" href="02-build-log/09-run-sd-boot.html">09 Run, SD boot, repo</a>
+<h4>Reference</h4>
+<a class="l" href="issues.html">Issues</a>
+<a class="l" href="gotchas.html">Gotchas</a>
+<a class="l" href="reference.html">Reference and snippets</a></nav><main><h1>01 · Architecture</h1><p class="lead">The stock Digilent demo, what I added, and how data flows.</p>
+<h2>1. What the original Digilent demo does</h2><ul><li><b>PL:</b> PS7 (GP0 for control, HP0 for video DMA); <code>axi_dynclk</code> generates the pixel clock; <code>axi_vdma</code> reads frame buffers from DDR into an AXI-Stream; <code>v_axi4s_vid_out</code> + <code>v_tc_out</code> (timing) → <code>rgb2dvi</code> → HDMI TX. An RX chain (<code>dvi2rgb</code>, <code>v_tc_in</code>, <code>v_vid_in_axi4s</code>, <code>axi_gpio_video</code>) writes captured video back to DDR.</li><li><b>PS:</b> <code>video_demo.c</code> runs a UART menu: change resolution, pick a frame buffer, test patterns, capture / invert / scale the HDMI input. Drivers: <code>display_ctrl</code>, <code>dynclk</code>, <code>video_capture</code>, <code>intc</code>, <code>timer_ps</code>.</li></ul>
+<h2>2. What I changed and why</h2><table><tr><th>Layer</th><th>Change</th><th>Why</th></tr><tr><td>PL</td><td>New IP <code>lorenz_dda_driver</code>: AXI-Lite slave on <code>axi_interconnect_gp0/M05_AXI</code> at <code>0x43C30000</code>, 64K</td><td>Compute the Lorenz equations in hardware</td></tr><tr><td>PL</td><td>IP core = 3 integrators + 4 multipliers, 27-bit fixed point, one Euler step per CTRL bit 0 rising edge, <code>dt</code> as shift, <code>load</code> bit</td><td>Cheap (shifts), and the PS controls the pace; <code>load</code> because init values could not otherwise reach the integrators</td></tr><tr><td>PL</td><td>Rest of the block design and the constraints left as Digilent shipped them (RX chain and RX pins still present)</td><td>Keep the known-good video path untouched</td></tr><tr><td>PS</td><td><code>src/lorenz_dda/lorenz_dda.{c,h}</code>: register driver + software plotter (font, phase plots, Bresenham lines, panel)</td><td>Talk to the IP and draw into the VDMA frame buffer</td></tr><tr><td>PS</td><td><code>video_demo.c/.h</code> reduced to the HDMI-out path; boots to 1920×1080 with four quadrants; keys <code>+ - p i s q</code></td><td>Simplify; the demo is now only a Lorenz plotter</td></tr><tr><td>Repo</td><td><code>.gitignore</code> for build junk and the Digilent archives; SD <code>BOOT.BIN</code></td><td>Repo stays small; board runs stand-alone</td></tr></table>
+<h2>3. Data flow</h2>
+<svg class="diagram" viewBox="0 0 900 400" role="img" aria-label="Block diagram: PS software, AXI-Lite control of the Lorenz IP, and the HDMI video path through DDR and the VDMA">
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<rect class="panel" x="10" y="10" width="230" height="380" rx="8"/><text class="ttl" x="125" y="32" text-anchor="middle">PS · ARM Cortex-A9</text>
+<rect class="box" x="30" y="50" width="190" height="60" rx="6"/><text x="125" y="76" text-anchor="middle">video_demo.c</text><text class="t2" x="125" y="94" text-anchor="middle">UART keys · main loop</text>
+<rect class="new" x="30" y="130" width="190" height="60" rx="6"/><text x="125" y="156" text-anchor="middle">lorenz_dda.c</text><text class="t2" x="125" y="174" text-anchor="middle">register driver (new)</text>
+<rect class="new" x="30" y="210" width="190" height="60" rx="6"/><text x="125" y="236" text-anchor="middle">plotter (new)</text><text class="t2" x="125" y="254" text-anchor="middle">draws pixels R,B,G</text>
+<rect class="box" x="30" y="300" width="190" height="60" rx="6"/><text x="125" y="326" text-anchor="middle">DDR frame buffers</text><text class="t2" x="125" y="344" text-anchor="middle">1920×1080×3 (×4)</text>
+<rect class="panel" x="300" y="10" width="590" height="380" rx="8"/><text class="ttl" x="595" y="32" text-anchor="middle">PL · Zynq fabric</text>
+<rect class="box" x="330" y="60" width="170" height="60" rx="6"/><text x="415" y="86" text-anchor="middle">axi_interconnect_gp0</text><text class="t2" x="415" y="104" text-anchor="middle">M05_AXI → Lorenz IP</text>
+<rect class="new" x="560" y="60" width="300" height="60" rx="6"/><text x="710" y="86" text-anchor="middle">lorenz_dda_driver_0 (new)</text><text class="t2" x="710" y="104" text-anchor="middle">0x43C30000 · 12 regs · 27-bit Euler solver</text>
+<rect class="box" x="330" y="160" width="170" height="50" rx="6"/><text x="415" y="181" text-anchor="middle">dynclk · VDMA · v_tc_out</text><text class="t2" x="415" y="197" text-anchor="middle">control registers</text>
+<rect class="box" x="330" y="290" width="120" height="60" rx="6"/><text x="390" y="316" text-anchor="middle">axi_vdma</text><text class="t2" x="390" y="334" text-anchor="middle">MM2S</text>
+<rect class="box" x="480" y="290" width="150" height="60" rx="6"/><text x="555" y="316" text-anchor="middle">v_axi4s_vid_out</text><text class="t2" x="555" y="334" text-anchor="middle">+ v_tc_out timing</text>
+<rect class="box" x="660" y="290" width="100" height="60" rx="6"/><text x="710" y="316" text-anchor="middle">rgb2dvi</text><text class="t2" x="710" y="334" text-anchor="middle">TMDS</text>
+<rect class="box" x="790" y="290" width="90" height="60" rx="6"/><text x="835" y="316" text-anchor="middle">HDMI TX</text><text class="t2" x="835" y="334" text-anchor="middle">monitor</text>
+<path class="ar" d="M220,160 H265 V90 H330"/><text class="t2" x="252" y="150" text-anchor="end">GP0</text>
+<path class="ar" d="M500,90 H560"/><path class="ar" d="M415,120 V160"/><path class="ar" d="M125,270 V300"/>
+<path class="ar" d="M220,330 H330" /><text class="t2" x="275" y="322" text-anchor="middle">HP0</text>
+<path class="ar" d="M450,320 H480"/><path class="ar" d="M630,320 H660"/><path class="ar" d="M760,320 H790"/>
+</svg>
+<p class="links">Highlighted boxes are new. Control path: PS → GP0 → interconnect → Lorenz IP (write parameters, pulse step, read x/y/z). Video path: the CPU draws into DDR; the VDMA streams it through the stock Digilent TX chain to HDMI. The PL only computes numbers; the CPU draws the picture.</p>
+
+<ul><li><b>Control path:</b> PS <code>Xil_Out32/Xil_In32</code> → GP0 → <code>axi_interconnect_gp0</code> → <code>M05_AXI</code> → <code>lorenz_dda_driver_0</code>. Software writes parameters, pulses <code>load</code>, then pulses <code>step</code> and reads X/Y/Z back.</li><li><b>Video path:</b> CPU writes pixels (3 bytes, R,B,G) into a DDR frame buffer → D-cache flush → <code>axi_vdma</code> (MM2S over HP0) → <code>v_axi4s_vid_out</code> with <code>v_tc_out</code> timing → <code>rgb2dvi</code> → HDMI TX; <code>axi_dynclk</code> sets the pixel clock (148.5 MHz for 1080p60 in the stock driver).</li><li>The PL never touches the pixels; the plot is 100 % software.</li></ul>
+<h2>4. The Lorenz core</h2><ul><li>Equations: dx = σ(y − x), dy = x(ρ − z) − y, dz = xy − βz. Euler with step 2<sup>−dt</sup>, implemented by right-shifting the operands by <code>dt</code>.</li><li>Number format: 27-bit signed, 1 sign + 6 integer + 20 fractional bits ("Q6.20"), value = raw / 2<sup>20</sup>, range about ±64.</li><li><code>signed_mult</code> multiplies two 27-bit values and keeps <code>{sign, product[45:20]}</code>; <code>integrator</code> is <code>v ← v + funct</code> on a step pulse and reloads init on <code>reset | load</code>.</li><li><code>lorenz_solver</code> turns CTRL bit 0 into a one-clock <code>step</code> on its rising edge and drives <code>done</code> one clock later.</li></ul>
+<h2>5. Address map (PS view)</h2><table><tr><th>Block</th><th>Base</th><th>Range</th></tr><tr><td><code>axi_vdma_0</code></td><td><code>0x43000000</code></td><td>64K</td></tr><tr><td><code>axi_dynclk_0</code></td><td><code>0x43C00000</code></td><td>64K</td></tr><tr><td><code>v_tc_in</code> (unused)</td><td><code>0x43C10000</code></td><td>64K</td></tr><tr><td><code>v_tc_out</code></td><td><code>0x43C20000</code></td><td>64K</td></tr><tr><td><b><code>lorenz_dda_driver_0</code></b></td><td><b><code>0x43C30000</code></b></td><td>64K</td></tr><tr><td><code>axi_gpio_video</code> (unused)</td><td><code>0x41200000</code></td><td>64K</td></tr></table>
+<h2>6. Left in place but unused</h2><ul><li>HDMI RX chain in the block design and the RX pin constraints in <code>Zybo-Z7-Master.xdc</code>.</li><li><code>video_capture/</code>, <code>intc/</code> sources in the app tree (not called), stock resolution menu and test patterns (removed from <code>video_demo.c</code>).</li></ul>
+<div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README).</div>
+</main></body></html>

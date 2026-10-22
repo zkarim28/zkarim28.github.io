@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Attempt 3 · second fresh restart: hardware side (09-22 morning) · Lorenz DDA on Zybo Z7-10 — full history</title>
+<link rel="stylesheet" href="../styles.css"></head>
+<body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — full history</p><p class="sub">Every attempt, dead end and fix</p>
+<a class="switch" href="../../clean/index.html">↔ Switch to the clean site</a>
+<a class="l" href="../index.html">Overview and contents</a>
+<a class="l" href="../01-architecture.html">01 Architecture</a>
+<h4>Build log</h4>
+<a class="l sub2" href="../02-build-log/00-background.html">00 Background (Feb-Sep 17)</a>
+<a class="l sub2" href="../02-build-log/01-ip-packaging.html">01 Attempt 1 · the IP and its packaging</a>
+<a class="l sub2" href="../02-build-log/02-attempt1-simplified.html">02 Attempt 1 · simplified design</a>
+<a class="l sub2" href="../02-build-log/03-attempt2-fresh-start.html">03 Attempt 2 · first fresh restart</a>
+<a class="l sub2 cur" href="../02-build-log/04-attempt3-hardware.html">04 Attempt 3 · hardware (working)</a>
+<a class="l sub2" href="../02-build-log/05-ps-driver-plotter.html">05 Attempt 3 · PS driver and plotter</a>
+<a class="l sub2" href="../02-build-log/06-ui-performance.html">06 Attempt 3 · UI and speed</a>
+<a class="l sub2" href="../02-build-log/07-sd-boot-repo.html">07 Attempt 3 · SD boot and repo</a>
+<h4>Reference</h4>
+<a class="l" href="../issues.html">Issues</a>
+<a class="l" href="../gotchas.html">Gotchas</a>
+<a class="l" href="../reference.html">Reference and snippets</a></nav><main><h1>Attempt 3 · second fresh restart: hardware side (09-22 morning)</h1><p class="lead">The build that worked. Same flow as the clean site.</p>
+<section class="step" id="step-baseline-archives"><h3><span class="no">04.1</span>Start from Digilent's release archives</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Download the demo from Digilent's <a href="https://digilent.com/reference/programmable-logic/zybo-z7/demos/hdmi">Zybo Z7 HDMI demo page</a> and extract the <b>Zybo-Z7-10-HDMI</b> release: the hardware archive (<code>Zybo-Z7-10-HDMI-hw.xpr.zip</code> → Vivado project <code>Zybo-Z7-HW</code>) and the software archive (<code>Zybo-Z7-10-HDMI-sw.ide.zip</code> → Vitis workspace with platform <code>design_1_wrapper</code>, app <code>Zybo-Z7-10-HDMI</code>, system project).</li><li>Open <code>Zybo-Z7-HW.xpr</code> in Vivado 2024.1. The archive already carries the Digilent IP repository (<code>axi_dynclk</code>, <code>rgb2dvi</code>, <code>dvi2rgb</code>, <code>tmds</code>) in <code>Zybo-Z7-HW.ipdefs/repo/vivado-library</code>.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Two earlier attempts (a hand-simplified design, then a first fresh project) ended in problems that were not worth debugging; a clean, known-good baseline avoided all of them.<!-- A vendor-supplied, known-good baseline is easier to reason about than a hand-modified design, and every later problem can be attributed to the added IP or software. --></p></div>
+<p class="figtext"><b>Figure (text only).</b> Opening <code>Zybo-Z7-HW.xpr</code> in Vivado 2024.1 shows the stock <code>design_1</code> block diagram (next figure).</p>
+<figure class="fig"><img loading="lazy" src="../../figures/step-baseline-vitis-explorer.png" alt="Folder ivan_lorenz_hdmi after extracting the archives: Vitis platform, app and system project, plus the Vivado project Zybo-Z7-HW"><figcaption><b>Figure.</b> Folder ivan_lorenz_hdmi after extracting the archives: Vitis platform, app and system project, plus the Vivado project Zybo-Z7-HW</figcaption></figure>
+</section>
+<section class="step" id="step-baseline-bd"><h3><span class="no">04.2</span>What the stock block design contains</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>PS7 with GP0 (control) and HP0 (video DMA); <code>axi_interconnect_gp0</code> for AXI-Lite slaves; <code>axi_interconnect_hp0</code> for the VDMA.</li><li>TX chain: <code>axi_vdma_0</code> → <code>axis_subset_converter_out</code> → <code>v_axi4s_vid_out_0</code> (+ <code>v_tc_out</code>) → <code>rgb2dvi_1</code>; pixel clock from <code>axi_dynclk_0</code>.</li><li>RX chain (unused by my app, left in place): <code>dvi2rgb_0</code>, <code>v_tc_in</code>, <code>v_vid_in_axi4s_0</code>, <code>axi_gpio_video</code>.</li><li>Stock AXI-Lite addresses: <code>axi_vdma_0</code> 0x43000000, <code>axi_dynclk_0</code> 0x43C00000, <code>v_tc_in</code> 0x43C10000, <code>v_tc_out</code> 0x43C20000, <code>axi_gpio_video</code> 0x41200000.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The custom IP has to slot in next to these without disturbing the video path; knowing the map avoids address clashes.</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-baseline-block-design.png" alt="Stock design_1 block design before adding the Lorenz IP"><figcaption><b>Figure.</b> Stock design_1 block design before adding the Lorenz IP</figcaption></figure>
+</section>
+<section class="step" id="step-repo-path"><h3><span class="no">04.3</span>Add the IP repository to the project</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Project Settings → IP → Repository: add <code>ip_repo/lorenz_dda_driver_1_0</code> (it is listed as a <i>Project</i> repository); click Refresh All and check the definition shows revision 3.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The BD can only instantiate what the catalog holds; a stale or duplicated path gives an older definition. See I-03.</p></div>
+<div class="block codeb"><div class="label">Code · point the project at the IP repositories and verify the revision <span style="opacity:.7">(Tcl)</span></div><div class="where">Zybo-Z7-HW.xpr records both paths as IPRepoPath (the Settings dialog lists only the Lorenz folder); the vendor is xilinx.com, not xilinx</div><pre><code>set_property ip_repo_paths [list \
+  [file normalize [get_property directory [current_project]]/ip_repo/lorenz_dda_driver_1_0] \
+  [file normalize [get_property directory [current_project]]/Zybo-Z7-HW.ipdefs/repo] \
+] [current_project]
+update_ip_catalog -rebuild
+get_ipdefs -all *lorenz_dda_driver*                       ;# xilinx.com:user:lorenz_dda_driver:1.0
+get_property core_revision [get_ipdefs xilinx.com:user:lorenz_dda_driver:1.0]   ;# expect 3</code></pre></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-repo-ip-settings.png" alt="Project Settings → IP → Repository listing ip_repo/lorenz_dda_driver_1_0"><figcaption><b>Figure.</b> Project Settings → IP → Repository listing ip_repo/lorenz_dda_driver_1_0</figcaption></figure>
+</section>
+<section class="step" id="step-add-ip"><h3><span class="no">04.4</span>Instantiate and wire <code>lorenz_dda_driver_0</code></h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Add the IP to <code>design_1</code> and run <b>Run Connection Automation</b>; the result is <code>S00_AXI</code> on a <b>new master port M05_AXI</b> of <code>axi_interconnect_gp0</code> (<code>NUM_MI</code> = 6).</li><li>Clock <code>s00_axi_aclk</code> and <code>M05_ACLK</code> = <code>FCLK_CLK0</code> (100 MHz, net <code>ACLK_2</code>); reset <code>s00_axi_aresetn</code> and <code>M05_ARESETN</code> = <code>proc_sys_reset_fclk0/peripheral_aresetn</code>.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The IP is a plain AXI-Lite peripheral on the same clock/reset as the other control registers; no interrupts, no extra I/O ports.</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-bd-lorenz-connections.png" alt="lorenz_dda_driver_0 on axi_interconnect_gp0/M05_AXI, clock and reset connected (highlighted in orange)"><figcaption><b>Figure.</b> lorenz_dda_driver_0 on axi_interconnect_gp0/M05_AXI, clock and reset connected (highlighted in orange)</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="../../figures/step-ip-block-design.png" alt="Whole design_1 with lorenz_dda_driver_0 added (highlighted)"><figcaption><b>Figure.</b> Whole design_1 with lorenz_dda_driver_0 added (highlighted)</figcaption></figure>
+</section>
+<section class="step" id="step-address"><h3><span class="no">04.5</span>Address assignment</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Address Editor: <code>/lorenz_dda_driver_0/S00_AXI/S00_AXI_reg</code> = <b>0x43C30000</b>, range 64K (0x43C30000-0x43C3FFFF).</li><li>Existing slaves keep their addresses (VDMA 0x43000000, dynclk 0x43C00000, v_tc_in 0x43C10000, v_tc_out 0x43C20000, gpio 0x41200000).</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The software base address comes from <code>xparameters.h</code>, but knowing 0x43C30000 makes a wrong-bitstream fault easy to recognise.</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-bd-address-editor.png" alt="Address Editor showing 0x43C30000 / 64K for lorenz_dda_driver_0"><figcaption><b>Figure.</b> Address Editor showing 0x43C30000 / 64K for lorenz_dda_driver_0</figcaption></figure>
+</section>
+<section class="step" id="step-ip-upgrade"><h3><span class="no">04.6</span>Upgrade the instance to revision 3</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>The instance had been created from the first packaging (Rev 1: the wizard version with the 7 registers I entered, 5-bit address). Report IP Status → <b>Upgrade Selected</b> moved it to Rev 3.</li><li>The log ends with CAUTION and a Critical Warning about port-width differences (5 → 7 bits). That is expected: the parameter is disabled in the new revision, so Vivado ignores the old value and keeps 7.</li><li>Verify <code>CONFIG.C_S00_AXI_ADDR_WIDTH</code> = 7, validate the design, save.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Rev 3 decodes 12 registers, which needs a 7-bit bus; a 5-bit instance could only reach the first 8 words, so BETA/DT/X-Y-Z-next would not exist.</p></div>
+<div class="block codeb"><div class="label">Code · ip_upgrade.log — the warnings are expected <span style="opacity:.7">(log)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-HW/ip_upgrade.log</div><pre><code>CAUTION (success, with warnings) in the upgrade of design_1_lorenz_dda_driver_0_0
+  (xilinx.com:user:lorenz_dda_driver:1.0) from (Rev. 1) to (Rev. 3)
+-Upgraded port 's00_axi_araddr' width 7 differs from original width 5
+-Upgraded port 's00_axi_awaddr' width 7 differs from original width 5
+An attempt to modify the value of disabled parameter 'C_S00_AXI_ADDR_WIDTH' from '7' to '5'
+  has been ignored for IP 'design_1_lorenz_dda_driver_0_0'</code></pre></div>
+<div class="block codeb"><div class="label">Code · upgrade the instance and check the address width <span style="opacity:.7">(Tcl)</span></div><pre><code>report_ip_status
+upgrade_ip [get_ips design_1_lorenz_dda_driver_0_0]
+get_property CONFIG.C_S00_AXI_ADDR_WIDTH [get_ips design_1_lorenz_dda_driver_0_0]   ;# expect 7
+validate_bd_design
+save_bd_design</code></pre></div>
+<p class="figtext"><b>Figure (text only).</b> Report IP Status lists <code>design_1_lorenz_dda_driver_0_0</code> as <i>IP revision change</i> with recommendation <b>Upgrade IP</b>; <b>Upgrade Selected</b> performs it.</p>
+<figure class="fig"><img loading="lazy" src="../../figures/issue-ip-upgrade-report.png" alt="ip_upgrade.log: upgraded port widths 7 differ from original width 5"><figcaption><b>Figure.</b> ip_upgrade.log: upgraded port widths 7 differ from original width 5</figcaption></figure>
+<p class="links">Related: Issue <a href="../issues.html#i-03">I-03</a></p>
+</section>
+<section class="step" id="step-validate"><h3><span class="no">04.7</span>Validate, generate output products, wrapper</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Validate Design (F6) — no errors; Generate Output Products (Global); use the Vivado-managed <code>design_1_wrapper</code>.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Catches unconnected clocks/resets before a 10-minute synthesis run.</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-bd-validate-ok.png" alt="Validate Design: 'Validation successful'"><figcaption><b>Figure.</b> Validate Design: 'Validation successful'</figcaption></figure>
+</section>
+<section class="step" id="step-bitstream"><h3><span class="no">04.8</span>Synthesis, implementation, bitstream</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Generate Bitstream (or the Tcl below). After the run, <b>check the run timestamps</b> in <code>synth_1</code>/<code>impl_1</code> and that the log mentions <code>lorenz</code>; if in doubt, <code>reset_run synth_1</code> first.</li><li>Result: synthesis complete, bitstream written.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Only a re-synthesis picks up block-design changes; <code>write_bitstream</code> alone reuses the last routed checkpoint (a stale bitstream is a classic cause of a data abort on first register access). It happened in attempt 2, I-12.</p></div>
+<div class="block codeb"><div class="label">Code · implementation to bitstream, then export hardware with the bitstream <span style="opacity:.7">(Tcl)</span></div><div class="where">GUI equivalent: Generate Bitstream, then File &gt; Export &gt; Export Hardware (Include bitstream)</div><pre><code>launch_runs impl_1 -to_step write_bitstream -jobs 8
+wait_on_run impl_1
+write_hw_platform -fixed -include_bit -force -file &lt;project&gt;/design_1_wrapper.xsa</code></pre></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-vivado-bitstream-done.png" alt="Vivado: write_bitstream Complete"><figcaption><b>Figure.</b> Vivado: write_bitstream Complete</figcaption></figure>
+<p class="figtext"><b>Figure (text only).</b> After the run, Reports → Timing Summary should show all user-specified timing constraints met; check it before exporting the hardware.</p>
+</section>
+<section class="step" id="step-export-xsa"><h3><span class="no">04.9</span>Export hardware with the bitstream</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>File → Export → Export Hardware → <b>Include bitstream</b> → <code>Zybo-Z7-HW/design_1_wrapper.xsa</code>.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The XSA is the only thing Vitis needs: it carries the bitstream, <code>ps7_init</code> and the BD's address map (and a copy of the IP driver).</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-export-hardware-dialog.png" alt="File → Export → Export Hardware… (tick 'Include bitstream' in the dialog that opens)"><figcaption><b>Figure.</b> File → Export → Export Hardware… (tick 'Include bitstream' in the dialog that opens)</figcaption></figure>
+</section>
+<section class="step" id="step-platform-update"><h3><span class="no">04.10</span>Update the Vitis platform</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Right-click platform <code>design_1_wrapper</code> → <b>Update Hardware Specification</b> → pick the new <code>design_1_wrapper.xsa</code>.</li><li>Clean Project, then Build Project on the platform (this rebuilds the BSP; there is no separate 'build BSP').</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Until this is done the BSP still holds the Digilent 2024-07-04 files and has no LORENZ macro; the app would still compile because the Lorenz code is behind <code>#ifdef</code>, and silently do nothing.</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-vitis-update-platform.png" alt="Assistant view: right-click design_1_wrapper [Platform] → Update Hardware Specification (Build and Clean are in the same menu)"><figcaption><b>Figure.</b> Assistant view: right-click design_1_wrapper [Platform] → Update Hardware Specification (Build and Clean are in the same menu)</figcaption></figure>
+<p class="links">Related: Issue <a href="../issues.html#i-06">I-06</a></p>
+</section>
+<section class="step" id="step-makefile-fix"><h3><span class="no">04.11</span>Fix the driver Makefile typo</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Platform build failed in <code>lorenz_dda_driver_v1_0</code>; fix <code>($wildcard ...)</code> → <code>$(wildcard ...)</code> (LIBSOURCES and OUTS).</li><li>Fix the <b>source</b> (<code>ip_repo/.../drivers/.../src/Makefile</code>) and re-export if the BSP re-extracts it; copies also live in <code>design_1_wrapper/hw/drivers</code>, <code>tempdsa/drivers</code>, the app BSP <code>libsrc</code>, the FSBL BSP <code>libsrc</code>, and <code>Zybo-Z7-HW.gen/.../ip/.../drivers</code>.</li><li>Rebuild the platform: 'Build Finished', libxil.a rebuilt for both BSPs.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The typo is in the Vivado-generated driver template, so it comes back with every fresh copy of the IP; the <code>cannot find -lrsa</code> error that follows is only a knock-on.</p></div>
+<div class="block codeb"><div class="label">Code · the symptom in the platform build log <span style="opacity:.7">(log)</span></div><pre><code>arm-xilinx-eabi-gcc.exe: error: (ildcard: linker input file not found: No such file or directory
+arm-xilinx-eabi-gcc.exe: error: *.c): linker input file not found: Invalid argument
+make[1]: *** [Makefile:46: ps7_cortexa9_0/libsrc/lorenz_dda_driver_v1_0/src/make.libs] Error 2
+Failed to generate the platform.  Reason: Failed to build the  zynq_fsbl application.</code></pre></div>
+<div class="block codeb"><div class="label">Code · driver Makefile — broken vs fixed <span style="opacity:.7">(make)</span></div><div class="where">drivers/lorenz_dda_driver_v1_0/src/Makefile</div><pre><code># broken (Vivado 2024.1 generated):
+LIBSOURCES=($wildcard *.c)      # make expands $w (empty) -&gt; gcc gets '(ildcard' and '*.c)'
+OUTS = ($wildcard *.o)
+
+# fixed:
+INCLUDEFILES=$(wildcard *.h)
+LIBSOURCES=$(wildcard *.c)
+OUTS = $(wildcard *.o)</code></pre></div>
+<p class="figtext"><b>Figure (text only).</b> The console output is the log excerpt above.</p>
+<p class="links">Related: Issue <a href="../issues.html#i-07">I-07</a></p>
+</section>
+<section class="step" id="step-xparams-check"><h3><span class="no">04.12</span>Confirm the macro exists</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Open the BSP <code>xparameters.h</code> and search <code>LORENZ</code>: <code>XPAR_LORENZ_DDA_DRIVER_0_S00_AXI_BASEADDR</code> = <code>0x43C30000</code>. The file must have a current modification time.</li><li>The generated <code>lorenz_dda_driver.h</code> in the BSP is stale (only <code>SLV_REG0-6</code>); it is not used — the app defines its own offsets.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>This macro is the switch that compiles the Lorenz code in.</p></div>
+<div class="block codeb"><div class="label">Code · what to look for in the regenerated BSP <span style="opacity:.7">(C)</span></div><div class="where">search the file for LORENZ; its modified time must be new (the stock file is dated 2024-07-04)</div><pre><code>/* design_1_wrapper/ps7_cortexa9_0/domain_ps7_cortexa9_0/bsp/ps7_cortexa9_0/include/xparameters.h */
+#define XPAR_LORENZ_DDA_DRIVER_0_S00_AXI_BASEADDR 0x43C30000</code></pre></div>
+<p class="figtext"><b>Figure (text only).</b> Searching the file for <code>LORENZ</code> finds one define, <code>XPAR_LORENZ_DDA_DRIVER_0_S00_AXI_BASEADDR</code> (see the snippet above).</p>
+</section>
+<p class="links"><a href="../02-build-log/03-attempt2-fresh-start.html">← 03 Attempt 2 · first fresh restart</a> &nbsp;·&nbsp; <a href="../02-build-log/05-ps-driver-plotter.html">05 Attempt 3 · PS driver and plotter →</a></p>
+<div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README). Yellow <span class="todo">TODO(user)</span> marks facts I could not find.</div>
+</main></body></html>

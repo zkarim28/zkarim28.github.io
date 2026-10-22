@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Overview · Lorenz DDA on Zybo Z7-10 — clean build</title>
+<link rel="stylesheet" href="styles.css"></head>
+<body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — clean build</p><p class="sub">Working flow only, from the second fresh start</p>
+<!-- <a class="switch" href="../full/index.html">↔ Switch to the full site</a> -->
+<a class="l cur" href="index.html">Overview and contents</a>
+<a class="l" href="01-architecture.html">01 Architecture</a>
+<h4>Build log</h4>
+<a class="l sub2" href="02-build-log/01-environment.html">01 Environment</a>
+<a class="l sub2" href="02-build-log/02-baseline.html">02 Fresh Digilent baseline</a>
+<a class="l sub2" href="02-build-log/03-custom-ip.html">03 The Lorenz IP</a>
+<a class="l sub2" href="02-build-log/04-block-design.html">04 Block design</a>
+<a class="l sub2" href="02-build-log/05-bitstream-xsa.html">05 Bitstream and XSA</a>
+<a class="l sub2" href="02-build-log/06-vitis-platform.html">06 Vitis platform</a>
+<a class="l sub2" href="02-build-log/07-ps-driver.html">07 PS driver</a>
+<a class="l sub2" href="02-build-log/08-plotter-demo.html">08 Plotter and demo app</a>
+<a class="l sub2" href="02-build-log/09-run-sd-boot.html">09 Run, SD boot, repo</a>
+<h4>Reference</h4>
+<a class="l" href="issues.html">Issues</a>
+<a class="l" href="gotchas.html">Gotchas</a>
+<a class="l" href="reference.html">Reference and snippets</a></nav><main><h1>Lorenz DDA on Zybo Z7-10 — clean build</h1>
+<p class="lead">How the Lorenz-attractor plotter was built on the Zybo Z7-10, following only the flow that worked: a fresh Digilent HDMI demo plus a custom AXI-Lite Lorenz IP and a small PS program.</p>
+<div class="card"><b>Scope.</b> Starts at the <b>second restart from a fresh Digilent demo</b>. <!-- Earlier attempts (a hand-simplified design, then a first fresh restart) are only mentioned where a lesson carries over; their story is in the <a href="../full/index.html">full-history site</a>. Issue IDs are the same in both sites. -->Earlier attempts (a hand-simplified design, then a first fresh restart) were abandoned; only the lessons that still matter are kept, as prerequisites and gotchas.</div>
+<div class="card"><b>Result.</b> A Lorenz attractor computed in the FPGA fabric, plotted by the ARM core as three phase-plane projections plus a parameter panel on a 1920×1080 HDMI display; UART keys change speed and parameters; the board runs the project from an SD card just by powering it on.</div>
+<h2>Video walkthrough</h2>
+<p>A screen recording of the whole project flow, focused on how the tool interfaces are used. Watch it once for orientation, then follow the build-log pages step by step.</p>
+<figure class="fig"><video controls preload="metadata" src="../figures/walkthrough-tool-flow-web.mp4">Your browser can't play this video. <a href="../figures/walkthrough-tool-flow-web.mp4">Download it</a> instead.</video><figcaption><b>Video.</b> Project flow through the tool interfaces (13 min 30 s).</figcaption></figure>
+<h2>Architecture at a glance</h2>
+<svg class="diagram" viewBox="0 0 900 400" role="img" aria-label="Block diagram: PS software, AXI-Lite control of the Lorenz IP, and the HDMI video path through DDR and the VDMA">
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<rect class="panel" x="10" y="10" width="230" height="380" rx="8"/><text class="ttl" x="125" y="32" text-anchor="middle">PS · ARM Cortex-A9</text>
+<rect class="box" x="30" y="50" width="190" height="60" rx="6"/><text x="125" y="76" text-anchor="middle">video_demo.c</text><text class="t2" x="125" y="94" text-anchor="middle">UART keys · main loop</text>
+<rect class="new" x="30" y="130" width="190" height="60" rx="6"/><text x="125" y="156" text-anchor="middle">lorenz_dda.c</text><text class="t2" x="125" y="174" text-anchor="middle">register driver (new)</text>
+<rect class="new" x="30" y="210" width="190" height="60" rx="6"/><text x="125" y="236" text-anchor="middle">plotter (new)</text><text class="t2" x="125" y="254" text-anchor="middle">draws pixels R,B,G</text>
+<rect class="box" x="30" y="300" width="190" height="60" rx="6"/><text x="125" y="326" text-anchor="middle">DDR frame buffers</text><text class="t2" x="125" y="344" text-anchor="middle">1920×1080×3 (×4)</text>
+<rect class="panel" x="300" y="10" width="590" height="380" rx="8"/><text class="ttl" x="595" y="32" text-anchor="middle">PL · Zynq fabric</text>
+<rect class="box" x="330" y="60" width="170" height="60" rx="6"/><text x="415" y="86" text-anchor="middle">axi_interconnect_gp0</text><text class="t2" x="415" y="104" text-anchor="middle">M05_AXI → Lorenz IP</text>
+<rect class="new" x="560" y="60" width="300" height="60" rx="6"/><text x="710" y="86" text-anchor="middle">lorenz_dda_driver_0 (new)</text><text class="t2" x="710" y="104" text-anchor="middle">0x43C30000 · 12 regs · 27-bit Euler solver</text>
+<rect class="box" x="330" y="160" width="170" height="50" rx="6"/><text x="415" y="181" text-anchor="middle">dynclk · VDMA · v_tc_out</text><text class="t2" x="415" y="197" text-anchor="middle">control registers</text>
+<rect class="box" x="330" y="290" width="120" height="60" rx="6"/><text x="390" y="316" text-anchor="middle">axi_vdma</text><text class="t2" x="390" y="334" text-anchor="middle">MM2S</text>
+<rect class="box" x="480" y="290" width="150" height="60" rx="6"/><text x="555" y="316" text-anchor="middle">v_axi4s_vid_out</text><text class="t2" x="555" y="334" text-anchor="middle">+ v_tc_out timing</text>
+<rect class="box" x="660" y="290" width="100" height="60" rx="6"/><text x="710" y="316" text-anchor="middle">rgb2dvi</text><text class="t2" x="710" y="334" text-anchor="middle">TMDS</text>
+<rect class="box" x="790" y="290" width="90" height="60" rx="6"/><text x="835" y="316" text-anchor="middle">HDMI TX</text><text class="t2" x="835" y="334" text-anchor="middle">monitor</text>
+<path class="ar" d="M220,160 H265 V90 H330"/><text class="t2" x="252" y="150" text-anchor="end">GP0</text>
+<path class="ar" d="M500,90 H560"/><path class="ar" d="M415,120 V160"/><path class="ar" d="M125,270 V300"/>
+<path class="ar" d="M220,330 H330" /><text class="t2" x="275" y="322" text-anchor="middle">HP0</text>
+<path class="ar" d="M450,320 H480"/><path class="ar" d="M630,320 H660"/><path class="ar" d="M760,320 H790"/>
+</svg>
+<p class="links">Highlighted boxes are new. Control path: PS → GP0 → interconnect → Lorenz IP (write parameters, pulse step, read x/y/z). Video path: the CPU draws into DDR; the VDMA streams it through the stock Digilent TX chain to HDMI. The PL only computes numbers; the CPU draws the picture.</p>
+
+<h2>Contents</h2><div class="card toc"><ul>
+<li><a href="01-architecture.html"><b>01 Architecture</b></a> — original demo vs my changes, data flow, the solver</li>
+<li><a href="02-build-log/01-environment.html"><b>01 Environment</b></a> — Things that must be true before the first click. The two Vivado items are permanent, one-time fixes.</li>
+<li><a href="02-build-log/02-baseline.html"><b>02 Fresh Digilent baseline</b></a> — The working build starts from Digilent's own release archives, not from a hand-edited design.</li>
+<li><a href="02-build-log/03-custom-ip.html"><b>03 The Lorenz IP</b></a> — Created with the AXI4 peripheral wizard, then filled in: a single-step Euler solver behind an AXI-Lite register file, 27-bit signed fixed point.</li>
+<li><a href="02-build-log/04-block-design.html"><b>04 Block design</b></a> — Put the IP on GP0 next to the other control registers, upgrade it to the current revision, validate.</li>
+<li><a href="02-build-log/05-bitstream-xsa.html"><b>05 Bitstream and XSA</b></a> — From block design to a bitstream the software can rely on.</li>
+<li><a href="02-build-log/06-vitis-platform.html"><b>06 Vitis platform</b></a> — Make the BSP see the new hardware and get past the driver Makefile typo.</li>
+<li><a href="02-build-log/07-ps-driver.html"><b>07 PS driver</b></a> — A page of register access code: parameters, load, step, read.</li>
+<li><a href="02-build-log/08-plotter-demo.html"><b>08 Plotter and demo app</b></a> — Software drawing into the VDMA frame buffer, the four-quadrant screen and the UART controls.</li>
+<li><a href="02-build-log/09-run-sd-boot.html"><b>09 Run, SD boot, repo</b></a> — Prove it over JTAG, then make it run from power-up.</li>
+<li><a href="issues.html"><b>Issues</b></a> — 9 entries with symptom, diagnosis, cause, fix, cross-linked to the steps</li>
+<li><a href="gotchas.html"><b>Gotchas</b></a> — things to remember that are not tied to one error</li>
+<li><a href="reference.html"><b>Reference</b></a> — register map, address map, keys, key files, reusable snippets</li></ul></div>
+<h2>How each step is laid out</h2><div class="step"><h3><span class="no">00.0</span>Example step</h3><div class="block did"><div class="label">What I did</div><ul><li>the action, in a bullet or two</li></ul></div><div class="block why"><div class="label">Why</div><p>the reason</p></div><div class="block codeb"><div class="label">Code · caption (language)</div><pre><code>code or commands</code></pre></div><figure class="fig missing"><div class="ph"><b>FIGURE PLACEHOLDER</b><br>save screenshot as <code>docs-site/figures/step-example.png</code></div><figcaption><b>Figure.</b> caption</figcaption></figure></div>
+<div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README).</div>
+</main></body></html>

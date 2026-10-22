@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reference · Lorenz DDA on Zybo Z7-10 — clean build</title>
+<link rel="stylesheet" href="styles.css"></head>
+<body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — clean build</p><p class="sub">Working flow only, from the second fresh start</p>
+<!-- <a class="switch" href="../full/index.html">↔ Switch to the full site</a> -->
+<a class="l" href="index.html">Overview and contents</a>
+<a class="l" href="01-architecture.html">01 Architecture</a>
+<h4>Build log</h4>
+<a class="l sub2" href="02-build-log/01-environment.html">01 Environment</a>
+<a class="l sub2" href="02-build-log/02-baseline.html">02 Fresh Digilent baseline</a>
+<a class="l sub2" href="02-build-log/03-custom-ip.html">03 The Lorenz IP</a>
+<a class="l sub2" href="02-build-log/04-block-design.html">04 Block design</a>
+<a class="l sub2" href="02-build-log/05-bitstream-xsa.html">05 Bitstream and XSA</a>
+<a class="l sub2" href="02-build-log/06-vitis-platform.html">06 Vitis platform</a>
+<a class="l sub2" href="02-build-log/07-ps-driver.html">07 PS driver</a>
+<a class="l sub2" href="02-build-log/08-plotter-demo.html">08 Plotter and demo app</a>
+<a class="l sub2" href="02-build-log/09-run-sd-boot.html">09 Run, SD boot, repo</a>
+<h4>Reference</h4>
+<a class="l" href="issues.html">Issues</a>
+<a class="l" href="gotchas.html">Gotchas</a>
+<a class="l cur" href="reference.html">Reference and snippets</a></nav><main><h1>Reference</h1><p class="lead">Register map, keys, key files and reusable snippets.</p>
+<h2>IP register map (base <code>0x43C30000</code>)</h2><table><tr><th>Offset</th><th>Name</th><th>Access</th><th>Meaning</th></tr><tr><td><code>0x00</code></td><td>CTRL</td><td>R/W</td><td>bit 0 enable (step on 0→1), bit 1 load (level)</td></tr><tr><td><code>0x04</code></td><td>STATUS</td><td>R</td><td>bit 0 done (one-clock pulse)</td></tr><tr><td><code>0x08 0x0C 0x10</code></td><td>X/Y/Z init</td><td>R/W</td><td>signed Q6.20</td></tr><tr><td><code>0x14 0x18 0x1C</code></td><td>σ, ρ, β</td><td>R/W</td><td>signed Q6.20</td></tr><tr><td><code>0x20</code></td><td>DT</td><td>R/W</td><td><b>raw right-shift count</b>, step = 2<sup>−dt</sup></td></tr><tr><td><code>0x24 0x28 0x2C</code></td><td>X/Y/Z next</td><td>R</td><td>signed Q6.20, sign-extended to 32 bits</td></tr></table>
+<h2>UART keys (115200 8N1)</h2><table><tr><th>Key</th><th>Action</th></tr><tr><td><code>+</code> / <code>-</code></td><td>halve / double the delay between plot updates (floor 100 µs, cap ~1 s)</td></tr><tr><td><code>p</code></td><td>pause / resume</td></tr><tr><td><code>i</code></td><td>reload initial conditions, clear the plots</td></tr><tr><td><code>s</code></td><td>prompt for x0, y0, z0, σ, ρ, β, dt (Enter keeps the value in brackets), reload and clear</td></tr><tr><td><code>q</code></td><td>quit the loop</td></tr></table>
+<h2>Key files</h2><table><tr><th>Path (under repo root)</th><th>What</th></tr><tr><td><code>ivan_lorenz_hdmi/Zybo-Z7-HW/Zybo-Z7-HW.xpr</code></td><td>Vivado project (from the Digilent archive)</td></tr><tr><td><code>ivan_lorenz_hdmi/Zybo-Z7-HW/ip_repo/lorenz_dda_driver_1_0/</code></td><td>the custom IP (hdl/, src/, drivers/, component.xml)</td></tr><tr><td><code>ivan_lorenz_hdmi/Zybo-Z7-HW/Zybo-Z7-HW.srcs/sources_1/bd/design_1/design_1.bd</code></td><td>block design</td></tr><tr><td><code>ivan_lorenz_hdmi/Zybo-Z7-HW/Zybo-Z7-HW.srcs/constrs_1/imports/constraints/Zybo-Z7-Master.xdc</code></td><td>constraints (HDMI TX pins H16/H17, D19/D20, C20/B20, B19/A20; TMDS_33)</td></tr><tr><td><code>ivan_lorenz_hdmi/Zybo-Z7-HW/design_1_wrapper.xsa</code></td><td>exported hardware (with bitstream)</td></tr><tr><td><code>ivan_lorenz_hdmi/design_1_wrapper/</code></td><td>Vitis platform, BSP, <code>xparameters.h</code> under <code>ps7_cortexa9_0/domain_ps7_cortexa9_0/bsp/ps7_cortexa9_0/include/</code></td></tr><tr><td><code>ivan_lorenz_hdmi/Zybo-Z7-10-HDMI/src/video_demo.c</code></td><td>main loop, key handling</td></tr><tr><td><code>ivan_lorenz_hdmi/Zybo-Z7-10-HDMI/src/lorenz_dda/lorenz_dda.c|.h</code></td><td>register driver + plotter</td></tr><tr><td><code>ivan_lorenz_hdmi/Zybo-Z7-10-HDMI_system/_ide/bootimage/BOOT.bin</code></td><td>SD boot image (generated)</td></tr></table>
+<h2>Reusable snippets</h2>
+<div class="block codeb"><div class="label">Code · check and fix the computer name (needs a reboot) <span style="opacity:.7">(PowerShell)</span></div><pre><code>$env:COMPUTERNAME
+($env:COMPUTERNAME.ToCharArray() | ForEach-Object { [int]$_ }) -join ','   # any value &gt; 127 is a problem (8216 = U+2018)
+Rename-Computer -NewName "IvanLaptop" -Restart                        # plain ASCII, letters/digits/hyphen</code></pre></div>
+<div class="block codeb"><div class="label">Code · point the project at the IP repositories and verify the revision <span style="opacity:.7">(Tcl)</span></div><div class="where">Zybo-Z7-HW.xpr records both paths as IPRepoPath (the Settings dialog lists only the Lorenz folder); the vendor is xilinx.com, not xilinx</div><pre><code>set_property ip_repo_paths [list \
+  [file normalize [get_property directory [current_project]]/ip_repo/lorenz_dda_driver_1_0] \
+  [file normalize [get_property directory [current_project]]/Zybo-Z7-HW.ipdefs/repo] \
+] [current_project]
+update_ip_catalog -rebuild
+get_ipdefs -all *lorenz_dda_driver*                       ;# xilinx.com:user:lorenz_dda_driver:1.0
+get_property core_revision [get_ipdefs xilinx.com:user:lorenz_dda_driver:1.0]   ;# expect 3</code></pre></div>
+<div class="block codeb"><div class="label">Code · upgrade the instance and check the address width <span style="opacity:.7">(Tcl)</span></div><pre><code>report_ip_status
+upgrade_ip [get_ips design_1_lorenz_dda_driver_0_0]
+get_property CONFIG.C_S00_AXI_ADDR_WIDTH [get_ips design_1_lorenz_dda_driver_0_0]   ;# expect 7
+validate_bd_design
+save_bd_design</code></pre></div>
+<div class="block codeb"><div class="label">Code · implementation to bitstream, then export hardware with the bitstream <span style="opacity:.7">(Tcl)</span></div><div class="where">GUI equivalent: Generate Bitstream, then File &gt; Export &gt; Export Hardware (Include bitstream)</div><pre><code>launch_runs impl_1 -to_step write_bitstream -jobs 8
+wait_on_run impl_1
+write_hw_platform -fixed -include_bit -force -file &lt;project&gt;/design_1_wrapper.xsa</code></pre></div>
+<div class="block codeb"><div class="label">Code · driver Makefile — broken vs fixed <span style="opacity:.7">(make)</span></div><div class="where">drivers/lorenz_dda_driver_v1_0/src/Makefile</div><pre><code># broken (Vivado 2024.1 generated):
+LIBSOURCES=($wildcard *.c)      # make expands $w (empty) -&gt; gcc gets '(ildcard' and '*.c)'
+OUTS = ($wildcard *.o)
+
+# fixed:
+INCLUDEFILES=$(wildcard *.h)
+LIBSOURCES=$(wildcard *.c)
+OUTS = $(wildcard *.o)</code></pre></div>
+<div class="block codeb"><div class="label">Code · the whole software protocol in five lines <span style="opacity:.7">(C)</span></div><pre><code>LorenzDDA_SetParams(base, x0, y0, z0, sigma, rho, beta, dtShift); /* write 6 Q6.20 values + raw shift */
+LorenzDDA_Load(base);                                            /* CTRL=2, CTRL=0: x/y/z := init   */
+for (;;) {
+    LorenzDDA_Step(base);                                        /* CTRL=1, CTRL=0: one Euler step  */
+    LorenzDDA_ReadState(base, &amp;x, &amp;y, &amp;z);                       /* XNEXT/YNEXT/ZNEXT               */
+}</code></pre></div>
+<div class="block codeb"><div class="label">Code · command-line alternative to Create Boot Image <span style="opacity:.7">(shell)</span></div><div class="where">system.bif = fsbl.elf + &lt;bitstream&gt; + application ELF</div><pre><code>cd ivan_lorenz_hdmi/Zybo-Z7-10-HDMI_system/Debug
+bootgen -image system.bif -o sd_card/BOOT.BIN -w</code></pre></div>
+<div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README).</div>
+</main></body></html>

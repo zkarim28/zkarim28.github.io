@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PS driver for the IP · Lorenz DDA on Zybo Z7-10 — clean build</title>
+<link rel="stylesheet" href="../styles.css"></head>
+<body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — clean build</p><p class="sub">Working flow only, from the second fresh start</p>
+<!-- <a class="switch" href="../../full/index.html">↔ Switch to the full site</a> -->
+<a class="l" href="../index.html">Overview and contents</a>
+<a class="l" href="../01-architecture.html">01 Architecture</a>
+<h4>Build log</h4>
+<a class="l sub2" href="../02-build-log/01-environment.html">01 Environment</a>
+<a class="l sub2" href="../02-build-log/02-baseline.html">02 Fresh Digilent baseline</a>
+<a class="l sub2" href="../02-build-log/03-custom-ip.html">03 The Lorenz IP</a>
+<a class="l sub2" href="../02-build-log/04-block-design.html">04 Block design</a>
+<a class="l sub2" href="../02-build-log/05-bitstream-xsa.html">05 Bitstream and XSA</a>
+<a class="l sub2" href="../02-build-log/06-vitis-platform.html">06 Vitis platform</a>
+<a class="l sub2 cur" href="../02-build-log/07-ps-driver.html">07 PS driver</a>
+<a class="l sub2" href="../02-build-log/08-plotter-demo.html">08 Plotter and demo app</a>
+<a class="l sub2" href="../02-build-log/09-run-sd-boot.html">09 Run, SD boot, repo</a>
+<h4>Reference</h4>
+<a class="l" href="../issues.html">Issues</a>
+<a class="l" href="../gotchas.html">Gotchas</a>
+<a class="l" href="../reference.html">Reference and snippets</a></nav><main><h1>PS driver for the IP</h1><p class="lead">A page of register access code: parameters, load, step, read.</p>
+<section class="step" id="step-ps-folder"><h3><span class="no">07.1</span>Add <code>src/lorenz_dda/</code> to the app</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>New files <code>lorenz_dda.c</code> / <code>lorenz_dda.h</code> under <code>Zybo-Z7-10-HDMI/src</code>; refresh the project so Vitis compiles them.</li><li>Register offsets are hand-copied from the Verilog map (word index × 4).</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The auto-generated BSP driver only knows <code>SLV_REG0-6</code>, so the app owns the register names.</p></div>
+<div class="block codeb"><div class="label">Code · register offsets and fixed-point helpers <span style="opacity:.7">(C)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-10-HDMI/src/lorenz_dda/lorenz_dda.c (lines 6-26)</div><pre><code>/* lorenz_dda_driver AXI4-Lite register offsets - see lorenz_dda_driver_slave_lite_v1_0_S00_AXI.v's REG_* localparams (word index * 4 = byte offset). */
+#define LORENZ_DDA_CTRL_OFFSET   0x00 /* R/W  bit0=enable(pulse), bit1=load(pulse) */
+#define LORENZ_DDA_STATUS_OFFSET 0x04 /* R    bit0=done (1 AXI-clock pulse only) */
+#define LORENZ_DDA_XINIT_OFFSET  0x08 /* R/W  signed Q6.20 */
+#define LORENZ_DDA_YINIT_OFFSET  0x0C /* R/W  signed Q6.20 */
+#define LORENZ_DDA_ZINIT_OFFSET  0x10 /* R/W  signed Q6.20 */
+#define LORENZ_DDA_SIGMA_OFFSET  0x14 /* R/W  signed Q6.20 */
+#define LORENZ_DDA_RHO_OFFSET    0x18 /* R/W  signed Q6.20 */
+#define LORENZ_DDA_BETA_OFFSET   0x1C /* R/W  signed Q6.20 */
+#define LORENZ_DDA_DT_OFFSET     0x20 /* R/W  raw right-shift count, NOT Q6.20 - see header */
+#define LORENZ_DDA_XNEXT_OFFSET  0x24 /* R    signed Q6.20 */
+#define LORENZ_DDA_YNEXT_OFFSET  0x28 /* R    signed Q6.20 */
+#define LORENZ_DDA_ZNEXT_OFFSET  0x2C /* R    signed Q6.20 */
+
+#define LORENZ_DDA_CTRL_ENABLE_BIT 0x1u
+#define LORENZ_DDA_CTRL_LOAD_BIT   0x2u
+
+/* Q6.20 fixed point &lt;-&gt; float, same format the IP/solver uses. */
+typedef signed int lorenz_fix;
+#define LORENZ_FIX2FLOAT(a) (((float)(a)) / 1048576.0f)
+#define LORENZ_FLOAT2FIX(f) ((lorenz_fix)((f) * 1048576.0f))</code></pre></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-vitis-app-tree.png" alt="Vitis Explorer: Zybo-Z7-10-HDMI/src with lorenz_dda/"><figcaption><b>Figure.</b> Vitis Explorer: Zybo-Z7-10-HDMI/src with lorenz_dda/</figcaption></figure>
+</section>
+<section class="step" id="step-q620"><h3><span class="no">07.2</span>Fixed-point and the DT trap</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Values ↔ float with <code>raw / 1048576.0f</code> (2<sup>20</sup>); use signed 32-bit <code>lorenz_fix</code> so sign extension works.</li><li><b>DT is not Q6.20</b>: write the raw shift count (dt=10 → step 2<sup>−10</sup>).</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Writing dt as fixed-point would silently give a huge shift and a frozen or garbage trace.</p></div>
+</section>
+<section class="step" id="step-driver-fns"><h3><span class="no">07.3</span>Driver functions</h3>
+<div class="block did"><div class="label">What I did</div><ul><li><code>LorenzDDA_SetParams</code> writes x0,y0,z0,σ,ρ,β (Q6.20) and dt (raw).</li><li><code>Load</code>: CTRL=2 then 0. <code>Step</code>: CTRL=1 then 0. <code>ReadState</code>: XNEXT/YNEXT/ZNEXT. <code>ReadParams</code>: read-back for checks.</li><li>Usage pattern below.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Two writes per pulse because the hardware detects the rising edge (<code>step</code>) or the level (<code>load</code>).</p></div>
+<div class="block codeb"><div class="label">Code · register-level driver functions <span style="opacity:.7">(C)</span></div><div class="where">ivan_lorenz_hdmi/Zybo-Z7-10-HDMI/src/lorenz_dda/lorenz_dda.c (lines 383-422)</div><pre><code>void LorenzDDA_SetParams(u32 baseAddr, float x0, float y0, float z0,
+                          float sigma, float rho, float beta, u32 dtShift)
+{
+	Xil_Out32(baseAddr + LORENZ_DDA_XINIT_OFFSET, (u32) LORENZ_FLOAT2FIX(x0));
+	Xil_Out32(baseAddr + LORENZ_DDA_YINIT_OFFSET, (u32) LORENZ_FLOAT2FIX(y0));
+	Xil_Out32(baseAddr + LORENZ_DDA_ZINIT_OFFSET, (u32) LORENZ_FLOAT2FIX(z0));
+	Xil_Out32(baseAddr + LORENZ_DDA_SIGMA_OFFSET, (u32) LORENZ_FLOAT2FIX(sigma));
+	Xil_Out32(baseAddr + LORENZ_DDA_RHO_OFFSET,   (u32) LORENZ_FLOAT2FIX(rho));
+	Xil_Out32(baseAddr + LORENZ_DDA_BETA_OFFSET,  (u32) LORENZ_FLOAT2FIX(beta));
+	/* Raw shift count, NOT Q6.20 - see the file header comment. */
+	Xil_Out32(baseAddr + LORENZ_DDA_DT_OFFSET, dtShift);
+}
+
+void LorenzDDA_Load(u32 baseAddr)
+{
+	Xil_Out32(baseAddr + LORENZ_DDA_CTRL_OFFSET, LORENZ_DDA_CTRL_LOAD_BIT);
+	Xil_Out32(baseAddr + LORENZ_DDA_CTRL_OFFSET, 0);
+}
+
+void LorenzDDA_Step(u32 baseAddr)
+{
+	Xil_Out32(baseAddr + LORENZ_DDA_CTRL_OFFSET, LORENZ_DDA_CTRL_ENABLE_BIT);
+	Xil_Out32(baseAddr + LORENZ_DDA_CTRL_OFFSET, 0);
+}
+
+void LorenzDDA_ReadState(u32 baseAddr, float *x, float *y, float *z)
+{
+	*x = LORENZ_FIX2FLOAT((lorenz_fix) Xil_In32(baseAddr + LORENZ_DDA_XNEXT_OFFSET));
+	*y = LORENZ_FIX2FLOAT((lorenz_fix) Xil_In32(baseAddr + LORENZ_DDA_YNEXT_OFFSET));
+	*z = LORENZ_FIX2FLOAT((lorenz_fix) Xil_In32(baseAddr + LORENZ_DDA_ZNEXT_OFFSET));
+}
+
+void LorenzDDA_ReadParams(u32 baseAddr, float *sigma, float *rho, float *beta, u32 *dtShift)
+{
+	*sigma = LORENZ_FIX2FLOAT((lorenz_fix) Xil_In32(baseAddr + LORENZ_DDA_SIGMA_OFFSET));
+	*rho   = LORENZ_FIX2FLOAT((lorenz_fix) Xil_In32(baseAddr + LORENZ_DDA_RHO_OFFSET));
+	*beta  = LORENZ_FIX2FLOAT((lorenz_fix) Xil_In32(baseAddr + LORENZ_DDA_BETA_OFFSET));
+	*dtShift = Xil_In32(baseAddr + LORENZ_DDA_DT_OFFSET);
+}</code></pre></div>
+<div class="block codeb"><div class="label">Code · the whole software protocol in five lines <span style="opacity:.7">(C)</span></div><pre><code>LorenzDDA_SetParams(base, x0, y0, z0, sigma, rho, beta, dtShift); /* write 6 Q6.20 values + raw shift */
+LorenzDDA_Load(base);                                            /* CTRL=2, CTRL=0: x/y/z := init   */
+for (;;) {
+    LorenzDDA_Step(base);                                        /* CTRL=1, CTRL=0: one Euler step  */
+    LorenzDDA_ReadState(base, &amp;x, &amp;y, &amp;z);                       /* XNEXT/YNEXT/ZNEXT               */
+}</code></pre></div>
+
+</section>
+<p class="links"><a href="../02-build-log/06-vitis-platform.html">← 06 Vitis platform</a> &nbsp;·&nbsp; <a href="../02-build-log/08-plotter-demo.html">08 Plotter and demo app →</a></p>
+<div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README).</div>
+</main></body></html>

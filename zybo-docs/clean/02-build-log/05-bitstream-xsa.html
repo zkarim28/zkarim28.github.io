@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bitstream and hardware export · Lorenz DDA on Zybo Z7-10 — clean build</title>
+<link rel="stylesheet" href="../styles.css"></head>
+<body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — clean build</p><p class="sub">Working flow only, from the second fresh start</p>
+<!-- <a class="switch" href="../../full/index.html">↔ Switch to the full site</a> -->
+<a class="l" href="../index.html">Overview and contents</a>
+<a class="l" href="../01-architecture.html">01 Architecture</a>
+<h4>Build log</h4>
+<a class="l sub2" href="../02-build-log/01-environment.html">01 Environment</a>
+<a class="l sub2" href="../02-build-log/02-baseline.html">02 Fresh Digilent baseline</a>
+<a class="l sub2" href="../02-build-log/03-custom-ip.html">03 The Lorenz IP</a>
+<a class="l sub2" href="../02-build-log/04-block-design.html">04 Block design</a>
+<a class="l sub2 cur" href="../02-build-log/05-bitstream-xsa.html">05 Bitstream and XSA</a>
+<a class="l sub2" href="../02-build-log/06-vitis-platform.html">06 Vitis platform</a>
+<a class="l sub2" href="../02-build-log/07-ps-driver.html">07 PS driver</a>
+<a class="l sub2" href="../02-build-log/08-plotter-demo.html">08 Plotter and demo app</a>
+<a class="l sub2" href="../02-build-log/09-run-sd-boot.html">09 Run, SD boot, repo</a>
+<h4>Reference</h4>
+<a class="l" href="../issues.html">Issues</a>
+<a class="l" href="../gotchas.html">Gotchas</a>
+<a class="l" href="../reference.html">Reference and snippets</a></nav><main><h1>Bitstream and hardware export</h1><p class="lead">From block design to a bitstream the software can rely on.</p>
+<section class="step" id="step-bitstream"><h3><span class="no">05.1</span>Synthesis, implementation, bitstream</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>Generate Bitstream (or the Tcl below). After the run, <b>check the run timestamps</b> in <code>synth_1</code>/<code>impl_1</code> and that the log mentions <code>lorenz</code>; if in doubt, <code>reset_run synth_1</code> first.</li><li>Result: synthesis complete, bitstream written.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>Only a re-synthesis picks up block-design changes; <code>write_bitstream</code> alone reuses the last routed checkpoint (a stale bitstream is a classic cause of a data abort on first register access).<!--  It happened in attempt 2, I-12. --></p></div>
+<div class="block codeb"><div class="label">Code · implementation to bitstream, then export hardware with the bitstream <span style="opacity:.7">(Tcl)</span></div><div class="where">GUI equivalent: Generate Bitstream, then File &gt; Export &gt; Export Hardware (Include bitstream)</div><pre><code>launch_runs impl_1 -to_step write_bitstream -jobs 8
+wait_on_run impl_1
+write_hw_platform -fixed -include_bit -force -file &lt;project&gt;/design_1_wrapper.xsa</code></pre></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-vivado-bitstream-done.png" alt="Vivado: write_bitstream Complete"><figcaption><b>Figure.</b> Vivado: write_bitstream Complete</figcaption></figure>
+<p class="figtext"><b>Figure (text only).</b> After the run, Reports → Timing Summary should show all user-specified timing constraints met; check it before exporting the hardware.</p>
+<!-- Related (full history): <a href="../../full/issues.html#i-12">Stale bitstream in attempt 2</a> -->
+</section>
+<section class="step" id="step-export-xsa"><h3><span class="no">05.2</span>Export hardware with the bitstream</h3>
+<div class="block did"><div class="label">What I did</div><ul><li>File → Export → Export Hardware → <b>Include bitstream</b> → <code>Zybo-Z7-HW/design_1_wrapper.xsa</code>.</li></ul></div>
+<div class="block why"><div class="label">Why</div><p>The XSA is the only thing Vitis needs: it carries the bitstream, <code>ps7_init</code> and the BD's address map (and a copy of the IP driver).</p></div>
+<figure class="fig"><img loading="lazy" src="../../figures/step-export-hardware-dialog.png" alt="File → Export → Export Hardware… (tick 'Include bitstream' in the dialog that opens)"><figcaption><b>Figure.</b> File → Export → Export Hardware… (tick 'Include bitstream' in the dialog that opens)</figcaption></figure>
+</section>
+<p class="links"><a href="../02-build-log/04-block-design.html">← 04 Block design</a> &nbsp;·&nbsp; <a href="../02-build-log/06-vitis-platform.html">06 Vitis platform →</a></p>
+<div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README).</div>
+</main></body></html>
