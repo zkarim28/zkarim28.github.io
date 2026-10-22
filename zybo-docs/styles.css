@@ -64,6 +64,7 @@ li{margin:3px 0}
 .codeb .where{color:var(--code-label);font-size:11.5px;padding:0 12px 6px}
 figure.fig{margin:0 0 14px;background:var(--fig-bg);border:2px dashed var(--fig-bd);border-radius:8px;padding:10px 12px}
 figure.fig img{max-width:100%;height:auto;display:block;margin:0 auto;border:1px solid var(--line);border-radius:4px;background:#fff}
+figure.fig video{width:100%;height:auto;display:block;margin:0 auto;border:1px solid var(--line);border-radius:4px;background:#000}
 figure.fig figcaption{font-size:13px;margin-top:6px}
 figure.fig .ph{font-size:13px;color:var(--fig-bd);font-family:Consolas,monospace;padding:14px 4px}
 figure.fig .ph b{letter-spacing:.06em}

@@ -3,8 +3,8 @@
 <title>PS driver for the IP · Lorenz DDA on Zybo Z7-10 — clean build</title>
 <link rel="stylesheet" href="../styles.css"></head>
 <body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — clean build</p><p class="sub">Working flow only, from the second fresh start</p>
-<!-- <a class="switch" href="../../full/index.html">↔ Switch to the full site</a> -->
-<a class="l" href="../index.html">Overview and contents</a>
+<!-- <a class="switch" href="../full/index.html">↔ Switch to the full site</a> -->
+<a class="l" href="../Lorenz_walkthrough.html">Overview and contents</a>
 <a class="l" href="../01-architecture.html">01 Architecture</a>
 <h4>Build log</h4>
 <a class="l sub2" href="../02-build-log/01-environment.html">01 Environment</a>
@@ -44,7 +44,7 @@
 typedef signed int lorenz_fix;
 #define LORENZ_FIX2FLOAT(a) (((float)(a)) / 1048576.0f)
 #define LORENZ_FLOAT2FIX(f) ((lorenz_fix)((f) * 1048576.0f))</code></pre></div>
-<figure class="fig"><img loading="lazy" src="../../figures/step-vitis-app-tree.png" alt="Vitis Explorer: Zybo-Z7-10-HDMI/src with lorenz_dda/"><figcaption><b>Figure.</b> Vitis Explorer: Zybo-Z7-10-HDMI/src with lorenz_dda/</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="../figures/step-vitis-app-tree.png" alt="Vitis Explorer: Zybo-Z7-10-HDMI/src with lorenz_dda/"><figcaption><b>Figure.</b> Vitis Explorer: Zybo-Z7-10-HDMI/src with lorenz_dda/</figcaption></figure>
 </section>
 <section class="step" id="step-q620"><h3><span class="no">07.2</span>Fixed-point and the DT trap</h3>
 <div class="block did"><div class="label">What I did</div><ul><li>Values ↔ float with <code>raw / 1048576.0f</code> (2<sup>20</sup>); use signed 32-bit <code>lorenz_fix</code> so sign extension works.</li><li><b>DT is not Q6.20</b>: write the raw shift count (dt=10 → step 2<sup>−10</sup>).</li></ul></div>

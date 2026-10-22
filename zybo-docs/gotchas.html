@@ -3,8 +3,8 @@
 <title>Gotchas · Lorenz DDA on Zybo Z7-10 — clean build</title>
 <link rel="stylesheet" href="styles.css"></head>
 <body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — clean build</p><p class="sub">Working flow only, from the second fresh start</p>
-<!-- <a class="switch" href="../full/index.html">↔ Switch to the full site</a> -->
-<a class="l" href="index.html">Overview and contents</a>
+<!-- <a class="switch" href="full/index.html">↔ Switch to the full site</a> -->
+<a class="l" href="Lorenz_walkthrough.html">Overview and contents</a>
 <a class="l" href="01-architecture.html">01 Architecture</a>
 <h4>Build log</h4>
 <a class="l sub2" href="02-build-log/01-environment.html">01 Environment</a>
@@ -26,6 +26,6 @@
 <h2>Vitis / PS</h2><ul><li>Update Hardware Specification → Clean → Build platform → check <code>xparameters.h</code> (file date!) before building the app (I-06).</li><li>The BSP re-extracts the driver files from the XSA; fix the IP source and re-export, not just the BSP copies.</li><li>The app builds without the Lorenz macro (guarded by <code>#ifdef</code>) — a missing menu/plot means a stale BSP.</li><li>Digilent's project files carry <code>D:/Zybo-Z7-SW</code> paths; fix before Create Boot Image (I-10).</li><li>Program Device warning 'executables ... doesn't exist' is harmless when you run the app separately.</li><li><code>xil_printf</code> has no float support; use <code>snprintf</code>. Source files use CRLF — keep it when editing with sed.</li><li>Serial 115200 8N1; open the terminal before running or early prints are lost.</li><li>Pixels are 3 bytes in order R, B, G; flush the D-cache after drawing or the VDMA shows stale pixels.</li></ul>
 <h2>Board and boot</h2><ul><li>JP5: JTAG for Program/Run from Vitis, SD to boot from card. PL configuration is volatile.</li><li><code>Create Boot Image</code> writes to <code>_ide/bootimage/BOOT.bin</code>, not to the old <code>Debug/sd_card/</code> folder.</li><li>HDMI cable goes to the <b>TX (OUT)</b> connector.</li></ul>
 <h2>Repo</h2><ul><li>GitHub blocks files over 100 MB; keep <code>*.zip</code>, <code>*.bit</code>, <code>*.xsa</code>, <code>*.runs</code>, <code>.metadata</code>, <code>_ide</code>, <code>Debug</code> out of git (I-17).</li></ul>
-<!-- <p class="links">Lessons from the abandoned attempts (simplified design, HP0 repair, black box) are in the <a href="../full/gotchas.html">full-history gotchas</a>.</p> -->
+<!-- <p class="links">Lessons from the abandoned attempts (simplified design, HP0 repair, black box) are in the <a href="full/gotchas.html">full-history gotchas</a>.</p> -->
 <div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README).</div>
 </main></body></html>

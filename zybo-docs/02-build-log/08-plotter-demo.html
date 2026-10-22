@@ -3,8 +3,8 @@
 <title>Plotter and demo application · Lorenz DDA on Zybo Z7-10 — clean build</title>
 <link rel="stylesheet" href="../styles.css"></head>
 <body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — clean build</p><p class="sub">Working flow only, from the second fresh start</p>
-<!-- <a class="switch" href="../../full/index.html">↔ Switch to the full site</a> -->
-<a class="l" href="../index.html">Overview and contents</a>
+<!-- <a class="switch" href="../full/index.html">↔ Switch to the full site</a> -->
+<a class="l" href="../Lorenz_walkthrough.html">Overview and contents</a>
 <a class="l" href="../01-architecture.html">01 Architecture</a>
 <h4>Build log</h4>
 <a class="l sub2" href="../02-build-log/01-environment.html">01 Environment</a>
@@ -122,8 +122,8 @@ Xil_DCacheFlushRange((unsigned int) pFrames[dispCtrl.curFrame], DEMO_MAX_FRAME);
 	PhasePlot_Init(&amp;plotXZ, QUAD_MARGIN,           QUAD_H + QUAD_MARGIN,  PLOT_W, PLOT_H,
 	               -20.0f, 20.0f,   0.0f, 50.0f, 0,   255, 0);   /* X-Z, blue */
 }</code></pre></div>
-<figure class="fig"><img loading="lazy" src="../../figures/step-display-full-screen.jpg" alt="Running display: XY (top-left), YZ (top-right), XZ (bottom-left) and the parameter panel; parameters shown: σ=10, ρ=28, β=2.67, dt=10"><figcaption><b>Figure.</b> Running display: XY (top-left), YZ (top-right), XZ (bottom-left) and the parameter panel; parameters shown: σ=10, ρ=28, β=2.67, dt=10</figcaption></figure>
-<figure class="fig"><img loading="lazy" src="../../figures/step-display-panel-closeup.jpg" alt="Parameter panel: initial values on the left, live X/Y/Z on the right"><figcaption><b>Figure.</b> Parameter panel: initial values on the left, live X/Y/Z on the right</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="../figures/step-display-full-screen.jpg" alt="Running display: XY (top-left), YZ (top-right), XZ (bottom-left) and the parameter panel; parameters shown: σ=10, ρ=28, β=2.67, dt=10"><figcaption><b>Figure.</b> Running display: XY (top-left), YZ (top-right), XZ (bottom-left) and the parameter panel; parameters shown: σ=10, ρ=28, β=2.67, dt=10</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="../figures/step-display-panel-closeup.jpg" alt="Parameter panel: initial values on the left, live X/Y/Z on the right"><figcaption><b>Figure.</b> Parameter panel: initial values on the left, live X/Y/Z on the right</figcaption></figure>
 </section>
 <section class="step" id="step-update"><h3><span class="no">08.4</span>One update: 16 solver steps per plotted point</h3>
 <div class="block did"><div class="label">What I did</div><ul><li><code>LorenzDDAPlot_Update</code>: 16× <code>Step</code>, one <code>ReadState</code>, add a point to the three plots, redraw live X/Y/Z.</li></ul></div>
@@ -328,7 +328,7 @@ void LorenzDDAPlot_Update(u8 *frame, u32 stride, u32 baseAddr)
 		return current;
 	return (float) atof(buf);
 }</code></pre></div>
-<figure class="fig"><img loading="lazy" src="../../figures/step-uart-menu.png" alt="PuTTY on COM6: key menu, then +, -, p, i and an 's' parameter session"><figcaption><b>Figure.</b> PuTTY on COM6: key menu, then +, -, p, i and an 's' parameter session</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="../figures/step-uart-menu.png" alt="PuTTY on COM6: key menu, then +, -, p, i and an 's' parameter session"><figcaption><b>Figure.</b> PuTTY on COM6: key menu, then +, -, p, i and an 's' parameter session</figcaption></figure>
 <div class="block why"><div class="label">Note</div><p>Known cosmetic bug visible in this capture: the 'Step delay' value printed after <code>+</code>/<code>-</code> is garbage (e.g. 12888659988524 us). Suspected cause: <code>%lu</code> in <code>xil_printf</code> (not verified); the delay variable itself is a 32-bit value.</p></div>
 <p class="links">Related: Issue <a href="../issues.html#i-14">I-14</a></p>
 </section>

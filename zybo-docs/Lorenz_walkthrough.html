@@ -3,8 +3,8 @@
 <title>Overview · Lorenz DDA on Zybo Z7-10 — clean build</title>
 <link rel="stylesheet" href="styles.css"></head>
 <body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — clean build</p><p class="sub">Working flow only, from the second fresh start</p>
-<!-- <a class="switch" href="../full/index.html">↔ Switch to the full site</a> -->
-<a class="l cur" href="index.html">Overview and contents</a>
+<!-- <a class="switch" href="full/index.html">↔ Switch to the full site</a> -->
+<a class="l cur" href="Lorenz_walkthrough.html">Overview and contents</a>
 <a class="l" href="01-architecture.html">01 Architecture</a>
 <h4>Build log</h4>
 <a class="l sub2" href="02-build-log/01-environment.html">01 Environment</a>
@@ -21,11 +21,11 @@
 <a class="l" href="gotchas.html">Gotchas</a>
 <a class="l" href="reference.html">Reference and snippets</a></nav><main><h1>Lorenz DDA on Zybo Z7-10 — clean build</h1>
 <p class="lead">How the Lorenz-attractor plotter was built on the Zybo Z7-10, following only the flow that worked: a fresh Digilent HDMI demo plus a custom AXI-Lite Lorenz IP and a small PS program.</p>
-<div class="card"><b>Scope.</b> Starts at the <b>second restart from a fresh Digilent demo</b>. <!-- Earlier attempts (a hand-simplified design, then a first fresh restart) are only mentioned where a lesson carries over; their story is in the <a href="../full/index.html">full-history site</a>. Issue IDs are the same in both sites. -->Earlier attempts (a hand-simplified design, then a first fresh restart) were abandoned; only the lessons that still matter are kept, as prerequisites and gotchas.</div>
+<div class="card"><b>Scope.</b> Starts at the <b>second restart from a fresh Digilent demo</b>. <!-- Earlier attempts (a hand-simplified design, then a first fresh restart) are only mentioned where a lesson carries over; their story is in the <a href="full/index.html">full-history site</a>. Issue IDs are the same in both sites. -->Earlier attempts (a hand-simplified design, then a first fresh restart) were abandoned; only the lessons that still matter are kept, as prerequisites and gotchas.</div>
 <div class="card"><b>Result.</b> A Lorenz attractor computed in the FPGA fabric, plotted by the ARM core as three phase-plane projections plus a parameter panel on a 1920×1080 HDMI display; UART keys change speed and parameters; the board runs the project from an SD card just by powering it on.</div>
 <h2>Video walkthrough</h2>
 <p>A screen recording of the whole project flow, focused on how the tool interfaces are used. Watch it once for orientation, then follow the build-log pages step by step.</p>
-<figure class="fig"><video controls preload="metadata" src="../figures/walkthrough-tool-flow-web.mp4">Your browser can't play this video. <a href="../figures/walkthrough-tool-flow-web.mp4">Download it</a> instead.</video><figcaption><b>Video.</b> Project flow through the tool interfaces (13 min 30 s).</figcaption></figure>
+<figure class="fig"><video controls preload="metadata" src="figures/walkthrough-tool-flow-web.mp4">Your browser can't play this video. <a href="figures/walkthrough-tool-flow-web.mp4">Download it</a> instead.</video><figcaption><b>Video.</b> Project flow through the tool interfaces (13 min 30 s).</figcaption></figure>
 <h2>Architecture at a glance</h2>
 <svg class="diagram" viewBox="0 0 900 400" role="img" aria-label="Block diagram: PS software, AXI-Lite control of the Lorenz IP, and the HDMI video path through DDR and the VDMA">
 <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z"/></marker></defs>

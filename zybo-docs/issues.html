@@ -3,8 +3,8 @@
 <title>Issues · Lorenz DDA on Zybo Z7-10 — clean build</title>
 <link rel="stylesheet" href="styles.css"></head>
 <body><nav class="side"><p class="brand">Lorenz DDA on Zybo Z7-10 — clean build</p><p class="sub">Working flow only, from the second fresh start</p>
-<!-- <a class="switch" href="../full/index.html">↔ Switch to the full site</a> -->
-<a class="l" href="index.html">Overview and contents</a>
+<!-- <a class="switch" href="full/index.html">↔ Switch to the full site</a> -->
+<a class="l" href="Lorenz_walkthrough.html">Overview and contents</a>
 <a class="l" href="01-architecture.html">01 Architecture</a>
 <h4>Build log</h4>
 <a class="l sub2" href="02-build-log/01-environment.html">01 Environment</a>
@@ -31,7 +31,7 @@
 <tr><td><a href="#i-17">I-17</a></td><td><code>git push</code> rejected: file over 100 MB</td><td><span class="tag resolved">resolved</span></td></tr>
 <tr><td><a href="#i-18">I-18</a></td><td>Stale <code>BOOT.BIN</code> / Create Boot Image fails</td><td><span class="tag resolved">resolved</span></td></tr>
 </table>
-<!-- <div class="card"><b>Earlier-attempt problems that shaped this flow (not met in it):</b> <a href="../full/issues.html#i-01">I-01</a> Vivado spawn error (ASCII computer name), <a href="../full/issues.html#i-02">I-02</a> path length (short packaging folder), <a href="../full/issues.html#i-05">I-05</a> solver stuck at zero (why <code>load</code> exists), <a href="../full/issues.html#i-09">I-09</a> broken HP0 interconnect, <a href="../full/issues.html#i-12">I-12</a> stale bitstream / data abort, <a href="../full/issues.html#i-13">I-13</a> axi_dynclk black box. The last three disappeared after restarting from a fresh Digilent project.</div> -->
+<!-- <div class="card"><b>Earlier-attempt problems that shaped this flow (not met in it):</b> <a href="full/issues.html#i-01">I-01</a> Vivado spawn error (ASCII computer name), <a href="full/issues.html#i-02">I-02</a> path length (short packaging folder), <a href="full/issues.html#i-05">I-05</a> solver stuck at zero (why <code>load</code> exists), <a href="full/issues.html#i-09">I-09</a> broken HP0 interconnect, <a href="full/issues.html#i-12">I-12</a> stale bitstream / data abort, <a href="full/issues.html#i-13">I-13</a> axi_dynclk black box. The last three disappeared after restarting from a fresh Digilent project.</div> -->
 <article class="issue-entry" id="i-03"><h3><span class="id">I-03</span>IP instance upgrade: stale definition / port-width warnings <span class="tag resolved">resolved</span></h3>
 <dl class="kv"><dt>Symptom</dt><dd><code>ip_upgrade.log</code> ends in CAUTION with <code>IP_Flow 19-4706</code> (port width differs), <code>19-3374</code> (disabled parameter ignored) and Critical Warning <code>Coretcl 2-1280</code>.</dd><dt>Trigger</dt><dd>Report IP Status → Upgrade Selected on <code>design_1_lorenz_dda_driver_0_0</code> after repackaging the IP.</dd></dl>
 <div class="block issue"><div class="label">How it was diagnosed</div><ul><li>Log: Rev 1 → Rev 3, address ports 5 → 7 bits, disabled-parameter warning, Critical Warning.</li><li>The old instance came from the 7-register wizard version (<code>WIZ_NUM_REG {7}</code> → 5-bit bus). The Rev 3 Verilog has <code>OPT_MEM_ADDR_BITS = 4</code> + <code>ADDR_LSB = 2</code> = 7 bits for 12 registers.</li></ul></div>
@@ -48,9 +48,9 @@ upgrade_ip [get_ips design_1_lorenz_dda_driver_0_0]
 get_property CONFIG.C_S00_AXI_ADDR_WIDTH [get_ips design_1_lorenz_dda_driver_0_0]   ;# expect 7
 validate_bd_design
 save_bd_design</code></pre></div>
-<figure class="fig"><img loading="lazy" src="../figures/issue-ip-upgrade-report.png" alt="ip_upgrade.log: upgraded port widths 7 differ from original width 5"><figcaption><b>Figure.</b> ip_upgrade.log: upgraded port widths 7 differ from original width 5</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="figures/issue-ip-upgrade-report.png" alt="ip_upgrade.log: upgraded port widths 7 differ from original width 5"><figcaption><b>Figure.</b> ip_upgrade.log: upgraded port widths 7 differ from original width 5</figcaption></figure>
 <p class="links">Seen in: <a href="02-build-log/04-block-design.html#step-ip-upgrade">04.4 Upgrade the instance to revision 3</a></p>
-<!-- <p class="links">Full-history version: <a href="../full/issues.html#i-03">I-03</a></p> -->
+<!-- <p class="links">Full-history version: <a href="full/issues.html#i-03">I-03</a></p> -->
 </article>
 <article class="issue-entry" id="i-06"><h3><span class="id">I-06</span>Vitis platform / BSP does not match the hardware <span class="tag resolved">resolved</span></h3>
 <dl class="kv"><dt>Symptom</dt><dd>No <code>LORENZ</code> macro in <code>xparameters.h</code>; the Lorenz code is silently compiled out.</dd><dt>Trigger</dt><dd>Starting PS work with a platform still built from the Digilent XSA (dated 2024-07-04).</dd></dl>
@@ -61,7 +61,7 @@ save_bd_design</code></pre></div>
 #define XPAR_LORENZ_DDA_DRIVER_0_S00_AXI_BASEADDR 0x43C30000</code></pre></div>
 <p class="figtext"><b>Figure (text only).</b> Searching the file for <code>LORENZ</code> finds one define, <code>XPAR_LORENZ_DDA_DRIVER_0_S00_AXI_BASEADDR</code> (see the snippet above).</p>
 <p class="links">Seen in: <a href="02-build-log/06-vitis-platform.html#step-platform-update">06.1 Update the Vitis platform</a></p>
-<!-- <p class="links">Full-history version: <a href="../full/issues.html#i-06">I-06</a></p> -->
+<!-- <p class="links">Full-history version: <a href="full/issues.html#i-06">I-06</a></p> -->
 </article>
 <article class="issue-entry" id="i-07"><h3><span class="id">I-07</span>Platform build fails in <code>lorenz_dda_driver_v1_0</code> (Makefile typo) <span class="tag resolved">resolved</span></h3>
 <dl class="kv"><dt>Symptom</dt><dd>gcc error: <code>(ildcard: linker input file not found</code>; then 'Failed to generate the platform' and <code>cannot find -lrsa</code>.</dd><dt>Trigger</dt><dd>Build Project on the platform right after Update Hardware Specification.</dd></dl>
@@ -82,7 +82,7 @@ LIBSOURCES=$(wildcard *.c)
 OUTS = $(wildcard *.o)</code></pre></div>
 <p class="figtext"><b>Figure (text only).</b> The console output is the log excerpt above.</p>
 <p class="links">Seen in: <a href="02-build-log/06-vitis-platform.html#step-makefile-fix">06.2 Fix the driver Makefile typo</a></p>
-<!-- <p class="links">Full-history version: <a href="../full/issues.html#i-07">I-07</a></p> -->
+<!-- <p class="links">Full-history version: <a href="full/issues.html#i-07">I-07</a></p> -->
 </article>
 <article class="issue-entry" id="i-10"><h3><span class="id">I-10</span>Vitis projects point at Digilent's old workspace <code>D:/Zybo-Z7-SW</code> <span class="tag resolved">resolved</span></h3>
 <dl class="kv"><dt>Symptom</dt><dd>Build: platform file not found; later Create Boot Image cannot find the platform.</dd><dt>Trigger</dt><dd>Create Boot Image on <code>Zybo-Z7-10-HDMI_system</code>.</dd></dl>
@@ -90,7 +90,7 @@ OUTS = $(wildcard *.o)</code></pre></div>
 <div class="block issue"><div class="label">Root cause</div><p>Digilent's archive was created in a different workspace location.</p></div>
 <div class="block did"><div class="label">Fix / workaround</div><ul><li>Point <code>Zybo-Z7-10-HDMI_system.sprj</code> at <code>ivan_lorenz_hdmi/design_1_wrapper/export/design_1_wrapper/design_1_wrapper.xpfm</code> (Vitis closed), then Refresh the project.</li><li>The dead <code>D:/Zybo-Z7-SW</code> include/linker paths in <code>.cproject</code> were left alone; the ELF builds.</li></ul></div>
 <p class="links">Seen in: <a href="02-build-log/09-run-sd-boot.html#step-sd-image">09.2 Create the boot image</a></p>
-<!-- <p class="links">Full-history version: <a href="../full/issues.html#i-10">I-10</a></p> -->
+<!-- <p class="links">Full-history version: <a href="full/issues.html#i-10">I-10</a></p> -->
 </article>
 <article class="issue-entry" id="i-14"><h3><span class="id">I-14</span><code>xil_printf</code> has no <code>%f</code>; prompts missing on <code>s</code> <span class="tag resolved">resolved</span></h3>
 <dl class="kv"><dt>Symptom</dt><dd>Pressing <code>s</code> shows no <code>[value]</code> prompts and nothing seems to update.</dd><dt>Trigger</dt><dd>New parameter-entry command.</dd></dl>
@@ -110,9 +110,9 @@ OUTS = $(wildcard *.o)</code></pre></div>
 		return current;
 	return (float) atof(buf);
 }</code></pre></div>
-<figure class="fig"><img loading="lazy" src="../figures/step-uart-menu.png" alt="Terminal: key menu and an 's' prompt"><figcaption><b>Figure.</b> Terminal: key menu and an 's' prompt</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="figures/step-uart-menu.png" alt="Terminal: key menu and an 's' prompt"><figcaption><b>Figure.</b> Terminal: key menu and an 's' prompt</figcaption></figure>
 <p class="links">Seen in: <a href="02-build-log/08-plotter-demo.html#step-keys">08.7 UART keys and the &lt;code&gt;s&lt;/code&gt; command</a></p>
-<!-- <p class="links">Full-history version: <a href="../full/issues.html#i-14">I-14</a></p> -->
+<!-- <p class="links">Full-history version: <a href="full/issues.html#i-14">I-14</a></p> -->
 </article>
 <article class="issue-entry" id="i-15"><h3><span class="id">I-15</span>YZ and XZ plot colours swapped <span class="tag resolved">resolved</span></h3>
 <dl class="kv"><dt>Symptom</dt><dd>Colours did not match the labels/comments.</dd><dt>Trigger</dt><dd>Code review while rebuilding the layout.</dd></dl>
@@ -131,7 +131,7 @@ frame[addr + 2] = green;  /* third byte  */
 /* after drawing, push pixels out of the D-cache so the VDMA scans fresh data: */
 Xil_DCacheFlushRange((unsigned int) pFrames[dispCtrl.curFrame], DEMO_MAX_FRAME);</code></pre></div>
 <p class="links">Seen in: <a href="02-build-log/08-plotter-demo.html#step-colors">08.8 Colour order</a></p>
-<!-- <p class="links">Full-history version: <a href="../full/issues.html#i-15">I-15</a></p> -->
+<!-- <p class="links">Full-history version: <a href="full/issues.html#i-15">I-15</a></p> -->
 </article>
 <article class="issue-entry" id="i-16"><h3><span class="id">I-16</span>Plot clipped and slow <span class="tag resolved">resolved</span></h3>
 <dl class="kv"><dt>Symptom</dt><dd>First run: trace crawled; plots looked cut off at the box edge.</dd><dt>Trigger</dt><dd>First working run of the plotter.</dd></dl>
@@ -158,7 +158,7 @@ void LorenzDDAPlot_Update(u8 *frame, u32 stride, u32 baseAddr)
 }</code></pre></div>
 <p class="figtext"><b>Figure (text only).</b> First run: the traces looked cut off at the plot-box edge; the boxes were then enlarged.</p>
 <p class="links">Seen in: <a href="02-build-log/08-plotter-demo.html#step-speed-tuning">08.9 Speed and layout tuning</a></p>
-<!-- <p class="links">Full-history version: <a href="../full/issues.html#i-16">I-16</a></p> -->
+<!-- <p class="links">Full-history version: <a href="full/issues.html#i-16">I-16</a></p> -->
 </article>
 <article class="issue-entry" id="i-17"><h3><span class="id">I-17</span><code>git push</code> rejected: file over 100 MB <span class="tag resolved">resolved</span></h3>
 <dl class="kv"><dt>Symptom</dt><dd>GH001: <code>Zybo-Z7-10-HDMI-hw.xpr.zip</code> is 117.17 MB, over GitHub's 100 MB limit.</dd><dt>Trigger</dt><dd>Pushing two local commits.</dd></dl>
@@ -175,7 +175,7 @@ _ide/  Debug/  Release/
 # plus the two Digilent release archives:
 *.zip</code></pre></div>
 <p class="links">Seen in: <a href="02-build-log/09-run-sd-boot.html#step-gitignore">09.4 Keep the repo pushable</a></p>
-<!-- <p class="links">Full-history version: <a href="../full/issues.html#i-17">I-17</a></p> -->
+<!-- <p class="links">Full-history version: <a href="full/issues.html#i-17">I-17</a></p> -->
 </article>
 <article class="issue-entry" id="i-18"><h3><span class="id">I-18</span>Stale <code>BOOT.BIN</code> / Create Boot Image fails <span class="tag resolved">resolved</span></h3>
 <dl class="kv"><dt>Symptom</dt><dd>The only <code>BOOT.BIN</code> on disk was dated 2024-07-04; Create Boot Image errored.</dd><dt>Trigger</dt><dd>Making the design boot from SD.</dd></dl>
@@ -191,9 +191,9 @@ the_ROM_image:
 }</code></pre></div>
 <div class="block codeb"><div class="label">Code · command-line alternative to Create Boot Image <span style="opacity:.7">(shell)</span></div><div class="where">system.bif = fsbl.elf + &lt;bitstream&gt; + application ELF</div><pre><code>cd ivan_lorenz_hdmi/Zybo-Z7-10-HDMI_system/Debug
 bootgen -image system.bif -o sd_card/BOOT.BIN -w</code></pre></div>
-<figure class="fig"><img loading="lazy" src="../figures/step-vitis-create-boot-image.png" alt="Create Boot Image dialog"><figcaption><b>Figure.</b> Create Boot Image dialog</figcaption></figure>
+<figure class="fig"><img loading="lazy" src="figures/step-vitis-create-boot-image.png" alt="Create Boot Image dialog"><figcaption><b>Figure.</b> Create Boot Image dialog</figcaption></figure>
 <p class="links">Seen in: <a href="02-build-log/09-run-sd-boot.html#step-sd-image">09.2 Create the boot image</a></p>
-<!-- <p class="links">Full-history version: <a href="../full/issues.html#i-18">I-18</a></p> -->
+<!-- <p class="links">Full-history version: <a href="full/issues.html#i-18">I-18</a></p> -->
 </article>
 <div class="foot">Generated from the project's chat history, git log and source files. Screenshots live in <code>docs-site/figures/</code> (see its README).</div>
 </main></body></html>
