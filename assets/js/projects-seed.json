@@ -1,0 +1,107 @@
+[
+ {
+  "img": "assets/img/portfolio/asic2_cover.jpg",
+  "alt": "DNA Alignment ASIC layout next to the wire-bonded chip",
+  "title": "DNA Alignment Chip (ASIC)",
+  "blurb": "chip taped out, now validating",
+  "href": "project-asic2.html"
+ },
+ {
+  "img": "assets/img/encryption.png",
+  "alt": "AES-128 FPGA Encryption",
+  "title": "AES-128 FPGA Encryption (ECE 5760 Final)",
+  "blurb": "hardware AES on DE1-SoC with VGA",
+  "href": "project-fpga-final.html"
+ },
+ {
+  "img": "assets/img/portfolio/rmidi.png",
+  "alt": "RiffMIDI",
+  "title": "RiffMIDI",
+  "blurb": "a guitar anyone can play",
+  "href": "project-riffMIDI.html"
+ },
+ {
+  "img": "assets/img/portfolio/asic1block.png",
+  "alt": "Popcorn Chip",
+  "title": "Popcorn Chip (ASIC)",
+  "blurb": "chip taped out, now validating",
+  "href": "project-asic1.html"
+ },
+ {
+  "img": "assets/img/portfolio/fpga1cover.png",
+  "alt": "Hardware Math Solver",
+  "title": "Hardware Math Solver (FPGA)",
+  "blurb": "digital logic on hardware",
+  "href": "project-fpga1.html"
+ },
+ {
+  "img": "assets/img/portfolio/fpga2cover.png",
+  "alt": "The Shape That Never Ends",
+  "title": "The Shape That Never Ends (FPGA)",
+  "blurb": "digital logic on hardware",
+  "href": "project-fpga2.html"
+ },
+ {
+  "img": "assets/img/portfolio/fpga3cover.png",
+  "alt": "Drum Synthesizer",
+  "title": "Drum Synthesizer (FPGA)",
+  "blurb": "digital logic on hardware",
+  "href": "project-fpga3.html"
+ },
+ {
+  "img": "assets/img/portfolio/galton_cover.jpg",
+  "alt": "Digital Galton Board",
+  "title": "Digital Galton Board (Pico 2)",
+  "blurb": "16,900 balls at 60 fps, dual-core + VGA",
+  "href": "project-galton.html"
+ },
+ {
+  "img": "assets/img/portfolio/birdsong_cover.jpg",
+  "alt": "Birdsong Synthesizer",
+  "title": "Birdsong Synthesizer (Pico 2)",
+  "blurb": "DDS audio on a microcontroller",
+  "href": "project-birdsong.html"
+ },
+ {
+  "img": "assets/img/portfolio/midi.png",
+  "alt": "MIDI Visualizer",
+  "title": "MIDI Visualizer",
+  "blurb": "piano visual effects app",
+  "href": "project-midi.html"
+ },
+ {
+  "img": "assets/img/portfolio/SRAMArray.png",
+  "alt": "SRAM Array",
+  "title": "SRAM Array",
+  "blurb": "1KB 32x32 6T SRAM array",
+  "href": "project-sram.html"
+ },
+ {
+  "img": "assets/img/portfolio/ALU_top.png",
+  "alt": "ALU-minati",
+  "title": "ALU-minati",
+  "blurb": "optimized arithmetic unit",
+  "href": "project-alu.html"
+ },
+ {
+  "img": "assets/img/portfolio/ikiwiki.png",
+  "alt": "i-kiwi-ki",
+  "title": "i-kiwi-ki",
+  "blurb": "survival game with gyroscopic controller",
+  "href": "project-ikiwiki.html"
+ },
+ {
+  "img": "assets/img/portfolio/mcp.png",
+  "alt": "Multi-Core Processor",
+  "title": "Multi-Core Processor",
+  "blurb": "simulated & verified multicore CPU",
+  "href": "project-mcp.html"
+ },
+ {
+  "img": "assets/img/portfolio/vu_green.png",
+  "alt": "LED VU Meter",
+  "title": "LED VU Meter",
+  "blurb": "embedded systems final project",
+  "href": "project-vu.html"
+ }
+]

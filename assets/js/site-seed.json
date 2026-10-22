@@ -1,0 +1,186 @@
+{
+ "courses": [
+  {
+   "group": "Computer related courses",
+   "title": "Computing Using Python",
+   "desc": "CS 1110: Python course emphasizing software development principles, procedures, functions, iteration, recursion, arrays, strings, algorithm design, and object-oriented programming."
+  },
+  {
+   "group": "Computer related courses",
+   "title": "The Complete Python Bootcamp From Zero to Hero in Python",
+   "desc": "<a href=\"https://www.udemy.com/certificate/UC-3ba0500a-494c-45b3-801f-e7ca6546d438/\" target=\"_blank\">Udemy Certificate Link</a>"
+  },
+  {
+   "group": "Computer related courses",
+   "title": "Object-Oriented Programming & Data Structures",
+   "desc": "CS 2110: Java course emphasizing Data Structures, asymptotic complexity, big \"O\" notation, recursion, searching/sorting and graph algorithms."
+  },
+  {
+   "group": "Computer related courses",
+   "title": "Digital Logic & Computer Organization",
+   "desc": "ECE 2300: Learn Boolean logic, state machines, digital logic design, memory systems, and CPU basics, with hands-on FPGA projects."
+  },
+  {
+   "group": "Computer related courses",
+   "title": "Embedded Systems",
+   "desc": "ECE 3140: Interaction between hardware, software, and the physical world. Topics: assembly language, interrupts, I/O, concurrency, scheduling, resource management, and real-time constraints."
+  },
+  {
+   "group": "Computer related courses",
+   "title": "C++ for Programmers Course",
+   "desc": "<a href=\"https://www.codecademy.com/profiles/fkhan1209/certificates/ddc94032dd07fd43ee02f994e8f72af9\" target=\"_blank\">Codecademy Certificate Link</a>"
+  },
+  {
+   "group": "Computer related courses",
+   "title": "Data Science",
+   "desc": "ECE 2720: Intro to data science for engineers. Data workflow, PCA, probability, statistical inference, and Python projects with ethical considerations."
+  },
+  {
+   "group": "Computer related courses",
+   "title": "Intro to Circuits",
+   "desc": "ECE 2100: Basic quantities, circuit analysis, passive &amp; active elements, Laplace transforms, lab experiments, and MATLAB modeling."
+  },
+  {
+   "group": "Computer related courses",
+   "title": "Microelectronics (Si Physics + MOSFET circuits)",
+   "desc": "ECE 3150: Microelectronics"
+  },
+  {
+   "group": "Computer related courses",
+   "title": "Intro to Digital VLSI",
+   "desc": "ECE 4740: Intro to Digital VLSI"
+  },
+  {
+   "group": "Computer related courses",
+   "title": "Computer Architecture",
+   "desc": "ECE 4750: Modern computer system architecture — processors, memories, networks — with a multicore design project."
+  },
+  {
+   "group": "Computer related courses",
+   "title": "ASIC Design",
+   "desc": "ECE 6745: Full custom and semi-custom IC design — RTL to GDSII, synthesis, place &amp; route, timing closure, and physical verification."
+  },
+  {
+   "group": "Computer related courses",
+   "title": "FPGA & Hardware Accelerator Design",
+   "desc": "ECE 5760: Advanced FPGA design using SystemVerilog and HLS — signal processing, hardware accelerators, and real-time SoC systems on DE1-SoC."
+  },
+  {
+   "group": "Computer related courses",
+   "title": "Signals and Systems",
+   "desc": "ECE 3250: Discrete- and continuous-time signals, Fourier transforms, sampling theory, vector spaces, and orthogonal expansions."
+  },
+  {
+   "group": "Computer related courses",
+   "title": "Electromagnetic Fields & Waves",
+   "desc": "ECE 3030: Maxwell's equations, wave propagation, material interactions, waveguides, antennas, and transmission lines."
+  },
+  {
+   "group": "Math courses",
+   "title": "Linear Algebra",
+   "desc": "MATH 2940"
+  },
+  {
+   "group": "Math courses",
+   "title": "Discrete Structures",
+   "desc": "CS 2800"
+  },
+  {
+   "group": "Math courses",
+   "title": "Probability & Inference",
+   "desc": "ECE 3100"
+  },
+  {
+   "group": "Math courses",
+   "title": "Differential Equations",
+   "desc": "MATH 2930"
+  },
+  {
+   "group": "Math courses",
+   "title": "Multivariable Calculus",
+   "desc": "MATH 1920"
+  }
+ ],
+ "songs": [
+  {
+   "group": "Vocals Included",
+   "title": "All is Life",
+   "src": "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1827403407&color=%2300d4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
+  },
+  {
+   "group": "Vocals Included",
+   "title": "Perilous",
+   "src": "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1712058630&color=%2300d4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
+  },
+  {
+   "group": "Vocals Included",
+   "title": "Chæm",
+   "src": "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1721192232&color=%2300d4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
+  },
+  {
+   "group": "Instrumentals",
+   "title": "Glamorous",
+   "src": "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1712058684&color=%2300d4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
+  },
+  {
+   "group": "Instrumentals",
+   "title": "Gentle",
+   "src": "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1712058132&color=%2300d4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
+  },
+  {
+   "group": "Instrumentals",
+   "title": "Memomania",
+   "src": "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1712058660&color=%2300d4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
+  },
+  {
+   "group": "Instrumentals",
+   "title": "Chasmous",
+   "src": "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1712058120&color=%2300d4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
+  },
+  {
+   "group": "Instrumentals",
+   "title": "Logichron",
+   "src": "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1712058672&color=%2300d4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
+  },
+  {
+   "group": "Instrumentals",
+   "title": "Los Encantos",
+   "src": "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1719493725&color=%2300d4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
+  },
+  {
+   "group": "Instrumentals",
+   "title": "My Way",
+   "src": "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1712058639&color=%2300d4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
+  },
+  {
+   "group": "Instrumentals",
+   "title": "Bassem 2.3 (Al-Andalus)",
+   "src": "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1712058741&color=%2300d4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
+  },
+  {
+   "group": "Instrumentals",
+   "title": "Flogga",
+   "src": "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1712058696&color=%2300d4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
+  },
+  {
+   "group": "Instrumentals",
+   "title": "Emerald",
+   "src": "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1712897280&color=%2300d4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
+  },
+  {
+   "group": "Lofi",
+   "title": "When You Smile",
+   "src": "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1712058591&color=%2300d4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
+  },
+  {
+   "group": "Lofi",
+   "title": "Chalette",
+   "src": "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1712058717&color=%2300d4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
+  },
+  {
+   "group": "Lofi",
+   "title": "Rest and Reminisce",
+   "src": "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1712063463&color=%2300d4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
+  }
+ ]
+}

@@ -159,6 +159,8 @@
     }
     @media (max-width: 576px) { .axis-grid { grid-template-columns: 1fr; } }
   </style>
+  <link href="assets/css/project-ui.css" rel="stylesheet">
+  <link href="assets/css/sim.css" rel="stylesheet">
 </head>
 
 <body>
@@ -171,14 +173,11 @@
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="nav-link" href="/index.html#hero">Home</a></li>
-          <li><a class="nav-link" href="/index.html#about">About</a></li>
-          <li><a class="nav-link active" href="/index.html#portfolio">Portfolio</a></li>
+          <li><a class="nav-link active" href="/index.html#projects">Projects</a></li>
           <li><a class="nav-link" href="/index.html#skills">Skills</a></li>
-          <li><a class="nav-link" href="/index.html#coursework">Coursework</a></li>
-          <li><a class="nav-link" href="/index.html#yt">YouTube</a></li>
-          <li><a class="nav-link" href="/index.html#resume">Resume</a></li>
-          <li><a class="nav-link" href="/index.html#pd">Songs</a></li>
+          <li><a class="nav-link" href="/index.html#experience">Experience</a></li>
+          <li><a class="nav-link" href="/index.html#courses">Courses</a></li>
+          <li><a class="nav-link" href="/index.html#music">Music</a></li>
           <li><a class="nav-link" href="/index.html#contact">Contact</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
@@ -199,7 +198,7 @@
           <h2>Project 2 — ECE 6745 Complex Digital ASIC Design</h2>
           <ol>
             <li><a href="index.html">Home</a></li>
-            <li><a href="/index.html#portfolio">Portfolio</a></li>
+            <li><a href="/index.html#projects">Portfolio</a></li>
             <li>Project Details</li>
           </ol>
         </div>
@@ -333,7 +332,7 @@
             <div class="proj-section">
               <h3>Introduction</h3>
               <p>Genomics requires more memory and computation than nearly any other field of research. Rapid growth of genomic data creates a critical bottleneck: aligning DNA sequences against each other at scale is both memory- and compute-intensive. Building a dedicated hardware accelerator is a powerful workaround to the limited throughput and parallelism of general-purpose CPUs.</p>
-              <p>As part of Cornell's ECE 6745 Complex Digital ASIC Design course, our team of three designed and taped out a Smith-Waterman algorithm accelerator targeting the TSMC 180nm node. The chip fits within a 1mm × 1mm footprint alongside the course's shared processor baseline and was submitted for fabrication in summer 2026.</p>
+              <p>As part of Cornell's ECE 6745 Complex Digital ASIC Design course, our team of three designed and taped out a Smith-Waterman algorithm accelerator targeting the TSMC 180nm node. The chip fits within a 1mm × 1mm footprint alongside the course's shared processor baseline and was submitted for fabrication in summer 2026. The fabricated chip is now back from the fab and being validated.</p>
             </div>
 
             <div class="proj-section">
@@ -483,7 +482,7 @@
 
             <div class="proj-section">
               <h3>Conclusions &amp; Future Work</h3>
-              <p>The tapeout-ready Smith-Waterman accelerator achieves a <strong>66x execution time reduction</strong> and <strong>76x energy reduction</strong> over the software baseline, completes in a fixed 77 cycles regardless of input, uses 71% of its area budget, and passes all DRC/LVS checks with no violations. The chip was submitted for fabrication in the TSMC 180nm node.</p>
+              <p>The tapeout-ready Smith-Waterman accelerator achieves a <strong>66x execution time reduction</strong> and <strong>76x energy reduction</strong> over the software baseline, completes in a fixed 77 cycles regardless of input, uses 71% of its area budget, and passes all DRC/LVS checks with no violations. The chip was fabricated in the TSMC 180nm node and is now being validated.</p>
               <p>Key takeaway: hardware specialization for a specific algorithm — even implemented in an older process node — delivers order-of-magnitude efficiency gains that a general-purpose processor cannot match. The bottleneck shifted from computation to control logic overhead.</p>
               <p>Future directions:</p>
               <ul>
@@ -529,6 +528,12 @@
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
   <script src="assets/vendor/typed.js/typed.umd.js"></script>
   <script src="assets/js/main.js"></script>
+  <script src="assets/js/sim-kit.js"></script>
+  <script src="assets/js/sims-chips.js"></script>
+  <script src="assets/js/sims-fpga.js"></script>
+  <script src="assets/js/sims-embedded.js"></script>
+  <script src="assets/js/projects-data.js"></script>
+  <script src="assets/js/project-ui.js"></script>
 
 </body>
 </html>

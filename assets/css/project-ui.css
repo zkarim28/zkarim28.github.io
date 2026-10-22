@@ -1,0 +1,70 @@
+/* Project page upgrade layer — loaded after style.css on every project-*.html page */
+#pui-progress { position: fixed; top: 0; left: 0; height: 3px; width: 0; z-index: 9999;
+  background: linear-gradient(90deg, #00d4ff, #8b5cf6); box-shadow: 0 0 12px #00d4ff; }
+
+/* at-a-glance tiles */
+.pui-glance { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin: 0 auto 8px; padding: 26px 16px 0; max-width: 1100px; }
+.pui-tile { position: relative; flex: 0 1 auto; min-width: 150px; padding: 16px 24px; text-align: center; border-radius: 16px;
+  background: linear-gradient(#0f1a30, #0f1a30) padding-box, linear-gradient(135deg, #00d4ff, #8b5cf6) border-box;
+  border: 1px solid transparent; font: 600 1.15rem/1.25 var(--mono, monospace); color: var(--text-primary, #e2e8f0);
+  box-shadow: 0 8px 30px rgba(0,0,0,.35); opacity: 0; transform: translateY(14px) scale(.96); animation: pui-in .55s cubic-bezier(.2,.9,.3,1.2) forwards; }
+.pui-tile:nth-child(2) { animation-delay: .08s; } .pui-tile:nth-child(3) { animation-delay: .16s; } .pui-tile:nth-child(4) { animation-delay: .24s; }
+.pui-tile small { display: block; font: 400 10px var(--mono, monospace); letter-spacing: 1.5px; text-transform: uppercase; color: var(--cyan, #00d4ff); margin-bottom: 3px; }
+@keyframes pui-in { to { opacity: 1; transform: none; } }
+
+/* gallery */
+.portfolio-details-slider .swiper-slide img { cursor: zoom-in; }
+.pui-cap { margin: 10px 2px 0; font: 400 12px var(--mono, monospace); color: var(--text-muted, #94a3b8); min-height: 20px; }
+.pui-cap::before { content: '// '; color: var(--cyan, #00d4ff); }
+.pui-zoom { position: fixed; inset: 0; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  background: rgba(4,8,18,.92); backdrop-filter: blur(8px); padding: 20px; animation: pui-fade .2s; }
+.pui-zoom[hidden] { display: none; }
+@keyframes pui-fade { from { opacity: 0; } }
+.pui-zoom img { max-width: min(1300px, 96vw); max-height: 80vh; object-fit: contain; border-radius: 8px; background: #0d1426; box-shadow: 0 20px 80px rgba(0,0,0,.7); }
+.pui-zoom p { color: #c8d5e1; font: 400 13px var(--mono, monospace); margin: 0; text-align: center; max-width: 900px; }
+.pui-zoom button { position: absolute; top: 50%; transform: translateY(-50%); width: 46px; height: 46px; border-radius: 50%; border: 1px solid #1e3a5f;
+  background: rgba(8,13,26,.85); color: #e2e8f0; font-size: 20px; cursor: pointer; }
+.pui-zoom button:hover { border-color: #00d4ff; color: #00d4ff; }
+.pui-zoom .pz-prev { left: 18px; } .pui-zoom .pz-next { right: 18px; }
+.pui-zoom .pz-x { top: 22px; right: 22px; transform: none; }
+
+/* tabs */
+.pui-tabbar { position: sticky; top: 64px; z-index: 20; display: flex; gap: 8px; align-items: center; padding: 10px 0; margin: 0 0 26px;
+  background: rgba(8,13,26,.92); backdrop-filter: blur(10px); border-bottom: 1px solid #1e3a5f; }
+.pui-tabs { display: flex; gap: 8px; overflow-x: auto; flex: 1; scrollbar-width: none; }
+.pui-tabs::-webkit-scrollbar { display: none; }
+.pui-tab, .pui-all { flex: none; background: transparent; border: 1px solid #1e3a5f; border-radius: 999px; padding: 7px 16px; font: 400 13px var(--sans, sans-serif);
+  color: #c8d5e1; cursor: pointer; transition: .2s; white-space: nowrap; }
+.pui-tab:hover, .pui-all:hover { border-color: #00d4ff; color: #00d4ff; }
+.pui-tab.on { background: rgba(0,212,255,.14); border-color: #00d4ff; color: #00d4ff; box-shadow: 0 0 18px rgba(0,212,255,.15); }
+.pui-all { font-family: var(--mono, monospace); font-size: 12px; }
+.pui-tabbed .proj-section { display: none; margin-bottom: 0; }
+.pui-tabbed .proj-section.on { display: block; animation: pui-slide .4s ease; }
+.pui-tabbed:not(.pui-expanded) .proj-section > h3 { display: none; }
+.pui-expanded .proj-section { display: block; margin-bottom: 40px; }
+@keyframes pui-slide { from { opacity: 0; transform: translateY(14px); } }
+.proj-section p, .proj-section li { font-size: 15px !important; }
+.proj-section strong { color: #e2e8f0; font-weight: 500; }
+mark.num { background: none; color: #00d4ff; font-family: var(--mono, monospace); font-weight: 600; font-size: .93em; padding: 0 3px; border-radius: 4px;
+  background: rgba(0,212,255,.1); white-space: nowrap; }
+
+/* sidebar polish */
+.portfolio-details .portfolio-info { border: 1px solid #1e3a5f; border-radius: 16px; background: #0f1a30; }
+
+/* prev / next */
+.pui-next { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 1100px; margin: 20px auto 60px; padding: 0 16px; }
+.pui-next a { display: flex; gap: 14px; align-items: center; padding: 12px; border: 1px solid #1e3a5f; border-radius: 16px; background: #0f1a30; color: #e2e8f0; transition: .25s; }
+.pui-next a:hover { border-color: #00d4ff; transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,212,255,.12); }
+.pui-next a.nx { flex-direction: row-reverse; text-align: right; }
+.pui-next img { width: 92px; height: 62px; object-fit: cover; border-radius: 10px; flex: none; }
+.pui-next small { display: block; font: 400 11px var(--mono, monospace); color: #00d4ff; text-transform: uppercase; letter-spacing: 1px; }
+.pui-next b { font-weight: 500; font-size: 14px; line-height: 1.3; display: block; }
+@media (max-width: 640px) { .pui-next { grid-template-columns: 1fr; } .pui-tile { min-width: 120px; padding: 12px 16px; } }
+
+/* header matches the home page */
+#header .logo a { display: inline-flex; align-items: center; gap: 10px; color: #e2e8f0; font: 600 16px var(--sans, 'Poppins', sans-serif); text-transform: none; letter-spacing: 0; }
+#header .logo a::before { content: 'ZK'; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 9px; font: 600 13px var(--mono, monospace); color: #080d1a; background: linear-gradient(135deg, #00d4ff, #8b5cf6); }
+.navbar a, .navbar a:focus { font-family: var(--sans, 'Poppins', sans-serif); font-size: 14px; text-transform: none; letter-spacing: 0; padding: 6px 12px; margin-left: 4px; border-radius: 999px; }
+.navbar a:hover, .navbar .active, .navbar .active:focus { background: rgba(0,212,255,.08); }
+.pui-legend, .pui-hint { font-variant-ligatures: none; }
+@media (prefers-reduced-motion: reduce) { .pui-tile, .pui-tabbed .proj-section.on { animation: none; opacity: 1; transform: none; } }

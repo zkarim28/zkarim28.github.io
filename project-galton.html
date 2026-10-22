@@ -80,6 +80,8 @@
     .portfolio-info a { color: var(--cyan, #00d4ff); }
     .portfolio-info a:hover { color: #7ee8ff; }
   </style>
+  <link href="assets/css/project-ui.css" rel="stylesheet">
+  <link href="assets/css/sim.css" rel="stylesheet">
 </head>
 
 <body>
@@ -92,14 +94,11 @@
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="nav-link" href="/index.html#hero">Home</a></li>
-          <li><a class="nav-link" href="/index.html#about">About</a></li>
-          <li><a class="nav-link active" href="/index.html#portfolio">Portfolio</a></li>
+          <li><a class="nav-link active" href="/index.html#projects">Projects</a></li>
           <li><a class="nav-link" href="/index.html#skills">Skills</a></li>
-          <li><a class="nav-link" href="/index.html#coursework">Coursework</a></li>
-          <li><a class="nav-link" href="/index.html#yt">YouTube</a></li>
-          <li><a class="nav-link" href="/index.html#resume">Resume</a></li>
-          <li><a class="nav-link" href="/index.html#pd">Songs</a></li>
+          <li><a class="nav-link" href="/index.html#experience">Experience</a></li>
+          <li><a class="nav-link" href="/index.html#courses">Courses</a></li>
+          <li><a class="nav-link" href="/index.html#music">Music</a></li>
           <li><a class="nav-link" href="/index.html#contact">Contact</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
@@ -120,7 +119,7 @@
           <h2>Embedded Project 2 — ECE 5730</h2>
           <ol>
             <li><a href="index.html">Home</a></li>
-            <li><a href="/index.html#portfolio">Portfolio</a></li>
+            <li><a href="/index.html#projects">Portfolio</a></li>
             <li>Project Details</li>
           </ol>
         </div>
@@ -277,7 +276,7 @@
 
             <div class="proj-section">
               <h3>Results</h3>
-              <p>Running at 350 MHz with 16,900 balls on screen, we dropped 2,128,816 balls over 669 s. The measured bin distribution has a mean of 8.00 and a standard deviation of 2.05 bins, against an ideal Binomial(16, ½) with μ = 8 and σ = 2, and the two histograms are nearly identical.</p>
+              <p>Running at 350 MHz with 16,900 balls on screen, we dropped 2,128,816 balls over 669 s. The measured bin distribution has a mean of 8.00 and a standard deviation of 2.05 bins, against an ideal Binomial(16, 1/2) with μ = 8 and σ = 2, and the two histograms are nearly identical.</p>
               <p>The physical board breaks the strict i.i.d. assumptions of the central limit theorem, since the only randomness is the spawn and the later motion is deterministic and correlated. It still produces a bell curve because the dynamics amplify tiny differences and forget earlier rows within a few pegs, so the 16 rows act like nearly independent left/right choices. The curve stops looking Gaussian when bounciness is high enough that balls skip pegs.</p>
               <p>The report appendix also includes the commented source and a log of the AI-assisted portions of the code.</p>
             </div>
@@ -318,6 +317,12 @@
   <script src="assets/vendor/php-email-form/validate.js"></script>
 
   <script src="assets/js/main.js"></script>
+  <script src="assets/js/sim-kit.js"></script>
+  <script src="assets/js/sims-chips.js"></script>
+  <script src="assets/js/sims-fpga.js"></script>
+  <script src="assets/js/sims-embedded.js"></script>
+  <script src="assets/js/projects-data.js"></script>
+  <script src="assets/js/project-ui.js"></script>
 
 </body>
 </html>
