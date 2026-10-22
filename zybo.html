@@ -93,16 +93,24 @@
     color:var(--ink-soft);
     font-size:12.5px;
   }
+
+  main{max-width:1100px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+  .col h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin:0 0 14px}
+  @media (max-width:760px){.cols{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <main>
   <header>
     <h1>Zybo-Z7 Docs</h1>
-    <p>Index of Zybo-Z7 / Zynq / Vivado / Vitis write-ups. Add a link here whenever a new one gets made.</p>
+    <p>Zybo-Z7 / Zynq / Vivado / Vitis write-ups: quick mini documents on the left, complete lab documentation sites on the right.</p>
   </header>
 
-  <div class="list">
+  <div class="cols">
+    <section class="col">
+      <h2>Mini documents</h2>
+      <div class="list">
     <a class="doclink" href="zybo_fib.html">
       <span class="icon">📘</span>
       <span class="txt">
@@ -110,7 +118,6 @@
         <span>Vivado block diagram basics, GPIO/BRAM over AXI, bitstream generation, Vitis Classic setup, and combining your own HDL.</span>
       </span>
     </a>
-
     <a class="doclink" href="zybo_hdmi_fix.html">
       <span class="icon">🛠️</span>
       <span class="txt">
@@ -118,7 +125,6 @@
         <span>Reconciling diverged branches, a SyncAsync.vhd IP-packaging bug between axi_dynclk/rgb2dvi, stale HDMI-RX constraints, and a broken Vitis Classic workspace.</span>
       </span>
     </a>
-
     <a class="doclink" href="zybo_bugs.html">
       <span class="icon">🐛</span>
       <span class="txt">
@@ -126,7 +132,6 @@
         <span>Duplicate top-level HDL wrappers, stale/missing IP repository paths, and IP not showing up due to stray .txt extensions.</span>
       </span>
     </a>
-
     <a class="doclink" href="zybo_reference.html">
       <span class="icon">📑</span>
       <span class="txt">
@@ -134,7 +139,6 @@
         <span>Fast lookup, split by Vivado and Vitis: opening projects, packaging a new AXI4 IP, wiring it into a block diagram, generating a bitstream, and reading it from Vitis.</span>
       </span>
     </a>
-
     <a class="doclink" href="zybo_IP.html">
       <span class="icon">🧩</span>
       <span class="txt">
@@ -142,16 +146,22 @@
         <span>Start-to-end walkthrough combining all the best-practices steps into one tutorial, using a worked down-counter IP example.</span>
       </span>
     </a>
-
+      </div>
+    </section>
+    <section class="col">
+      <h2>Full lab documentation sites</h2>
+      <div class="list">
     <a class="doclink" href="zybo-docs/Lorenz_walkthrough.html">
       <span class="icon">🔬</span>
       <span class="txt">
-        <strong>Lorenz Attractor on Zybo-Z7 &mdash; Full Documentation Site</strong>
+        <strong>Lorenz Attractor on Zybo-Z7</strong>
         <span>Multi-page site covering the custom Lorenz IP, HDMI output, PS driver and plotter, with a clean step-by-step build and a full build log including failed attempts.</span>
       </span>
     </a>
 
-    <div class="placeholder">More Zybo write-ups go here as they're made.</div>
+        <div class="placeholder">More full lab sites go here as they're made.</div>
+      </div>
+    </section>
   </div>
 
   <footer>Not linked from site navigation — bookmark this page directly.</footer>
