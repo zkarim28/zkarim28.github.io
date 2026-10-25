@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuts by Jeffrey</title>
+  <meta name="description" content="Book a haircut with Jeffrey McMillan in Shirley and Farmingville, NY.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#16130f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #16130f; --surface: #201c17; --surface-2: #2a251e;
+      --ink: #f3ece0; --ink-dim: #c9bfae; --muted: #8f8676;
+      --line: rgba(243,236,224,0.10);
+      --accent: #d8432f; --accent-ink: #fff;
+      --accent-soft: rgba(216,67,47,0.16);
+      --gold: #d9a441;
+      --radius: 14px;
+    }
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        --bg: #f5efe4; --surface: #fffaf2; --surface-2: #efe6d6;
+        --ink: #1d1914; --ink-dim: #4a4237; --muted: #7a705f;
+        --line: rgba(29,25,20,0.12);
+        --accent: #b8321f; --accent-soft: rgba(184,50,31,0.10);
+        --gold: #9a6d17;
+      }
+    }
+    :root[data-theme="light"] {
+      --bg: #f5efe4; --surface: #fffaf2; --surface-2: #efe6d6;
+      --ink: #1d1914; --ink-dim: #4a4237; --muted: #7a705f;
+      --line: rgba(29,25,20,0.12);
+      --accent: #b8321f; --accent-soft: rgba(184,50,31,0.10);
+      --gold: #9a6d17;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font: 16px/1.55 Inter, system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; }
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+    .display { font-family: Anton, Impact, sans-serif; font-weight: 400; letter-spacing: .01em; text-transform: uppercase; line-height: 1; }
+    .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); }
+
+    /* Barber pole stripe */
+    .pole {
+      height: 6px;
+      background: repeating-linear-gradient(-45deg, var(--accent) 0 12px, var(--ink) 12px 24px, #2f5fa8 24px 36px, var(--ink) 36px 48px);
+      background-size: 68px 68px;
+      animation: pole 2.4s linear infinite;
+    }
+    @keyframes pole { to { background-position: 68px 0; } }
+    @media (prefers-reduced-motion: reduce) { .pole { animation: none; } html { scroll-behavior: auto; } }
+
+    /* Header */
+    header { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+    header .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+    .brand { font-family: Anton, Impact, sans-serif; font-size: 22px; text-transform: uppercase; text-decoration: none; letter-spacing: .02em; }
+    .brand span { color: var(--accent); }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 44px; padding: 0 20px; border-radius: 999px; border: 1px solid transparent;
+      font: 600 15px Inter, sans-serif; text-decoration: none; cursor: pointer;
+      background: var(--accent); color: var(--accent-ink); transition: transform .15s, filter .15s;
+    }
+    .btn:hover { filter: brightness(1.08); }
+    .btn:active { transform: scale(.98); }
+    .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
+    .btn.sm { min-height: 38px; padding: 0 16px; font-size: 14px; }
+
+    /* Hero */
+    .hero { padding: 72px 0 56px; }
+    .hero h1 { font-size: clamp(56px, 13vw, 128px); margin: 12px 0 16px; }
+    .hero h1 em { font-style: normal; color: var(--accent); }
+    .hero p { font-size: 18px; color: var(--ink-dim); max-width: 520px; margin: 0 0 28px; }
+    .hero .ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+
+    section { padding: 56px 0; }
+    section h2 { font-size: clamp(36px, 7vw, 56px); margin: 8px 0 28px; }
+
+    /* Locations */
+    .locs { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .loc {
+      background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 22px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .loc h3 { margin: 0; font-size: 20px; }
+    .loc .addr { color: var(--ink-dim); }
+    .loc .days { margin-top: 8px; font-size: 14px; color: var(--muted); }
+    .loc .days b { color: var(--ink); font-weight: 600; }
+    .loc a.map { margin-top: 10px; font-size: 14px; font-weight: 600; color: var(--accent); text-decoration: none; }
+    .tag { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; vertical-align: 1px; }
+    .tag.a { background: var(--accent); }
+    .tag.b { background: var(--gold); }
+
+    /* Services */
+    .services { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .svc {
+      text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 18px; color: var(--ink); font: inherit; cursor: pointer; transition: border-color .15s, background .15s;
+    }
+    .svc:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); }
+    .svc[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+    .svc .row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .svc .name { font-weight: 600; }
+    .svc .price { font-family: Anton, Impact, sans-serif; font-size: 22px; }
+    .svc .meta { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    /* Booking */
+    .book { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 24px; }
+    .steps { display: grid; grid-template-columns: 1fr; gap: 28px; }
+    @media (min-width: 860px) { .steps { grid-template-columns: 1.1fr 1fr; } }
+    .step-label { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin: 0 0 12px; }
+    .step-label b { color: var(--accent); margin-right: 6px; }
+
+    .seg { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+    .seg button {
+      flex: 1 1 90px; min-height: 44px; border-radius: 10px; border: 1px solid var(--line);
+      background: var(--surface-2); color: var(--ink); font: 600 14px Inter, sans-serif; cursor: pointer; padding: 8px 12px;
+    }
+    .seg button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+
+    .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .cal-head strong { font-size: 18px; }
+    .cal-nav { display: flex; gap: 6px; }
+    .icon-btn {
+      width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2);
+      color: var(--ink); font-size: 18px; cursor: pointer; display: grid; place-items: center;
+    }
+    .icon-btn:disabled { opacity: .3; cursor: default; }
+    .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal .dow { text-align: center; font-size: 12px; color: var(--muted); font-weight: 600; padding: 4px 0; }
+    .day {
+      position: relative; aspect-ratio: 1; min-height: 40px; border-radius: 10px; border: 1px solid transparent;
+      background: var(--surface-2); color: var(--ink); font: 600 14px Inter, sans-serif; cursor: pointer;
+    }
+    .day:disabled { background: transparent; color: var(--muted); opacity: .45; cursor: default; }
+    .day.blank { visibility: hidden; }
+    .day.today { outline: 1px dashed var(--muted); outline-offset: -3px; }
+    .day[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+    .day .dot { position: absolute; left: 50%; bottom: 5px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; }
+    .day .dot.a { background: var(--accent); }
+    .day .dot.b { background: var(--gold); }
+    .day[aria-pressed="true"] .dot { background: var(--accent-ink); }
+    .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin-top: 12px; }
+
+    .slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 8px; }
+    .slot {
+      min-height: 42px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2);
+      color: var(--ink); font: 600 14px Inter, sans-serif; cursor: pointer;
+    }
+    .slot[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+    .slot:disabled { text-decoration: line-through; opacity: .35; cursor: default; }
+    .hint { grid-column: 1 / -1; color: var(--muted); font-size: 14px; margin: 0; }
+    .where { font-size: 14px; color: var(--ink-dim); margin: -4px 0 12px; }
+
+    .fields { display: grid; gap: 12px; margin-top: 24px; }
+    @media (min-width: 520px) { .fields { grid-template-columns: 1fr 1fr; } .fields .full { grid-column: 1 / -1; } }
+    label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink-dim); }
+    input, select, textarea {
+      width: 100%; min-height: 44px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line);
+      background: var(--surface-2); color: var(--ink); font: 400 16px Inter, sans-serif;
+    }
+    textarea { min-height: 70px; resize: vertical; }
+    input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .summary {
+      margin-top: 24px; padding: 16px; border-radius: 12px; border: 1px dashed var(--line);
+      font-size: 15px; color: var(--ink-dim);
+    }
+    .summary strong { color: var(--ink); }
+    .send { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+    .send .btn { flex: 1 1 180px; }
+    .fine { font-size: 13px; color: var(--muted); margin-top: 12px; }
+
+    footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--muted); font-size: 14px; }
+    footer .wrap { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; }
+  </style>
+</head>
+<body>
+  <div class="pole" aria-hidden="true"></div>
+
+  <header>
+    <div class="wrap">
+      <a class="brand" href="#top">Cuts by <span>Jeffrey</span></a>
+      <a class="btn sm" href="#book">Book now</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap">
+        <div class="eyebrow">Barber · Shirley &amp; Farmingville, NY</div>
+        <h1 class="display">Jeffrey<br><em>McMillan</em></h1>
+        <p>Fades, tapers, lineups and beard work. Pick a shop, pick a time, and send me your request. I'll confirm by text.</p>
+        <div class="ctas">
+          <a class="btn" href="#book">Book a cut</a>
+          <a class="btn ghost" href="#locations">Where to find me</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="locations">
+      <div class="wrap">
+        <div class="eyebrow">Two chairs</div>
+        <h2 class="display">Locations</h2>
+        <div class="locs" id="locs"></div>
+      </div>
+    </section>
+
+    <section id="services">
+      <div class="wrap">
+        <div class="eyebrow">Menu</div>
+        <h2 class="display">Services</h2>
+        <div class="services" id="services-list"></div>
+      </div>
+    </section>
+
+    <section id="book">
+      <div class="wrap">
+        <div class="eyebrow">Request an appointment</div>
+        <h2 class="display">Book</h2>
+
+        <div class="book">
+          <div class="steps">
+            <div>
+              <p class="step-label"><b>1</b>Shop</p>
+              <div class="seg" id="shop-seg"></div>
+
+              <p class="step-label"><b>2</b>Day</p>
+              <div class="cal-head">
+                <strong id="cal-title"></strong>
+                <div class="cal-nav">
+                  <button class="icon-btn" id="prev" aria-label="Previous month">‹</button>
+                  <button class="icon-btn" id="next" aria-label="Next month">›</button>
+                </div>
+              </div>
+              <div class="cal" id="cal"></div>
+              <div class="legend" id="legend"></div>
+            </div>
+
+            <div>
+              <p class="step-label"><b>3</b>Time</p>
+              <p class="where" id="where"></p>
+              <div class="slots" id="slots"></div>
+
+              <div class="fields">
+                <label class="full">Service
+                  <select id="svc-select"></select>
+                </label>
+                <label>Your name
+                  <input id="name" autocomplete="name" placeholder="First & last">
+                </label>
+                <label>Phone
+                  <input id="phone" type="tel" autocomplete="tel" placeholder="(631) 555-0123">
+                </label>
+                <label class="full"><span>Notes <span style="font-weight:400;color:var(--muted)">(optional)</span></span>
+                  <textarea id="notes" placeholder="Style, length, anything I should know"></textarea>
+                </label>
+              </div>
+
+              <div class="summary" id="summary">Pick a day and time to see your request.</div>
+              <div class="send">
+                <a class="btn" id="send-imsg" role="button" aria-disabled="true">Send via iMessage</a>
+                <a class="btn ghost" id="send-mail" role="button" aria-disabled="true">Send via email</a>
+              </div>
+              <p class="fine">This sends a request, not a confirmed booking. Jeffrey will text you back to lock it in.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>© <span id="yr"></span> Jeffrey McMillan</span>
+      <a href="mailto:jeffrey.mcmillan1@icloud.com">jeffrey.mcmillan1@icloud.com</a>
+    </div>
+  </footer>
+
+  <script>
+  /* ===== CONFIG: edit this to match Jeffrey's real schedule ===== */
+  const CONTACT = "jeffrey.mcmillan1@icloud.com";
+
+  // days: 0=Sun … 6=Sat. hours: [open, close] in 24h. PLACEHOLDER schedule.
+  const SHOPS = [
+    {
+      id: "a", name: "Reyes Cuts Barbershop", short: "Shirley",
+      addr: "60 Northern Blvd, Shirley, NY",
+      maps: "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("Reyes Cuts Barbershop 60 Northern Blvd Shirley NY"),
+      days: [2, 4, 6], hours: [10, 19]
+    },
+    {
+      id: "b", name: "Danny's Barbershop", short: "Farmingville",
+      addr: "734 Horseblock Rd, Farmingville, NY 11738",
+      maps: "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("Danny's Barbershop 734 Horseblock Road Farmingville NY 11738"),
+      days: [1, 3, 5], hours: [10, 19]
+    }
+  ];
+
+  // PLACEHOLDER prices
+  const SERVICES = [
+    { id: "cut",   name: "Haircut",          price: 35, mins: 30, meta: "Fade, taper or scissor cut" },
+    { id: "cutb",  name: "Haircut + Beard",  price: 45, mins: 45, meta: "Cut plus beard shape & lineup" },
+    { id: "line",  name: "Lineup",           price: 15, mins: 15, meta: "Edge-up only" },
+    { id: "kids",  name: "Kids Cut",         price: 25, mins: 30, meta: "12 and under" }
+  ];
+
+  const SLOT_MINS = 45;          // spacing between bookable start times
+  const BOOK_AHEAD_DAYS = 42;    // how far out people can request
+  const BLOCKED_DATES = [];      // e.g. "2026-11-26" for days off
+  /* ============================================================= */
+
+  const $ = s => document.querySelector(s);
+  const pad = n => String(n).padStart(2, "0");
+  const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const fmtTime = m => { const h = Math.floor(m / 60), mm = m % 60; return `${(h % 12) || 12}:${pad(mm)} ${h < 12 ? "AM" : "PM"}`; };
+  const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const DOW_LONG = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const lastDay = new Date(today); lastDay.setDate(lastDay.getDate() + BOOK_AHEAD_DAYS);
+
+  const state = { shop: "any", date: null, time: null, svc: SERVICES[0].id, view: new Date(today.getFullYear(), today.getMonth(), 1) };
+
+  const shopFor = d => SHOPS.find(s => s.days.includes(d.getDay()));
+  const isOpen = d => {
+    if (d < today || d > lastDay || BLOCKED_DATES.includes(ymd(d))) return false;
+    const s = shopFor(d);
+    return !!s && (state.shop === "any" || s.id === state.shop);
+  };
+
+  /* Locations */
+  $("#locs").innerHTML = SHOPS.map(s => `
+    <div class="loc">
+      <h3><span class="tag ${s.id}"></span>${s.name}</h3>
+      <div class="addr">${s.addr}</div>
+      <div class="days"><b>${s.days.map(d => DOW_LONG[d]).join(", ")}</b><br>${fmtTime(s.hours[0] * 60)} – ${fmtTime(s.hours[1] * 60)}</div>
+      <a class="map" href="${s.maps}" target="_blank" rel="noopener">Open in Maps →</a>
+    </div>`).join("");
+
+  /* Services */
+  function renderServices() {
+    $("#services-list").innerHTML = SERVICES.map(s => `
+      <button class="svc" data-svc="${s.id}" aria-pressed="${s.id === state.svc}">
+        <div class="row"><span class="name">${s.name}</span><span class="price">$${s.price}</span></div>
+        <div class="meta">${s.meta} · ${s.mins} min</div>
+      </button>`).join("");
+    $("#svc-select").innerHTML = SERVICES.map(s => `<option value="${s.id}" ${s.id === state.svc ? "selected" : ""}>${s.name} · $${s.price}</option>`).join("");
+  }
+  $("#services-list").addEventListener("click", e => {
+    const b = e.target.closest("[data-svc]"); if (!b) return;
+    state.svc = b.dataset.svc; renderServices(); update();
+    $("#book").scrollIntoView();
+  });
+  $("#svc-select").addEventListener("change", e => { state.svc = e.target.value; renderServices(); update(); });
+
+  /* Shop toggle */
+  function renderShops() {
+    const opts = [{ id: "any", label: "Either shop" }, ...SHOPS.map(s => ({ id: s.id, label: s.short }))];
+    $("#shop-seg").innerHTML = opts.map(o => `<button data-shop="${o.id}" aria-pressed="${o.id === state.shop}">${o.id !== "any" ? `<span class="tag ${o.id}"></span>` : ""}${o.label}</button>`).join("");
+    $("#legend").innerHTML = SHOPS.map(s => `<span><span class="tag ${s.id}"></span>${s.short}</span>`).join("");
+  }
+  $("#shop-seg").addEventListener("click", e => {
+    const b = e.target.closest("[data-shop]"); if (!b) return;
+    state.shop = b.dataset.shop;
+    if (state.date && !isOpen(state.date)) { state.date = null; state.time = null; }
+    renderShops(); renderCal(); renderSlots(); update();
+  });
+
+  /* Calendar */
+  function renderCal() {
+    const v = state.view, y = v.getFullYear(), m = v.getMonth();
+    $("#cal-title").textContent = v.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+    $("#prev").disabled = y === today.getFullYear() && m === today.getMonth();
+    $("#next").disabled = new Date(y, m + 1, 1) > lastDay;
+    let html = DOW.map(d => `<div class="dow">${d[0]}</div>`).join("");
+    const first = new Date(y, m, 1).getDay(), n = new Date(y, m + 1, 0).getDate();
+    for (let i = 0; i < first; i++) html += `<button class="day blank" tabindex="-1" aria-hidden="true"></button>`;
+    for (let d = 1; d <= n; d++) {
+      const dt = new Date(y, m, d), open = isOpen(dt), s = shopFor(dt);
+      const sel = state.date && ymd(state.date) === ymd(dt);
+      html += `<button class="day${ymd(dt) === ymd(today) ? " today" : ""}" data-date="${ymd(dt)}" ${open ? "" : "disabled"} aria-pressed="${!!sel}"
+        aria-label="${dt.toDateString()}${open ? ", " + s.short : ", unavailable"}">${d}${open ? `<span class="dot ${s.id}"></span>` : ""}</button>`;
+    }
+    $("#cal").innerHTML = html;
+  }
+  $("#cal").addEventListener("click", e => {
+    const b = e.target.closest("[data-date]"); if (!b || b.disabled) return;
+    const [y, m, d] = b.dataset.date.split("-").map(Number);
+    state.date = new Date(y, m - 1, d); state.time = null;
+    renderCal(); renderSlots(); update();
+  });
+  $("#prev").onclick = () => { state.view = new Date(state.view.getFullYear(), state.view.getMonth() - 1, 1); renderCal(); };
+  $("#next").onclick = () => { state.view = new Date(state.view.getFullYear(), state.view.getMonth() + 1, 1); renderCal(); };
+
+  /* Time slots */
+  function renderSlots() {
+    if (!state.date) {
+      $("#where").textContent = "";
+      $("#slots").innerHTML = `<p class="hint">Choose a day first.</p>`;
+      return;
+    }
+    const s = shopFor(state.date);
+    $("#where").innerHTML = `<span class="tag ${s.id}"></span>${s.name} · ${state.date.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}`;
+    const now = new Date(), isToday = ymd(state.date) === ymd(now);
+    const nowMins = now.getHours() * 60 + now.getMinutes();
+    let html = "";
+    for (let t = s.hours[0] * 60; t + 30 <= s.hours[1] * 60; t += SLOT_MINS) {
+      const past = isToday && t <= nowMins + 60;
+      html += `<button class="slot" data-time="${t}" ${past ? "disabled" : ""} aria-pressed="${state.time === t}">${fmtTime(t)}</button>`;
+    }
+    $("#slots").innerHTML = html;
+  }
+  $("#slots").addEventListener("click", e => {
+    const b = e.target.closest("[data-time]"); if (!b || b.disabled) return;
+    state.time = Number(b.dataset.time); renderSlots(); update();
+  });
+
+  /* Summary + send links */
+  ["#name", "#phone", "#notes"].forEach(id => $(id).addEventListener("input", update));
+
+  function update() {
+    const svc = SERVICES.find(s => s.id === state.svc);
+    const name = $("#name").value.trim(), phone = $("#phone").value.trim(), notes = $("#notes").value.trim();
+    const ready = state.date && state.time != null && name;
+    const imsg = $("#send-imsg"), mail = $("#send-mail");
+
+    if (!state.date || state.time == null) {
+      $("#summary").textContent = "Pick a day and time to see your request.";
+    } else {
+      const s = shopFor(state.date);
+      const when = state.date.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+      $("#summary").innerHTML = `<strong>${svc.name}</strong> ($${svc.price}) at <strong>${s.name}</strong><br>${when} at <strong>${fmtTime(state.time)}</strong>${name ? "" : "<br><em>Add your name to send.</em>"}`;
+    }
+
+    if (!ready) {
+      [imsg, mail].forEach(a => { a.removeAttribute("href"); a.setAttribute("aria-disabled", "true"); a.style.opacity = .4; });
+      return;
+    }
+    const s = shopFor(state.date);
+    const when = state.date.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+    const body = [
+      `Hi Jeffrey, I'd like to book a ${svc.name.toLowerCase()}.`,
+      `${when} at ${fmtTime(state.time)}`,
+      `${s.name} (${s.short})`,
+      `Name: ${name}` + (phone ? ` · ${phone}` : ""),
+      notes ? `Notes: ${notes}` : ""
+    ].filter(Boolean).join("\n");
+
+    // "?&body=" works for both iOS and Android sms: handlers
+    imsg.href = `sms:${CONTACT}?&body=${encodeURIComponent(body)}`;
+    mail.href = `mailto:${CONTACT}?subject=${encodeURIComponent(`Booking request: ${when} ${fmtTime(state.time)}`)}&body=${encodeURIComponent(body)}`;
+    [imsg, mail].forEach(a => { a.removeAttribute("aria-disabled"); a.style.opacity = ""; });
+  }
+
+  $("#yr").textContent = today.getFullYear();
+  renderServices(); renderShops(); renderCal(); renderSlots(); update();
+  </script>
+</body>
+</html>
