@@ -1,0 +1,3 @@
+/* index.html only: remove all rounded edges */
+:root { --r: 0; }
+*, *::before, *::after { border-radius: 0 !important; }
